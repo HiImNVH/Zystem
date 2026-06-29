@@ -1,6 +1,8 @@
 // backend/src/routes/routes.character.js
-// Version: 3.0
-// Cap nhat: Gan verifyToken + verifyPlayerOwnership
+// Version: 4.0
+// Cap nhat: Nhan startingJobCode khi tao nhan vat
+//           GET /account/me tra ve nhan vat duy nhat (khong phai mang)
+//           Kiem tra da co nhan vat truoc khi cho tao
 
 const express = require('express');
 const characterRouter = express.Router();
@@ -11,24 +13,30 @@ const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware
 /**
  * @route   POST /api/characters
  * @access  Protected
- * @body    { characterName }
+ * @body    { characterName, startingJobCode }
+ * @desc    Tao nhan vat moi — moi account chi duoc tao 1 nhan vat
+ *          startingJobCode: nghe khoi dau se duoc day len cap 20 ngay lap tuc
  */
 characterRouter.post('/', verifyToken, async (req, res, next) => {
-    const { characterName } = req.body;
+    const { characterName, startingJobCode } = req.body;
 
     if (!characterName || characterName.trim() === '') {
-        return res.status(400).json({ success: false, message: 'Ten nhan vat khong duoc de trong!' });
+        return res.status(400).json({ success: false, message: 'Ten nhan vat khong duoc de trong.' });
     }
 
     if (characterName.trim().length < 3 || characterName.trim().length > 50) {
         return res.status(400).json({ success: false, message: 'Ten nhan vat phai tu 3 den 50 ky tu.' });
     }
 
+    if (!startingJobCode) {
+        return res.status(400).json({ success: false, message: 'Phai chon nghe khoi dau (startingJobCode).' });
+    }
+
     try {
-        // Gan accountId tu token — khong nhan tu body de tranh gia mao
         const newPlayer = await characterRepository.createCharacter({
-            accountId:     req.accountId,
-            characterName: characterName.trim()
+            accountId:       req.accountId,
+            characterName:   characterName.trim(),
+            startingJobCode: startingJobCode
         });
 
         if (!newPlayer) {
@@ -41,7 +49,7 @@ characterRouter.post('/', verifyToken, async (req, res, next) => {
 
         return res.status(201).json({
             success: true,
-            message: 'Tao nhan vat thanh cong!',
+            message: `Tao nhan vat "${newPlayer.character_name}" thanh cong! Nghe khoi dau: ${newPlayer.starting_job?.display_name} (cap 20).`,
             data: newPlayer
         });
     } catch (error) {
@@ -51,13 +59,20 @@ characterRouter.post('/', verifyToken, async (req, res, next) => {
 
 /**
  * @route   GET /api/characters/account/me
- * @desc    Lay danh sach nhan vat cua account dang dang nhap
+ * @desc    Lay nhan vat duy nhat cua account dang dang nhap
+ *          Tra ve null neu chua co nhan vat (de frontend biet phai tao moi)
  * @access  Protected
  */
 characterRouter.get('/account/me', verifyToken, async (req, res, next) => {
     try {
-        const players = await characterRepository.findCharactersByAccount(req.accountId);
-        return res.json({ success: true, data: players });
+        const player = await characterRepository.findCharacterByAccount(req.accountId);
+
+        // Tra ve null thay vi 404 de frontend xu ly
+        return res.json({
+            success: true,
+            data: player || null,
+            has_character: player !== null
+        });
     } catch (error) {
         next(error);
     }

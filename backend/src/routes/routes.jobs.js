@@ -212,3 +212,128 @@ jobsRouter.post('/forget', verifyToken, async (req, res, next) => {
 });
 
 module.exports = jobsRouter;
+
+/**
+ * @route   POST /api/jobs/invest-sp
+ * @body    { playerId, jobCode, spAmount }
+ * @desc    Dau tu SP de nang cap nghe thu cong (ngoai viec train EXP tu hanh dong)
+ *          1 SP = 1 cap nghe, bi chan cung boi player_level
+ * @access  Protected
+ */
+jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
+    const { playerId, jobCode, spAmount } = req.body;
+
+    if (!playerId || !jobCode || !spAmount) {
+        return res.status(400).json({
+            success: false,
+            message: 'Thieu tham so: playerId, jobCode, spAmount.'
+        });
+    }
+
+    const investAmount = parseInt(spAmount);
+    if (isNaN(investAmount) || investAmount < 1) {
+        return res.status(400).json({
+            success: false,
+            message: 'spAmount phai la so nguyen duong.'
+        });
+    }
+
+    const client = await dbPool.connect();
+    try {
+        await client.query('BEGIN');
+
+        // Lay thong tin player (lock)
+        const playerResult = await client.query(
+            `SELECT id, player_level, skill_points FROM players WHERE id = $1 FOR UPDATE;`,
+            [playerId]
+        );
+
+        if (playerResult.rows.length === 0) throw new Error('Khong tim thay nhan vat.');
+
+        const player = playerResult.rows[0];
+
+        // Kiem tra quyen so huu
+        const ownerResult = await client.query(
+            `SELECT account_id FROM players WHERE id = $1;`, [playerId]
+        );
+        if (ownerResult.rows[0].account_id !== req.accountId) {
+            throw new Error('Khong co quyen dau tu SP cho nhan vat nay.');
+        }
+
+        if (player.skill_points < investAmount) {
+            throw new Error(`Khong du SP. Can ${investAmount} SP, hien co ${player.skill_points} SP.`);
+        }
+
+        // Lay thong tin nghe
+        const jobResult = await client.query(
+            `SELECT pj.*, js.code, js.display_name, js.is_available
+             FROM player_jobs pj
+             JOIN jobs_seed js ON pj.job_id = js.id
+             WHERE pj.player_id = $1 AND js.code = $2
+             FOR UPDATE;`,
+            [playerId, jobCode.toLowerCase()]
+        );
+
+        if (jobResult.rows.length === 0) {
+            throw new Error(`Chua mo khoa nghe: ${jobCode}. Mo khoa truoc khi dau tu SP.`);
+        }
+
+        const playerJob = jobResult.rows[0];
+        const currentJobLevel = playerJob.job_level;
+
+        // Kiem tra gioi han cung: job_level <= player_level
+        if (currentJobLevel >= player.player_level) {
+            throw new Error(
+                `Cap nghe ${jobCode} (${currentJobLevel}) da dat gioi han Player Level (${player.player_level}). ` +
+                `Can nang Player Level len ${currentJobLevel + 1} truoc.`
+            );
+        }
+
+        // Tinh so cap co the nang (bi gioi han boi player_level va SP con lai)
+        const maxPossibleLevels = Math.min(
+            investAmount,
+            player.player_level - currentJobLevel
+        );
+
+        if (maxPossibleLevels <= 0) {
+            throw new Error('Khong the nang cap nghe them. Kiem tra lai Player Level va SP.');
+        }
+
+        const newJobLevel = currentJobLevel + maxPossibleLevels;
+        const actualSpSpent = maxPossibleLevels; // 1 SP = 1 cap
+
+        // Tru SP va nang cap nghe
+        await client.query(
+            `UPDATE players SET skill_points = skill_points - $1 WHERE id = $2;`,
+            [actualSpSpent, playerId]
+        );
+
+        await client.query(
+            `UPDATE player_jobs SET job_level = $1, sp_invested = sp_invested + $2, updated_at = NOW()
+             WHERE id = $3;`,
+            [newJobLevel, actualSpSpent, playerJob.id]
+        );
+
+        await client.query('COMMIT');
+
+        console.log(`[SUCCESS] Player ${playerId} dau tu ${actualSpSpent} SP vao nghe ${jobCode}: cap ${currentJobLevel} -> ${newJobLevel}`);
+
+        return res.json({
+            success: true,
+            message: `Nang cap ${jobCode} len cap ${newJobLevel}! Dau tu ${actualSpSpent} SP.`,
+            data: {
+                job_code:       jobCode,
+                old_level:      currentJobLevel,
+                new_level:      newJobLevel,
+                sp_spent:       actualSpSpent,
+                sp_remaining:   player.skill_points - actualSpSpent,
+            }
+        });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error('[ERROR] Loi khi invest SP:', error.message);
+        return res.status(400).json({ success: false, message: error.message });
+    } finally {
+        client.release();
+    }
+});
