@@ -1,6 +1,4 @@
-// backend/src/routes/routes.wallet.js
-// Version: 3.0
-// Cap nhat: Gan verifyToken + verifyPlayerOwnership
+﻿// backend/src/routes/routes.wallet.js
 
 const express = require('express');
 const walletRouter = express.Router();

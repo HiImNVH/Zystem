@@ -1,5 +1,4 @@
-// backend/src/routes/routes.achievements.js
-// Version: 1.0
+﻿// backend/src/routes/routes.achievements.js
 // Endpoint quan ly thanh tuu: lay danh sach, cap nhat tien do, claim SP, trang bi title
 
 const express = require('express');

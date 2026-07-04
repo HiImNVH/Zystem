@@ -1,22 +1,24 @@
-// backend/src/services/services.loot.js
-// Version: 1.0
-// Roll loot sau khi claim action — CUREL weight system + DEX bonus
+﻿// backend/src/services/services.loot.js
 
 const { dbPool } = require('../repositories/repositories.database');
 const craftingService = require('./services.crafting');
+const itemStatsService = require('./services.itemStats');
 
-// Map action type sang loai drop tuong ung
 const ACTION_DROP_POOL = {
     MINE:    ['MATERIAL'],
     CHOP:    ['MATERIAL'],
-    HUNT:    ['MATERIAL', 'WEAPON'],
+    HUNT:    ['MATERIAL'],
     FORAGE:  ['MATERIAL'],
-    EXPLORE: ['MATERIAL', 'WEAPON', 'ARMOR'],
-    CRAFT:   [],  // Craft khong drop loot ngau nhien
+    EXPLORE: ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    BATTLE:  ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    CRAFT:   ['WEAPON', 'EQUIPMENT', 'TOOL', 'BUILDING'],
     FARM:    ['MATERIAL'],
 };
 
-// So luong item co the drop theo loai action va thoi gian
+const ACTION_DROP_ORIGINS = {
+    CRAFT: ['Craftable'],
+};
+
 function calculateDropCount(actionType, durationSeconds) {
     const baseCount = {
         MINE:    1,
@@ -24,33 +26,35 @@ function calculateDropCount(actionType, durationSeconds) {
         HUNT:    1,
         FORAGE:  1,
         EXPLORE: 2,
+        BATTLE:  2,
+        CRAFT:   1,
         FARM:    1,
     };
     const base = baseCount[actionType] || 1;
-
-    // Moi 5 phut them 1 drop, toi da 5 drop
     const timeBonus = Math.floor(durationSeconds / 300);
     return Math.min(base + timeBonus, 5);
 }
 
-// Lay danh sach item template phu hop de roll loot
-async function getCandidateTemplates(categories, zoneMinLevel) {
+async function getCandidateTemplates(categories, zoneMinLevel, origins) {
     if (!categories || categories.length === 0) return [];
 
-    const maxLevel = Math.max(1, (zoneMinLevel || 1) + 5); // Roll item trong khoang cap zone
+    const maxLevel = Math.max(1, (zoneMinLevel || 1) + 5);
     const minLevel = Math.max(1, (zoneMinLevel || 1) - 5);
-
-    const placeholders = categories.map((_, i) => `$${i + 1}`).join(', ');
+    const allowedOrigins = origins || ['Gatherable', 'Loot-only'];
+    const categoryPlaceholders = categories.map((_, index) => `$${index + 1}`).join(', ');
+    const originOffset = categories.length;
+    const originPlaceholders = allowedOrigins.map((_, index) => `$${originOffset + index + 1}`).join(', ');
     const sqlQuery = `
-        SELECT id, item_level, drop_weight_common, drop_weight_uncommon,
+        SELECT id, category, item_level, drop_weight_common, drop_weight_uncommon,
                drop_weight_rare, drop_weight_epic, drop_weight_legendary
         FROM item_templates
-        WHERE category = ANY(ARRAY[${placeholders}])
-          AND item_level BETWEEN $${categories.length + 1} AND $${categories.length + 2};
+        WHERE category = ANY(ARRAY[${categoryPlaceholders}])
+          AND origin = ANY(ARRAY[${originPlaceholders}])
+          AND item_level BETWEEN $${categories.length + allowedOrigins.length + 1} AND $${categories.length + allowedOrigins.length + 2};
     `;
 
     try {
-        const result = await dbPool.query(sqlQuery, [...categories, minLevel, maxLevel]);
+        const result = await dbPool.query(sqlQuery, [...categories, ...allowedOrigins, minLevel, maxLevel]);
         return result.rows;
     } catch (error) {
         console.error('[ERROR] Loi khi lay candidate templates:', error.message);
@@ -58,31 +62,23 @@ async function getCandidateTemplates(categories, zoneMinLevel) {
     }
 }
 
-// Roll 1 item tu danh sach candidate
 function rollOneItem(candidates, crafterDex) {
     if (!candidates || candidates.length === 0) return null;
 
-    // Chon template ngau nhien (trong so deu nhau giua cac template)
     const template = candidates[Math.floor(Math.random() * candidates.length)];
-
-    // Roll do hiem CUREL — DEX cua player anh huong
-    const rarity = craftingService.rollCurelRarity(
-        template.item_level,
-        'COMMON', // Nguyen lieu cua drop luon la COMMON
-        crafterDex || 0
-    );
-
+    const rarity = craftingService.rollCurelRarity(template.item_level);
     const itemPower = craftingService.calculateItemPower(template.item_level, rarity);
+    const rolledStats = itemStatsService.rollItemStats(template.category, itemPower, rarity);
 
     return {
         templateId: template.id,
         itemLevel: template.item_level,
         rarity,
-        itemPower
+        itemPower,
+        ...rolledStats
     };
 }
 
-// Insert cac item da roll vao bang items
 async function insertDroppedItems(playerId, droppedItems, actionId) {
     if (!droppedItems || droppedItems.length === 0) return [];
 
@@ -92,10 +88,17 @@ async function insertDroppedItems(playerId, droppedItems, actionId) {
         try {
             const result = await dbPool.query(`
                 INSERT INTO items
-                    (template_id, rarity, item_power, owner_player_id, source, quantity)
-                VALUES ($1, $2, $3, $4, 'drop', 1)
-                RETURNING id, template_id, rarity, item_power;
-            `, [item.templateId, item.rarity, item.itemPower, playerId]);
+                    (template_id, rarity, item_power, owner_player_id, source, quantity,
+                     stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
+                VALUES ($1, $2, $3, $4, 'drop', 1, $5, $6, $7, $8, $9, $10)
+                RETURNING id, template_id, rarity, item_power,
+                          stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value;
+            `, [
+                item.templateId, item.rarity, item.itemPower, playerId,
+                item.stat_1_type || null, item.stat_1_value || 0,
+                item.stat_2_type || null, item.stat_2_value || 0,
+                item.stat_3_type || null, item.stat_3_value || 0
+            ]);
 
             insertedItems.push(result.rows[0]);
         } catch (error) {
@@ -103,46 +106,39 @@ async function insertDroppedItems(playerId, droppedItems, actionId) {
         }
     }
 
-    // Luu loot snapshot vao action_queue de audit
     if (insertedItems.length > 0) {
         await dbPool.query(
             `UPDATE action_queue SET loot_snapshot = $1 WHERE id = $2;`,
             [JSON.stringify(insertedItems), actionId]
-        ).catch(err => console.error('[WARN] Loi khi luu loot_snapshot:', err.message));
+        ).catch(error => console.error('[WARN] Loi khi luu loot_snapshot:', error.message));
     }
 
     return insertedItems;
 }
 
-// Ham chinh: tinh toan va thuc hien drop loot sau khi claim
 async function processLootDrop(playerId, claimedAction, playerDex) {
     const actionType = claimedAction.action_type?.toUpperCase();
     const categories = ACTION_DROP_POOL[actionType];
 
-    // Action khong co drop pool (vd CRAFT) — bo qua
     if (!categories || categories.length === 0) {
         return { items_dropped: [] };
     }
 
     const zoneMinLevel = claimedAction.zone_min_level || 1;
     const dropCount = calculateDropCount(actionType, claimedAction.actual_duration_s);
+    const candidates = await getCandidateTemplates(categories, zoneMinLevel, ACTION_DROP_ORIGINS[actionType]);
 
-    // Lay danh sach template ung vien
-    const candidates = await getCandidateTemplates(categories, zoneMinLevel);
     if (candidates.length === 0) {
         return { items_dropped: [] };
     }
 
-    // Roll tung item
     const droppedItems = [];
-    for (let i = 0; i < dropCount; i++) {
-        // 70% co xuong do moi action slot (khong phai 100% dam bao loot)
+    for (let index = 0; index < dropCount; index++) {
         if (Math.random() > 0.70) continue;
         const item = rollOneItem(candidates, playerDex);
         if (item) droppedItems.push(item);
     }
 
-    // Insert vao DB va tra ve ket qua
     const savedItems = await insertDroppedItems(playerId, droppedItems, claimedAction.id);
 
     if (savedItems.length > 0) {

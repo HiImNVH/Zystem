@@ -1,6 +1,4 @@
-// backend/src/routes/routes.account.js
-// Version: 2.0
-// Cap nhat: Tra ve JWT token sau khi dang nhap thanh cong
+﻿// backend/src/routes/routes.account.js
 //           Bo sung GET /me de lay thong tin account hien tai
 
 const express = require('express');

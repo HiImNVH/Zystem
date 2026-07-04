@@ -1,5 +1,4 @@
-// backend/src/routes/routes.jobs.js
-// Version: 1.0
+﻿// backend/src/routes/routes.jobs.js
 // Endpoint quan ly nghe nghiep: lay danh sach, lay nghe cua nhan vat, mo khoa nghe
 
 const express = require('express');
@@ -309,7 +308,7 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
         );
 
         await client.query(
-            `UPDATE player_jobs SET job_level = $1, sp_invested = sp_invested + $2, updated_at = NOW()
+            `UPDATE player_jobs SET job_level = $1, sp_invested = sp_invested + $2
              WHERE id = $3;`,
             [newJobLevel, actualSpSpent, playerJob.id]
         );

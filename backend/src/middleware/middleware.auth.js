@@ -1,5 +1,4 @@
-// backend/src/middleware/middleware.auth.js
-// Version: 1.0
+﻿// backend/src/middleware/middleware.auth.js
 // Middleware xac thuc JWT — gan vao moi route can bao ve
 
 const jwt = require('jsonwebtoken');

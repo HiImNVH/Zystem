@@ -1,6 +1,4 @@
-// backend/src/routes/routes.character.js
-// Version: 4.0
-// Cap nhat: Nhan startingJobCode khi tao nhan vat
+﻿// backend/src/routes/routes.character.js
 //           GET /account/me tra ve nhan vat duy nhat (khong phai mang)
 //           Kiem tra da co nhan vat truoc khi cho tao
 

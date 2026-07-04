@@ -1,0 +1,32 @@
+﻿// frontend/src/components/layout/BottomNav.jsx
+
+const NAV_ITEMS = [
+    { key: 'MAIN',      label: 'Bản đồ', mark: 'MAP' },
+    { key: 'INVENTORY', label: 'Túi đồ', mark: 'BAG' },
+    { key: 'QUEST',     label: 'Kỹ năng', mark: 'SP' },
+    { key: 'CHAT',      label: 'Chat', mark: 'CHAT' },
+    { key: 'PROFILE',   label: 'Hồ sơ', mark: 'ME' },
+];
+
+export default function BottomNav({ activeTab, onChangeTab }) {
+    return (
+        <div className="md:hidden h-16 flex items-center border-t border-border bg-panel flex-shrink-0">
+            {NAV_ITEMS.map(item => (
+                <button
+                    key={item.key}
+                    onClick={() => onChangeTab(item.key)}
+                    className="flex-1 h-full flex flex-col items-center justify-center gap-1 transition-colors"
+                >
+                    <span className={`text-[10px] font-bold ${activeTab === item.key ? 'text-accent' : 'text-textMuted opacity-60'}`}>
+                        {item.mark}
+                    </span>
+                    <span className={`text-[10px] font-medium ${
+                        activeTab === item.key ? 'text-accent' : 'text-textMuted'
+                    }`}>
+                        {item.label}
+                    </span>
+                </button>
+            ))}
+        </div>
+    );
+}

@@ -1,7 +1,4 @@
 # .gitignore
-// Version: 1.0
-// Chinh sua gan nhat: Bo qua cac tep tin rac va thu muc dependencies cua Node.js
-
 # Thu muc cai dat thu vien (Bat buoc phai bo qua vi qua nang)
 node_modules/
 jspm_packages/

@@ -1,5 +1,4 @@
-// frontend/src/api/api.auth.js
-// Version: 1.0
+﻿// frontend/src/api/api.auth.js
 // Goi API xac thuc: register va login
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';

@@ -1,6 +1,5 @@
-// backend/src/services/services.combat.js
-// Version: 1.0
-// Tinh toan cac chi so chien dau: giam sat thuong giap, crit, dodge, HP
+﻿// backend/src/services/services.combat.js
+// Tinh toan chi so chien dau theo sheet KY NANG VA CHI SO
 
 // Cong thuc giam sat thuong theo Balance Sheet: Armor / (Armor + K), K = PlayerLevel + 40
 function calculateDefenseReduction(armor, playerLevel) {
@@ -13,12 +12,20 @@ function calculateDefenseReduction(armor, playerLevel) {
     return Math.min(reductionRatio, 0.9); // Cap toi da 90% giam sat thuong
 }
 
-// Tinh chi so HP toi da tu VIT va STR
-// MaxHP = 80 + VIT * 10 + STR * 2
-function calculateMaxHp(vitStat, strStat) {
-    const vit = vitStat || 10;
-    const str = strStat || 10;
-    return Math.floor(80 + vit * 10 + str * 2);
+function calculateMaxHp(stats) {
+    const vit = stats?.vit || 0;
+    const str = stats?.str || 0;
+    const playerLevel = stats?.playerLevel || 1;
+    const baseHp = 100;
+    return Math.floor(baseHp + vit * 4 + str * 0.5 + playerLevel * 10);
+}
+
+function calculateAttack(strStat, weaponAttack) {
+    return parseFloat(((weaponAttack || 0) + (strStat || 0)).toFixed(2));
+}
+
+function calculateDefense(vitStat, equipmentDefense) {
+    return parseFloat(((equipmentDefense || 0) + (vitStat || 0) / 5).toFixed(2));
 }
 
 // Tinh ty le ne duong: moi 1 AGI cho 0.05% dodge, cap 50%
@@ -47,7 +54,7 @@ function calculateCritDamage(gearCritDmgBonus) {
 function calculateAttackDamage(attackerStats, defenderStats) {
     if (!attackerStats || !defenderStats) return 0;
 
-    const baseAtk = attackerStats.base_str || 10;
+    const baseAtk = calculateAttack(attackerStats.base_str || 0, attackerStats.weapon_attack || 0);
     const critRate = calculateCritRate(attackerStats.base_dex, 0);
     const isCrit = Math.random() < critRate;
     const critMult = isCrit ? calculateCritDamage(0) : 1;
@@ -98,6 +105,8 @@ function calculateRadiationGain(zoneRadiationRisk, vitStat) {
 module.exports = {
     calculateDefenseReduction,
     calculateMaxHp,
+    calculateAttack,
+    calculateDefense,
     calculateDodgeRate,
     calculateCritRate,
     calculateCritDamage,

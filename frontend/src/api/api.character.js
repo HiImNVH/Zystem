@@ -1,5 +1,4 @@
-// frontend/src/api/api.character.js
-// Version: 1.0
+﻿// frontend/src/api/api.character.js
 // Goi API nhan vat: lay nhan vat, tao moi voi nghe khoi dau
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';

@@ -1,10 +1,8 @@
-// backend/src/repositories/repositories.character.js
-// Version: 3.0
-// Cap nhat: Gioi han 1 nhan vat/account, base stats bat dau tu 0
-//           Ho tro startingJobCode: day nghe khoi dau len cap 20 ngay khi tao
+﻿// backend/src/repositories/repositories.character.js
 
 const { dbPool } = require('./repositories.database');
 const walletRepository = require('./repositories.wallet');
+const combatService = require('../services/services.combat');
 
 // Tinh stat bonus khi nghe len cap 20 (20 cap * stat_per_lv)
 function calculateStartingJobBonus(jobStats) {
@@ -62,16 +60,20 @@ async function createCharacter(characterData) {
                 int: parseFloat(startingJob.int_per_lv),
                 chr: parseFloat(startingJob.chr_per_lv),
             });
-            baseStr = bonus.str;
-            baseAgi = bonus.agi;
-            baseDex = bonus.dex;
-            baseVit = bonus.vit;
-            baseInt = bonus.int;
-            baseChr = bonus.chr;
+            baseStr = 0;
+            baseAgi = 0;
+            baseDex = 0;
+            baseVit = 0;
+            baseInt = 0;
+            baseChr = 0;
+            startingJob.stat_bonus = bonus;
         }
 
-        // MaxHP tinh tu VIT: 80 + VIT * 10 + STR * 2
-        const maxHp = Math.floor(80 + baseVit * 10 + baseStr * 2);
+        const maxHp = combatService.calculateMaxHp({
+            vit: startingJob?.stat_bonus?.vit || baseVit,
+            str: startingJob?.stat_bonus?.str || baseStr,
+            playerLevel: 1
+        });
 
         // Tao nhan vat voi base stats tu 0 + bonus nghe khoi dau
         const playerResult = await client.query(`

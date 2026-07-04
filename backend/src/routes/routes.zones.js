@@ -1,5 +1,4 @@
-// backend/src/routes/routes.zones.js
-// Version: 1.0
+﻿// backend/src/routes/routes.zones.js
 // Endpoint tra ve danh sach zone va thong tin khu vuc
 
 const express = require('express');

@@ -1,92 +1,111 @@
-// backend/src/services/services.crafting.js
-// Version: 1.0
-// Logic AutoFit Crafting: tinh cap do thanh pham khi tho yeu dung nguyen lieu cao cap
-// Logic CUREL drop weight: tinh trong so theo do hiem nguyen lieu
+﻿// backend/src/services/services.crafting.js
 
-const RARITY_WEIGHT_BASE = {
-    COMMON:    200,
-    UNCOMMON:   40,
-    RARE:       10,
-    EPIC:        5,
-    LEGENDARY:   1,
+const RARITY_BONUS = {
+    COMMON: 0,
+    UNCOMMON: 5,
+    RARE: 10,
+    EPIC: 15,
+    LEGENDARY: 20,
 };
 
-// Bonus weight khi craft voi nguyen lieu do hiem cao (theo Balance Sheet v3)
-// mat_rarity -> { UNCOMMON, RARE, EPIC, LEGENDARY }
-const MAT_RARITY_BONUS = {
-    COMMON:    { UNCOMMON: 5,  RARE: 1,  EPIC: 0,  LEGENDARY: 0 },
-    UNCOMMON:  { UNCOMMON: 10, RARE: 5,  EPIC: 1,  LEGENDARY: 0 },
-    RARE:      { UNCOMMON: 20, RARE: 10, EPIC: 5,  LEGENDARY: 1 },
-    EPIC:      { UNCOMMON: 40, RARE: 20, EPIC: 10, LEGENDARY: 5 },
-    LEGENDARY: { UNCOMMON: 80, RARE: 40, EPIC: 20, LEGENDARY: 10 },
-};
+const CUREL_RARITY_WEIGHT_BY_LEVEL = [
+    { level: 0, common: 200, uncommon: 40, rare: 10, epic: 5, legendary: 1 },
+    { level: 1, common: 199, uncommon: 41, rare: 10, epic: 5, legendary: 1 },
+    { level: 2, common: 198, uncommon: 41, rare: 11, epic: 5, legendary: 1 },
+    { level: 3, common: 197, uncommon: 42, rare: 10, epic: 6, legendary: 1 },
+    { level: 4, common: 196, uncommon: 42, rare: 11, epic: 6, legendary: 1 },
+    { level: 5, common: 195, uncommon: 43, rare: 11, epic: 5, legendary: 2 },
+    { level: 6, common: 194, uncommon: 43, rare: 11, epic: 6, legendary: 2 },
+    { level: 7, common: 193, uncommon: 44, rare: 11, epic: 6, legendary: 2 },
+    { level: 8, common: 192, uncommon: 44, rare: 12, epic: 6, legendary: 2 },
+    { level: 9, common: 191, uncommon: 45, rare: 11, epic: 7, legendary: 2 },
+    { level: 10, common: 190, uncommon: 45, rare: 12, epic: 6, legendary: 3 },
+    { level: 11, common: 189, uncommon: 46, rare: 12, epic: 6, legendary: 3 },
+    { level: 12, common: 188, uncommon: 46, rare: 12, epic: 7, legendary: 3 },
+    { level: 13, common: 187, uncommon: 47, rare: 12, epic: 7, legendary: 3 },
+    { level: 14, common: 186, uncommon: 47, rare: 13, epic: 7, legendary: 3 },
+    { level: 15, common: 185, uncommon: 48, rare: 12, epic: 7, legendary: 4 },
+    { level: 16, common: 184, uncommon: 48, rare: 13, epic: 7, legendary: 4 },
+    { level: 17, common: 183, uncommon: 49, rare: 13, epic: 7, legendary: 4 },
+    { level: 18, common: 182, uncommon: 49, rare: 13, epic: 8, legendary: 4 },
+    { level: 19, common: 181, uncommon: 50, rare: 13, epic: 8, legendary: 4 },
+    { level: 20, common: 180, uncommon: 50, rare: 14, epic: 7, legendary: 5 },
+    { level: 21, common: 179, uncommon: 51, rare: 13, epic: 8, legendary: 5 },
+    { level: 22, common: 178, uncommon: 51, rare: 14, epic: 8, legendary: 5 },
+    { level: 23, common: 177, uncommon: 52, rare: 14, epic: 8, legendary: 5 },
+    { level: 24, common: 176, uncommon: 52, rare: 14, epic: 9, legendary: 5 },
+    { level: 25, common: 175, uncommon: 53, rare: 14, epic: 8, legendary: 6 },
+    { level: 26, common: 174, uncommon: 53, rare: 15, epic: 8, legendary: 6 },
+    { level: 27, common: 173, uncommon: 54, rare: 14, epic: 9, legendary: 6 },
+    { level: 28, common: 172, uncommon: 54, rare: 15, epic: 9, legendary: 6 },
+    { level: 29, common: 171, uncommon: 55, rare: 15, epic: 9, legendary: 6 },
+    { level: 30, common: 170, uncommon: 55, rare: 15, epic: 9, legendary: 7 },
+    { level: 31, common: 169, uncommon: 56, rare: 15, epic: 9, legendary: 7 },
+    { level: 32, common: 168, uncommon: 56, rare: 16, epic: 9, legendary: 7 },
+    { level: 33, common: 167, uncommon: 57, rare: 15, epic: 10, legendary: 7 },
+    { level: 34, common: 166, uncommon: 57, rare: 16, epic: 10, legendary: 7 },
+    { level: 35, common: 165, uncommon: 58, rare: 16, epic: 9, legendary: 8 },
+    { level: 36, common: 164, uncommon: 58, rare: 16, epic: 10, legendary: 8 },
+    { level: 37, common: 163, uncommon: 59, rare: 16, epic: 10, legendary: 8 },
+    { level: 38, common: 162, uncommon: 59, rare: 17, epic: 10, legendary: 8 },
+    { level: 39, common: 161, uncommon: 60, rare: 16, epic: 11, legendary: 8 },
+    { level: 40, common: 160, uncommon: 60, rare: 17, epic: 10, legendary: 9 },
+];
 
-// AutoFit Crafting: xac dinh Item Level cua thanh pham
-// Neu craftJobLevel < matLevel -> ha cap ve craftJobLevel
-// Nguoc lai -> giu nguyen mat level
+function clampCurelLevel(curelLevel) {
+    const normalizedLevel = Math.floor(Number(curelLevel) || 0);
+    return Math.min(Math.max(normalizedLevel, 0), 40);
+}
+
+function getCurelRarityWeights(curelLevel) {
+    const targetLevel = clampCurelLevel(curelLevel);
+    return CUREL_RARITY_WEIGHT_BY_LEVEL[targetLevel] || CUREL_RARITY_WEIGHT_BY_LEVEL[0];
+}
+
 function calculateOutputItemLevel(craftJobLevel, materialItemLevel) {
     if (!craftJobLevel || !materialItemLevel) return 1;
 
     if (craftJobLevel >= materialItemLevel) {
-        // Truong hop binh thuong: giu nguyen cap nguyen lieu
         return materialItemLevel;
     }
 
-    // AutoFit: ha cap ve bang cap nghe cua tho
     console.log(`[INFO] AutoFit: Nguyen lieu cap ${materialItemLevel} + nghe cap ${craftJobLevel} -> thanh pham ha xuong cap ${craftJobLevel}`);
     return craftJobLevel;
 }
 
-// Cuon ket qua do hiem ngau nhien theo trong so (Weight Roll)
-// DEX cua crafter tang trong so do hiem cao
-function rollCurelRarity(craftJobLevel, materialRarity, crafterDex) {
-    const matRarityKey = (materialRarity || 'COMMON').toUpperCase();
-    const bonus = MAT_RARITY_BONUS[matRarityKey] || MAT_RARITY_BONUS.COMMON;
-
-    // DEX tang trong so: 20 DEX +1 Rare, 40 DEX +1 Epic, 50 DEX +1 Legendary
-    const dex = crafterDex || 0;
-    const dexRareBonus    = Math.floor(dex / 20);
-    const dexEpicBonus    = Math.floor(dex / 40);
-    const dexLegBonus     = Math.floor(dex / 50);
-
-    const weights = {
-        COMMON:    RARITY_WEIGHT_BASE.COMMON,
-        UNCOMMON:  RARITY_WEIGHT_BASE.UNCOMMON + bonus.UNCOMMON,
-        RARE:      RARITY_WEIGHT_BASE.RARE     + bonus.RARE     + dexRareBonus,
-        EPIC:      RARITY_WEIGHT_BASE.EPIC     + bonus.EPIC     + dexEpicBonus,
-        LEGENDARY: RARITY_WEIGHT_BASE.LEGENDARY + bonus.LEGENDARY + dexLegBonus,
-    };
-
-    const totalWeight = Object.values(weights).reduce((sum, w) => sum + w, 0);
+function rollWeightedRarity(weights) {
+    const weightedEntries = [
+        ['COMMON', weights.common],
+        ['UNCOMMON', weights.uncommon],
+        ['RARE', weights.rare],
+        ['EPIC', weights.epic],
+        ['LEGENDARY', weights.legendary],
+    ];
+    const totalWeight = weightedEntries.reduce((sum, [, weight]) => sum + weight, 0);
     let roll = Math.random() * totalWeight;
 
-    for (const [rarity, weight] of Object.entries(weights)) {
+    for (const [rarity, weight] of weightedEntries) {
         roll -= weight;
         if (roll <= 0) return rarity;
     }
 
-    return 'COMMON'; // Fallback
+    return 'COMMON';
 }
 
-// Tinh Item Power theo CUREL: ItemPower = ItemLevel + RarityBonus
+function rollCurelRarity(curelLevel) {
+    return rollWeightedRarity(getCurelRarityWeights(curelLevel));
+}
+
 function calculateItemPower(itemLevel, rarity) {
-    const rarityBonus = {
-        COMMON:    0,
-        UNCOMMON:  5,
-        RARE:      10,
-        EPIC:      15,
-        LEGENDARY: 20,
-    };
-    return (itemLevel || 1) + (rarityBonus[rarity?.toUpperCase()] || 0);
+    const normalizedRarity = rarity?.toUpperCase() || 'COMMON';
+    return (itemLevel || 1) + (RARITY_BONUS[normalizedRarity] || 0);
 }
 
-// Tinh ty le that bai che tao (giam theo INT, that bai cho ra "rac pham")
-// INT anh huong: moi 1 INT giam 0.5% fail rate, base 30%
 function calculateCraftFailRate(intStat, itemLevel, craftJobLevel) {
     const baseFailRate = 0.30;
-    const intReduction = Math.min((intStat || 10) * 0.005, 0.25); // Max giam 25% tu INT
-    const levelGap = Math.max(0, itemLevel - craftJobLevel); // Gap nguyen lieu vs nghe
-    const gapPenalty = levelGap * 0.02; // Moi cap gap them 2% fail
+    const intReduction = Math.min((intStat || 10) * 0.005, 0.25);
+    const levelGap = Math.max(0, itemLevel - craftJobLevel);
+    const gapPenalty = levelGap * 0.02;
 
     return Math.min(Math.max(baseFailRate - intReduction + gapPenalty, 0), 0.95);
 }
@@ -96,6 +115,7 @@ module.exports = {
     rollCurelRarity,
     calculateItemPower,
     calculateCraftFailRate,
-    RARITY_WEIGHT_BASE,
-    MAT_RARITY_BONUS
+    getCurelRarityWeights,
+    CUREL_RARITY_WEIGHT_BY_LEVEL,
+    RARITY_BONUS,
 };

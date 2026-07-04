@@ -1,6 +1,5 @@
-// backend/src/services/services.progression.js
-// Version: 1.0
-// Xu ly logic tien trinh nhan vat: EXP, kiem tra gioi han nghe, tinh SP
+﻿// backend/src/services/services.progression.js
+// Xu ly EXP player/ky nang theo sheet CAP DO
 
 const { dbPool } = require('../repositories/repositories.database');
 const characterRepository = require('../repositories/repositories.character');
@@ -10,6 +9,12 @@ function calculateExpRequired(targetLevel) {
     if (!targetLevel || targetLevel < 1) return 0;
     const L = targetLevel;
     return Math.floor(0.7 * Math.pow(L, 3) + 20 * Math.pow(L, 2) + 100 * L + 50);
+}
+
+function calculateSkillExpRequired(targetLevel) {
+    if (!targetLevel || targetLevel < 1) return 0;
+    const L = targetLevel;
+    return Math.floor(15 * Math.pow(L, 2) + 50 * L + 100);
 }
 
 // Tinh tong EXP tich luy can de dat den mot cap nhat dinh
@@ -66,23 +71,29 @@ async function processPlayerExpGain(playerId, expAmount) {
     }
 
     const newTotalExp = BigInt(character.current_exp) + BigInt(expAmount);
-    const expNeededToLevelUp = BigInt(calculateExpRequired(currentLevel));
-
-    const updates = { current_exp: newTotalExp.toString() };
+    let remainingExp = newTotalExp;
     let leveledUp = false;
     let newLevel = currentLevel;
 
-    if (newTotalExp >= expNeededToLevelUp) {
-        newLevel = Math.min(calculateLevelFromExp(Number(newTotalExp)), maxLevel);
-        // 5 SP moi cap theo Balance Sheet
-        const levelsGained = newLevel - currentLevel;
-        const spGained = levelsGained * 5;
-
-        updates.player_level = newLevel;
-        updates.skill_points = character.skill_points + spGained;
-        updates.current_exp = (newTotalExp - expNeededToLevelUp).toString();
-
+    while (newLevel < maxLevel) {
+        const expNeeded = BigInt(calculateExpRequired(newLevel));
+        if (remainingExp < expNeeded) break;
+        remainingExp -= expNeeded;
+        newLevel++;
         leveledUp = true;
+    }
+
+    const levelsGained = newLevel - currentLevel;
+    const spGained = levelsGained * 5;
+    const updates = {
+        current_exp: remainingExp.toString(),
+        ...(leveledUp ? {
+            player_level: newLevel,
+            skill_points: character.skill_points + spGained
+        } : {})
+    };
+
+    if (leveledUp) {
         console.log(`[SUCCESS] Nhan vat ${playerId} len cap ${newLevel}! Nhan +${spGained} SP.`);
     }
 
@@ -113,34 +124,40 @@ async function processJobExpGain(playerId, jobId, expAmount) {
         if (playerResult.rows.length === 0) return null;
         const playerLevel = playerResult.rows[0].player_level;
 
-        if (jobResult.rows.length === 0) {
-            // Tu dong tao ban ghi nghe moi neu chua co
-            await dbPool.query(
+        let currentJob = jobResult.rows[0];
+
+        if (!currentJob) {
+            const insertedJob = await dbPool.query(
                 `INSERT INTO player_jobs (player_id, job_id, job_level, current_exp)
-                 VALUES ($1, $2, 0, $3)
-                 ON CONFLICT (player_id, job_id) DO NOTHING;`,
-                [playerId, jobId, expAmount]
+                 VALUES ($1, $2, 0, 0)
+                 ON CONFLICT (player_id, job_id) DO UPDATE SET current_exp = player_jobs.current_exp
+                 RETURNING *;`,
+                [playerId, jobId]
             );
-            return { job_level: 0, exp_gained: expAmount };
+            currentJob = insertedJob.rows[0];
         }
 
-        const currentJob = jobResult.rows[0];
         const newJobExp = BigInt(currentJob.current_exp) + BigInt(expAmount);
-        const expNeededToLevel = BigInt(calculateExpRequired(currentJob.job_level));
+        let remainingExp = newJobExp;
 
         let newJobLevel = currentJob.job_level;
 
-        if (newJobExp >= expNeededToLevel && currentJob.job_level < playerLevel) {
-            // Chi len cap nghe khi con duoi player_level
-            newJobLevel = Math.min(currentJob.job_level + 1, playerLevel);
-            console.log(`[INFO] Nghe job_id=${jobId} cua nhan vat ${playerId} len cap ${newJobLevel}`);
+        while (newJobLevel < playerLevel) {
+            const expNeededToLevel = BigInt(calculateSkillExpRequired(newJobLevel || 1));
+            if (remainingExp < expNeededToLevel) break;
+            remainingExp -= expNeededToLevel;
+            newJobLevel++;
+        }
+
+        if (newJobLevel > currentJob.job_level) {
+            console.log(`[INFO] Ky nang job_id=${jobId} cua nhan vat ${playerId} len cap ${newJobLevel}`);
         }
 
         await dbPool.query(
             `UPDATE player_jobs
              SET job_level = $1, current_exp = $2
              WHERE player_id = $3 AND job_id = $4;`,
-            [newJobLevel, (newJobExp - expNeededToLevel > 0n ? newJobExp - expNeededToLevel : newJobExp).toString(), playerId, jobId]
+            [newJobLevel, remainingExp.toString(), playerId, jobId]
         );
 
         return { job_level: newJobLevel, exp_gained: expAmount };
@@ -152,6 +169,7 @@ async function processJobExpGain(playerId, jobId, expAmount) {
 
 module.exports = {
     calculateExpRequired,
+    calculateSkillExpRequired,
     calculateTotalExpForLevel,
     calculateLevelFromExp,
     verifySkillProgression,

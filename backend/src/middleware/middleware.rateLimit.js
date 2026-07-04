@@ -1,13 +1,12 @@
-// backend/src/middleware/middleware.rateLimit.js
-// Version: 1.0
+﻿// backend/src/middleware/middleware.rateLimit.js
 // Rate limiting chong spam va brute-force
 
 const rateLimit = require('express-rate-limit');
 
-// Gioi han chung cho toan bo API: 200 request / 15 phut moi IP
+// Gioi han chung cho toan bo API: 600 request / 15 phut moi IP
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 200,
+    max: 600,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -16,11 +15,11 @@ const globalLimiter = rateLimit({
     }
 });
 
-// Gioi han chat cho endpoint dang nhap / dang ky: 10 lan / 15 phut moi IP
+// Gioi han chat cho endpoint dang nhap / dang ky: 20 lan / 15 phut moi IP
 // Chong brute-force mat khau
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 10,
+    max: 20,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -29,11 +28,11 @@ const authLimiter = rateLimit({
     }
 });
 
-// Gioi han cho action queue: 30 lan / phut moi IP
+// Gioi han cho action queue: 90 lan / phut moi IP
 // Chong spam dang ky hanh dong lien tuc
 const actionLimiter = rateLimit({
     windowMs: 60 * 1000,
-    max: 30,
+    max: 90,
     standardHeaders: true,
     legacyHeaders: false,
     message: {

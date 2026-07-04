@@ -1,5 +1,4 @@
-// frontend/src/api/api.game.js
-// Version: 1.0
+﻿// frontend/src/api/api.game.js
 // Goi API gameplay: zones, action queue, inventory, stats
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -100,6 +99,55 @@ export async function forgetJob(playerId, jobCode) {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify({ playerId, jobCode })
+    });
+    return handleResponse(res);
+}
+
+// === SKILL TREE API ===
+export async function getPlayerSkills(playerId) {
+    const res = await fetch(`${BASE_URL}/api/skills/player/${playerId}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function unlockSkill(playerId, skillCode) {
+    const res = await fetch(`${BASE_URL}/api/skills/unlock`, {
+        method: 'POST', headers: getHeaders(),
+        body: JSON.stringify({ playerId, skillCode })
+    });
+    return handleResponse(res);
+}
+
+export async function refundSkill(playerId, skillCode) {
+    const res = await fetch(`${BASE_URL}/api/skills/refund`, {
+        method: 'POST', headers: getHeaders(),
+        body: JSON.stringify({ playerId, skillCode })
+    });
+    return handleResponse(res);
+}
+
+export async function getRefundStatus(playerId) {
+    const res = await fetch(`${BASE_URL}/api/skills/refund-status/${playerId}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+// === EQUIPMENT API ===
+export async function getEquippedItems(playerId) {
+    const res = await fetch(`${BASE_URL}/api/items/player/${playerId}/equipped`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function equipItem(playerId, itemId) {
+    const res = await fetch(`${BASE_URL}/api/items/equip`, {
+        method: 'POST', headers: getHeaders(),
+        body: JSON.stringify({ playerId, itemId })
+    });
+    return handleResponse(res);
+}
+
+export async function unequipItem(playerId, itemId) {
+    const res = await fetch(`${BASE_URL}/api/items/unequip`, {
+        method: 'POST', headers: getHeaders(),
+        body: JSON.stringify({ playerId, itemId })
     });
     return handleResponse(res);
 }

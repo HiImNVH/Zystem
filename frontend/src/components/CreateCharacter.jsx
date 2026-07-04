@@ -1,20 +1,18 @@
-// frontend/src/components/CreateCharacter.jsx
-// Version: 1.0
-// Man hinh tao nhan vat: chon nghe -> dat ten -> xac nhan
+﻿// frontend/src/components/CreateCharacter.jsx
 
 import { useState, useEffect } from 'react';
 import { getJobs, createCharacter } from '../api/api.character';
 import JobCard from './JobCard';
 
-const CATEGORY_ORDER = ['combat', 'gather', 'craft'];
+const CATEGORY_ORDER = ['combat', 'survival', 'production'];
 const CATEGORY_LABELS = {
-    combat: '⚔ HE CHIEN DAU',
-    gather: '⛏ HE KHAI THAC',
-    craft:  '🔨 HE SAN XUAT',
+    combat: 'Chiến đấu',
+    survival: 'Sinh tồn',
+    production: 'Sản xuất',
 };
 
-export default function CreateCharacter({ account, onCharacterCreated }) {
-    const [step, setStep] = useState(1); // 1: chon nghe, 2: dat ten + confirm
+export default function CreateCharacter({ account, onCharacterCreated, onLogout }) {
+    const [step, setStep] = useState(1);
     const [jobs, setJobs] = useState([]);
     const [selectedJob, setSelectedJob] = useState(null);
     const [characterName, setCharacterName] = useState('');
@@ -23,28 +21,15 @@ export default function CreateCharacter({ account, onCharacterCreated }) {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        async function loadJobs() {
-            try {
-                const result = await getJobs();
-                // Chi lay cac nghe available (bo qua doctor)
-                setJobs(result.data.filter(j => j.is_available));
-            } catch (err) {
-                setError('Khong the tai danh sach nghe. Thu lai sau.');
-            } finally {
-                setIsLoading(false);
-            }
-        }
-        loadJobs();
+        getJobs()
+            .then(result => setJobs(result.data.filter(job => job.is_available)))
+            .catch(() => setError('Không tải được danh sách kỹ năng.'))
+            .finally(() => setIsLoading(false));
     }, []);
-
-    function handleSelectJob(job) {
-        setSelectedJob(job);
-        setError('');
-    }
 
     function handleNextStep() {
         if (!selectedJob) {
-            setError('Vui long chon mot nghe khoi dau.');
+            setError('Hãy chọn một kỹ năng khởi đầu.');
             return;
         }
         setStep(2);
@@ -52,16 +37,8 @@ export default function CreateCharacter({ account, onCharacterCreated }) {
     }
 
     async function handleCreate() {
-        if (!characterName.trim()) {
-            setError('Ten nhan vat khong duoc de trong.');
-            return;
-        }
-        if (characterName.trim().length < 3) {
-            setError('Ten nhan vat phai co it nhat 3 ky tu.');
-            return;
-        }
-        if (characterName.trim().length > 50) {
-            setError('Ten nhan vat toi da 50 ky tu.');
+        if (!characterName.trim() || characterName.trim().length < 3) {
+            setError('Tên nhân vật cần có ít nhất 3 ký tự.');
             return;
         }
 
@@ -77,195 +54,132 @@ export default function CreateCharacter({ account, onCharacterCreated }) {
         }
     }
 
-    // Nhom job theo category
-    const jobsByCategory = CATEGORY_ORDER.reduce((acc, cat) => {
-        acc[cat] = jobs.filter(j => j.category === cat);
+    const jobsByCategory = CATEGORY_ORDER.reduce((acc, category) => {
+        acc[category] = jobs.filter(job => job.category === category);
         return acc;
     }, {});
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-phosphor text-center">
-                    <div style={{ fontSize: '10px' }} className="animate-blink mb-4">
-                        DANG TAI DU LIEU...
-                    </div>
-                </div>
+            <div className="min-h-screen flex items-center justify-center bg-base">
+                <p className="text-sm text-textMuted">Đang tải...</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen flex flex-col">
-            {/* Header */}
-            <div className="border-b border-phosphor border-opacity-20 p-4 flex items-center justify-between flex-shrink-0">
+        <div className="min-h-screen bg-base flex flex-col">
+            <div className="border-b border-border px-6 py-4 flex items-center justify-between flex-shrink-0">
                 <div>
-                    <div className="text-phosphor glow-text animate-flicker" style={{ fontSize: '11px', letterSpacing: '4px' }}>
-                        ZYSTEM
-                    </div>
-                    <div className="text-phosphor opacity-40 mt-1" style={{ fontSize: '7px' }}>
-                        XIN CHAO, {account?.username?.toUpperCase()} — TAO NHAN VAT
-                    </div>
+                    <h1 className="font-bold">ZYSTEM</h1>
+                    <p className="text-xs text-textMuted">Chào {account?.username}, hãy tạo nhân vật của bạn</p>
                 </div>
-                {/* Step indicator */}
-                <div className="flex items-center gap-3">
-                    {[1, 2].map(s => (
-                        <div key={s} className="flex items-center gap-2">
-                            <div className={`w-6 h-6 flex items-center justify-center border-2 ${
-                                s === step ? 'border-amber text-amber bg-amber bg-opacity-10' :
-                                s < step  ? 'border-phosphor text-phosphor bg-phosphor bg-opacity-10' :
-                                            'border-phosphor border-opacity-30 text-phosphor opacity-30'
-                            }`} style={{ fontSize: '8px' }}>
-                                {s < step ? '✓' : s}
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        {[1, 2].map(item => (
+                            <div key={item} className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
+                                item === step ? 'bg-accent text-base' : item < step ? 'bg-success/20 text-success' : 'bg-elevated text-textMuted'
+                            }`}>
+                                {item < step ? '✓' : item}
                             </div>
-                            {s < 2 && <div className="text-phosphor opacity-20" style={{ fontSize: '8px' }}>──</div>}
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                    {onLogout && (
+                        <button onClick={onLogout} className="text-xs text-textMuted hover:text-danger transition-colors">
+                            Đổi tài khoản
+                        </button>
+                    )}
                 </div>
             </div>
 
-            {/* STEP 1: Chon nghe */}
             {step === 1 && (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                    <div className="p-6 flex-shrink-0">
-                        <div className="text-amber glow-text-amber mb-1" style={{ fontSize: '11px' }}>
-                            // BUOC 1: CHON NGHE KHOI DAU
-                        </div>
-                        <div className="text-phosphor opacity-50" style={{ fontSize: '8px', lineHeight: '2' }}>
-                            Nghe nay se duoc nang cap thang cap 20. Chi so se cong vao nhan vat ngay tu dau.<br/>
-                            Cac chi so khac bat dau tu 0. Day la lua chon duy nhat — khong the thay doi sau khi tao.
-                        </div>
+                    <div className="px-6 py-5 flex-shrink-0 max-w-3xl">
+                        <h2 className="text-lg font-bold mb-1">Chọn kỹ năng khởi đầu</h2>
+                        <p className="text-sm text-textMuted">
+                            Kỹ năng được chọn sẽ bắt đầu ở cấp 20 và cộng chỉ số ngay khi tạo nhân vật.
+                        </p>
                     </div>
 
                     <div className="flex-1 overflow-y-auto px-6 pb-6">
-                        {CATEGORY_ORDER.map(cat => (
-                            jobsByCategory[cat]?.length > 0 && (
-                                <div key={cat} className="mb-6">
-                                    <div className="text-amber mb-3" style={{ fontSize: '8px' }}>
-                                        ── {CATEGORY_LABELS[cat]} ──────────────
-                                    </div>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                                        {jobsByCategory[cat].map(job => (
-                                            <JobCard
-                                                key={job.id}
-                                                job={job}
-                                                isSelected={selectedJob?.id === job.id}
-                                                onClick={() => handleSelectJob(job)}
-                                            />
-                                        ))}
-                                    </div>
+                        {CATEGORY_ORDER.map(category => jobsByCategory[category]?.length > 0 && (
+                            <div key={category} className="mb-6">
+                                <p className="text-xs font-semibold text-textMuted mb-3">{CATEGORY_LABELS[category].toUpperCase()}</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                    {jobsByCategory[category].map(job => (
+                                        <JobCard
+                                            key={job.id}
+                                            job={job}
+                                            isSelected={selectedJob?.id === job.id}
+                                            onClick={() => { setSelectedJob(job); setError(''); }}
+                                        />
+                                    ))}
                                 </div>
-                            )
+                            </div>
                         ))}
                     </div>
 
-                    {/* Footer sticky */}
-                    <div className="flex-shrink-0 border-t border-phosphor border-opacity-20 p-4">
-                        {error && (
-                            <div className="text-danger mb-3" style={{ fontSize: '8px' }}>⚠ {error}</div>
-                        )}
-                        <div className="flex items-center gap-4">
-                            {selectedJob && (
-                                <div className="flex-1 text-amber" style={{ fontSize: '8px' }}>
-                                    ► DA CHON: {selectedJob.code.toUpperCase()}
-                                </div>
-                            )}
-                            <button
-                                onClick={handleNextStep}
-                                disabled={!selectedJob}
-                                className="pixel-btn pixel-btn-primary"
-                                style={{ fontSize: '9px', width: 'auto', padding: '12px 24px' }}
-                            >
-                                TIEP THEO ►
+                    <div className="border-t border-border px-6 py-4 flex-shrink-0">
+                        {error && <p className="text-sm text-danger mb-3">{error}</p>}
+                        <div className="flex items-center justify-between">
+                            <p className="text-sm text-textSecondary">
+                                {selectedJob ? `Đã chọn: ${selectedJob.display_name}` : 'Chưa chọn kỹ năng'}
+                            </p>
+                            <button onClick={handleNextStep} disabled={!selectedJob} className="btn-primary px-6">
+                                Tiếp tục
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* STEP 2: Dat ten + xac nhan */}
             {step === 2 && (
                 <div className="flex-1 flex items-center justify-center p-6">
-                    <div className="w-full max-w-lg">
-                        <div className="text-amber glow-text-amber mb-6" style={{ fontSize: '11px' }}>
-                            // BUOC 2: DAT TEN NHAN VAT
-                        </div>
+                    <div className="w-full max-w-md">
+                        <h2 className="text-lg font-bold mb-5">Đặt tên nhân vật</h2>
 
-                        {/* Selected job summary */}
-                        <div className="pixel-card p-4 mb-6">
-                            <div className="text-phosphor opacity-50 mb-2" style={{ fontSize: '7px' }}>
-                                NGHE DA CHON:
-                            </div>
-                            <div className="text-amber" style={{ fontSize: '10px' }}>
-                                {selectedJob.code.toUpperCase()}
-                            </div>
-                            <div className="mt-3 flex flex-wrap gap-3">
+                        <div className="card p-4 mb-5">
+                            <p className="text-xs text-textMuted mb-2">Kỹ năng khởi đầu</p>
+                            <p className="font-semibold mb-3">{selectedJob.display_name}</p>
+                            <div className="flex flex-wrap gap-3 text-xs">
                                 {['str_per_lv','agi_per_lv','dex_per_lv','vit_per_lv','int_per_lv','chr_per_lv']
-                                    .filter(k => parseFloat(selectedJob[k]) > 0)
-                                    .map(k => (
-                                        <div key={k} className="text-phosphor" style={{ fontSize: '8px' }}>
-                                            <span className="opacity-50">{k.replace('_per_lv','').toUpperCase()} </span>
-                                            <span className="text-amber">+{(selectedJob[k]*20).toFixed(1)}</span>
-                                            <span className="opacity-30"> (cap 20)</span>
-                                        </div>
-                                    ))
-                                }
+                                    .filter(key => parseFloat(selectedJob[key]) > 0)
+                                    .map(key => (
+                                        <span key={key}>
+                                            <span className="text-textMuted">{key.replace('_per_lv','').toUpperCase()} </span>
+                                            <span className="text-accent font-semibold">+{(selectedJob[key] * 20).toFixed(1)}</span>
+                                        </span>
+                                    ))}
                             </div>
                         </div>
 
-                        {/* Input ten */}
-                        <div className="mb-4">
-                            <label className="block text-phosphor opacity-70 mb-2" style={{ fontSize: '8px' }}>
-                                {'>'} TEN NHAN VAT
-                            </label>
-                            <input
-                                type="text"
-                                value={characterName}
-                                onChange={e => { setCharacterName(e.target.value); setError(''); }}
-                                placeholder="VD: SurvivorX, NVHWarrior..."
-                                className="pixel-input"
-                                maxLength={50}
-                                autoFocus
-                                disabled={isSubmitting}
-                                onKeyDown={e => e.key === 'Enter' && handleCreate()}
-                            />
-                            <div className="text-phosphor opacity-30 mt-1 text-right" style={{ fontSize: '7px' }}>
-                                {characterName.length}/50
-                            </div>
-                        </div>
+                        <label className="block text-xs font-medium text-textSecondary mb-1.5">Tên nhân vật</label>
+                        <input
+                            type="text"
+                            value={characterName}
+                            onChange={event => { setCharacterName(event.target.value); setError(''); }}
+                            placeholder="SurvivorX"
+                            className="input-field mb-5"
+                            maxLength={50}
+                            autoFocus
+                            disabled={isSubmitting}
+                            onKeyDown={event => event.key === 'Enter' && handleCreate()}
+                        />
 
-                        {/* Warning */}
-                        <div className="border border-danger border-opacity-40 p-3 mb-4"
-                             style={{ backgroundColor: 'rgba(255,49,49,0.05)' }}>
-                            <p className="text-danger opacity-70" style={{ fontSize: '7px', lineHeight: '2' }}>
-                                ⚠ CANH BAO: KHONG THE THAY DOI TEN VA NGHE SAU KHI TAO.<br/>
-                                MOI TAI KHOAN CHI DUOC TAO 1 NHAN VAT DUY NHAT.
+                        <div className="bg-danger/10 rounded-lg p-3 mb-5">
+                            <p className="text-xs text-danger">
+                                Tên nhân vật và kỹ năng khởi đầu sẽ không đổi sau khi tạo.
                             </p>
                         </div>
 
-                        {error && (
-                            <div className="border border-danger p-3 mb-4"
-                                 style={{ backgroundColor: 'rgba(255,49,49,0.08)' }}>
-                                <p className="text-danger" style={{ fontSize: '8px' }}>⚠ {error}</p>
-                            </div>
-                        )}
+                        {error && <p className="text-sm text-danger mb-4">{error}</p>}
 
                         <div className="flex gap-3">
-                            <button
-                                onClick={() => { setStep(1); setError(''); }}
-                                disabled={isSubmitting}
-                                className="pixel-btn pixel-btn-secondary"
-                                style={{ fontSize: '9px' }}
-                            >
-                                ◄ QUAY LAI
+                            <button onClick={() => { setStep(1); setError(''); }} disabled={isSubmitting} className="btn-secondary">
+                                Quay lại
                             </button>
-                            <button
-                                onClick={handleCreate}
-                                disabled={isSubmitting || !characterName.trim()}
-                                className="pixel-btn pixel-btn-primary flex-1"
-                                style={{ fontSize: '9px' }}
-                            >
-                                {isSubmitting ? '[ DANG TAO... ]' : '[ XAC NHAN TAO NHAN VAT ]'}
+                            <button onClick={handleCreate} disabled={isSubmitting || !characterName.trim()} className="btn-primary flex-1">
+                                {isSubmitting ? 'Đang tạo...' : 'Tạo nhân vật'}
                             </button>
                         </div>
                     </div>

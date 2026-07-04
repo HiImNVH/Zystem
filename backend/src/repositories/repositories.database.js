@@ -1,7 +1,4 @@
-// backend/src/repositories/repositories.database.js
-// Version: 4.0
-// Cap nhat: Bo sung 5 bang con thieu (wallet_transactions, accounts, zones, achievements, player_achievements)
-//           Fix seedJobsSeedTable export de tuong thich voi index.js
+﻿// backend/src/repositories/repositories.database.js
 
 require('dotenv').config();
 const { Pool } = require('pg');
@@ -42,6 +39,9 @@ async function initializeDatabaseSchema() {
         await client.query(`
             DROP TABLE IF EXISTS player_achievements CASCADE;
             DROP TABLE IF EXISTS achievements CASCADE;
+            DROP TABLE IF EXISTS skill_refund_log CASCADE;
+            DROP TABLE IF EXISTS player_skills CASCADE;
+            DROP TABLE IF EXISTS job_skills CASCADE;
             DROP TABLE IF EXISTS player_recipes CASCADE;
             DROP TABLE IF EXISTS recipe_ingredients CASCADE;
             DROP TABLE IF EXISTS recipes CASCADE;
@@ -224,7 +224,12 @@ async function initializeDatabaseSchema() {
                 code VARCHAR(50) NOT NULL UNIQUE,
                 display_name VARCHAR(100) NOT NULL,
                 category VARCHAR(30) NOT NULL,
+                tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+                description TEXT,
+                note TEXT,
+                origin VARCHAR(30) DEFAULT 'Gatherable',
                 item_level SMALLINT DEFAULT 1,
+                lifecycle_model VARCHAR(20) NOT NULL DEFAULT 'None',
                 drop_weight_common INT DEFAULT 200,
                 drop_weight_uncommon INT DEFAULT 40,
                 drop_weight_rare INT DEFAULT 10,
@@ -233,6 +238,8 @@ async function initializeDatabaseSchema() {
                 required_job_id SMALLINT REFERENCES jobs_seed(id) ON DELETE SET NULL,
                 required_job_lv SMALLINT DEFAULT 1,
                 base_durability INT DEFAULT 0,
+                base_duration_hours INT DEFAULT 0,
+                lifecycle_note TEXT,
                 is_stackable BOOLEAN DEFAULT FALSE,
                 max_stack SMALLINT DEFAULT 1,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -370,8 +377,54 @@ async function initializeDatabaseSchema() {
         await client.query(`CREATE INDEX idx_queue_completes ON action_queue(completes_at) WHERE status = 'PENDING';`);
         await client.query(`CREATE INDEX idx_player_jobs_player ON player_jobs(player_id);`);
 
+
+        // === BANG KY NANG (SKILL TREE) ===
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS job_skills (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                job_code VARCHAR(30) NOT NULL,
+                branch VARCHAR(50) NOT NULL DEFAULT 'general',
+                skill_code VARCHAR(50) NOT NULL UNIQUE,
+                skill_name VARCHAR(100) NOT NULL,
+                lv_required SMALLINT NOT NULL DEFAULT 1,
+                sp_cost SMALLINT NOT NULL DEFAULT 0,
+                tier SMALLINT NOT NULL DEFAULT 1,
+                effect_type VARCHAR(50) NOT NULL DEFAULT 'passive',
+                effect_val NUMERIC(8,2) NOT NULL DEFAULT 0,
+                description TEXT,
+                prerequisite_skill_code VARCHAR(50),
+                created_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS player_skills (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+                skill_id UUID NOT NULL REFERENCES job_skills(id) ON DELETE CASCADE,
+                is_unlocked BOOLEAN DEFAULT FALSE,
+                unlocked_at TIMESTAMPTZ,
+                UNIQUE (player_id, skill_id)
+            );
+        `);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS skill_refund_log (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+                skill_id UUID NOT NULL REFERENCES job_skills(id) ON DELETE CASCADE,
+                sp_refunded SMALLINT NOT NULL,
+                refunded_at TIMESTAMPTZ DEFAULT NOW()
+            );
+        `);
+
+        // Index cho skill system
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_player_skills_player ON player_skills(player_id);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_job_skills_job_code ON job_skills(job_code);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_refund_log_player_date ON skill_refund_log(player_id, refunded_at);`);
+
         await client.query('COMMIT');
-        console.log('[SUCCESS] Toan bo 15 bang he thong Zystem da khoi tao thanh cong!');
+        console.log('[SUCCESS] Toan bo 18 bang he thong Zystem da khoi tao thanh cong!');
         return true;
 
     } catch (error) {

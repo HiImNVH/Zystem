@@ -1,5 +1,4 @@
-// backend/src/middleware/middleware.errorHandler.js
-// Version: 1.0
+﻿// backend/src/middleware/middleware.errorHandler.js
 // Xu ly loi toan cuc cho Express — bat tat ca error chua duoc xu ly
 
 /**

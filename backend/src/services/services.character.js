@@ -1,12 +1,11 @@
-// backend/src/services/services.character.js
-// Version: 2.0
-// Cap nhat: Tich hop progressionService, tinh tong stat tu nghe + gear + title
+﻿// backend/src/services/services.character.js
 
 const characterRepository = require('../repositories/repositories.character');
 const combatService = require('./services.combat');
+const itemStatsService = require('./services.itemStats');
 const { dbPool } = require('../repositories/repositories.database');
 
-// Tinh tong stat cua nhan vat: base_stat + stat tu nghe + stat tu title
+// Tinh tong stat cua nhan vat: base_stat + stat tu nghe + stat tu title + stat tu gear
 async function calculateTotalStats(playerId) {
     if (!playerId) return null;
 
@@ -53,14 +52,23 @@ async function calculateTotalStats(playerId) {
         }
     }
 
-    const totalStr = parseFloat(character.base_str) + parseFloat(jobStats.job_str || 0) + titleStats.str;
-    const totalAgi = parseFloat(character.base_agi) + parseFloat(jobStats.job_agi || 0) + titleStats.agi;
-    const totalDex = parseFloat(character.base_dex) + parseFloat(jobStats.job_dex || 0) + titleStats.dex;
-    const totalVit = parseFloat(character.base_vit) + parseFloat(jobStats.job_vit || 0) + titleStats.vit;
-    const totalInt = parseFloat(character.base_int) + parseFloat(jobStats.job_int || 0) + titleStats.int;
-    const totalChr = parseFloat(character.base_chr) + parseFloat(jobStats.job_chr || 0) + titleStats.chr;
+    // Lay stat tu toan bo gear dang equip (tong hop tu 3 stat slot moi item)
+    const gearStats = await itemStatsService.calculateGearStatBonus(playerId);
 
-    const maxHp = combatService.calculateMaxHp(totalVit, totalStr);
+    const totalStr = parseFloat(character.base_str) + parseFloat(jobStats.job_str || 0) + titleStats.str + gearStats.str;
+    const totalAgi = parseFloat(character.base_agi) + parseFloat(jobStats.job_agi || 0) + titleStats.agi + gearStats.agi;
+    const totalDex = parseFloat(character.base_dex) + parseFloat(jobStats.job_dex || 0) + titleStats.dex + gearStats.dex;
+    const totalVit = parseFloat(character.base_vit) + parseFloat(jobStats.job_vit || 0) + titleStats.vit + gearStats.vit;
+    const totalInt = parseFloat(character.base_int) + parseFloat(jobStats.job_int || 0) + titleStats.int + gearStats.int;
+    const totalChr = parseFloat(character.base_chr) + parseFloat(jobStats.job_chr || 0) + titleStats.chr + gearStats.chr;
+
+    const maxHp = combatService.calculateMaxHp({
+        vit: totalVit,
+        str: totalStr,
+        playerLevel: character.player_level
+    });
+    const attack = combatService.calculateAttack(totalStr, 0);
+    const defense = combatService.calculateDefense(totalVit, 0);
     const dodgeRate = combatService.calculateDodgeRate(totalAgi);
     const critRate = combatService.calculateCritRate(totalDex, 0);
 
@@ -80,12 +88,15 @@ async function calculateTotalStats(playerId) {
             chr: parseFloat(jobStats.job_chr || 0).toFixed(2),
         },
         from_title: titleStats,
+        from_gear: gearStats,
         total: {
             str: totalStr.toFixed(2), agi: totalAgi.toFixed(2), dex: totalDex.toFixed(2),
             vit: totalVit.toFixed(2), int: totalInt.toFixed(2), chr: totalChr.toFixed(2),
         },
         derived: {
             max_hp: maxHp,
+            attack,
+            defense,
             dodge_rate_pct: (dodgeRate * 100).toFixed(2),
             crit_rate_pct: (critRate * 100).toFixed(2),
         }

@@ -1,6 +1,4 @@
-// backend/src/repositories/repositories.wallet.js
-// Version: 2.0
-// Cap nhat: Fix UUID thay cho parseInt, bo sung getWalletByPlayer, getTransactionHistory
+﻿// backend/src/repositories/repositories.wallet.js
 
 const { dbPool } = require('./repositories.database');
 

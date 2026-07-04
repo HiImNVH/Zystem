@@ -1,6 +1,4 @@
-// backend/src/repositories/repositories.account.js
-// Version: 2.0
-// Cap nhat: Thay SHA256 bang bcrypt, bo sung findAccountById
+﻿// backend/src/repositories/repositories.account.js
 
 const { dbPool } = require('./repositories.database');
 const bcrypt = require('bcryptjs');

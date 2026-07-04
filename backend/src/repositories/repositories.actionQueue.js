@@ -1,6 +1,4 @@
-// backend/src/repositories/repositories.actionQueue.js
-// Version: 3.0
-// Cap nhat: Fix loi "FOR UPDATE cannot be applied to nullable side of outer join"
+﻿// backend/src/repositories/repositories.actionQueue.js
 //           Tach query lock va query lay zone thanh 2 buoc doc lap
 
 const { dbPool } = require('./repositories.database');

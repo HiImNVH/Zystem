@@ -1,12 +1,27 @@
-// backend/src/routes/routes.items.js
-// Version: 1.0
-// Endpoint quan ly vat pham: lay inventory, lay template, check equip requirement
+﻿// backend/src/routes/routes.items.js
+// Endpoint quan ly vat pham: ho tro tags/source theo data design
 
 const express = require('express');
 const itemsRouter = express.Router();
 const { dbPool } = require('../repositories/repositories.database');
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 const craftingService = require('../services/services.crafting');
+
+function getEquipSlot(item) {
+    const tags = (item.tags || []).map(tag => tag.toLowerCase());
+
+    if (item.category === 'WEAPON') return 'weapon';
+    if (item.category === 'TOOL') return 'tool';
+    if (tags.includes('backpack')) return 'backpack';
+    if (tags.includes('jewelry')) return 'accessory_1';
+    if (tags.includes('helmet')) return 'head';
+    if (tags.includes('gloves')) return 'hands';
+    if (tags.includes('boots')) return 'feet';
+    if (tags.includes('pants')) return 'lower_body';
+    if (tags.includes('armor')) return 'armor';
+
+    return 'upper_body';
+}
 
 /**
  * @route   GET /api/items/templates
@@ -44,7 +59,8 @@ itemsRouter.get('/player/:playerId', verifyToken, verifyPlayerOwnership, async (
     const { equipped } = req.query;
 
     let sqlQuery = `
-        SELECT i.*, it.display_name, it.category, it.item_level, it.is_stackable
+        SELECT i.*, it.display_name, it.category, it.tags, it.description, it.note,
+               it.origin, it.item_level, it.is_stackable
         FROM items i
         JOIN item_templates it ON i.template_id = it.id
         WHERE i.owner_player_id = $1
@@ -90,7 +106,7 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
     try {
         // Lay thong tin item va template
         const itemResult = await dbPool.query(`
-            SELECT i.*, it.item_level, it.display_name, it.category, it.base_durability
+            SELECT i.*, it.item_level, it.display_name, it.category, it.tags, it.base_durability
             FROM items i
             JOIN item_templates it ON i.template_id = it.id
             WHERE i.id = $1 AND i.owner_player_id = $2;
@@ -123,18 +139,7 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
         }
 
         // Xac dinh slot trang bi dua theo category
-        const categoryToSlot = {
-            WEAPON: 'weapon',
-            ARMOR:  'body',
-            HELMET: 'head',
-            PANTS:  'legs',
-            BOOTS:  'feet',
-            GLOVES: 'hands',
-            RING:   'ring_1',
-            AMULET: 'amulet',
-        };
-
-        const equipSlot = categoryToSlot[item.category] || 'misc';
+        const equipSlot = getEquipSlot(item);
 
         // Thao do cu trong cung slot (neu co)
         await dbPool.query(
@@ -186,6 +191,39 @@ itemsRouter.post('/unequip', verifyToken, async (req, res, next) => {
         }
 
         return res.json({ success: true, message: 'Da thao trang bi.', data: result.rows[0] });
+    } catch (error) {
+        next(error);
+    }
+});
+
+
+/**
+ * @route   GET /api/items/player/:playerId/equipped
+ * @desc    Lay danh sach item dang trang bi, gom nhom theo slot — dung cho UI paper-doll
+ * @access  Protected
+ */
+itemsRouter.get('/player/:playerId/equipped', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
+    const { playerId } = req.params;
+
+    try {
+        const result = await dbPool.query(`
+            SELECT i.*, it.display_name, it.category, it.tags, it.item_level
+            FROM items i
+            JOIN item_templates it ON i.template_id = it.id
+            WHERE i.owner_player_id = $1 AND i.is_equipped = TRUE
+            ORDER BY i.equip_slot ASC;
+        `, [playerId]);
+
+        const itemsWithPower = result.rows.map(item => ({
+            ...item,
+            item_power: craftingService.calculateItemPower(item.item_level, item.rarity)
+        }));
+
+        // Gom theo slot de frontend de render paper-doll
+        const bySlot = {};
+        itemsWithPower.forEach(item => { bySlot[item.equip_slot] = item; });
+
+        return res.json({ success: true, data: bySlot });
     } catch (error) {
         next(error);
     }

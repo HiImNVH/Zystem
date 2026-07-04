@@ -1,6 +1,4 @@
-// backend/src/routes/routes.actionQueue.js
-// Version: 4.0
-// Cap nhat: Gan verifyToken + verifyPlayerOwnership vao tat ca route
+﻿// backend/src/routes/routes.actionQueue.js
 //           Bo sung GET /:playerId/history
 
 const express = require('express');

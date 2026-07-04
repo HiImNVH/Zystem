@@ -1,0 +1,213 @@
+================================================================================
+                    AGENT SYSTEM PROMPT - NVH CODING STANDARDS
+        Read carefully and ingest the entire content before proceeding.
+================================================================================
+
+MANDATORY INITIALIZATION DIRECTIVE
+────────────────────────────────────────────────────────────────────────────────
+Before writing ANY line of code, the agent MUST:
+  1. Read this entire document.
+  2. Confirm clear understanding of every section.
+  3. Apply these standards consistently throughout the project.
+  4. Reload this file whenever switching to a new module or file.
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 1 — FILE STRUCTURE & MANAGEMENT
+────────────────────────────────────────────────────────────────────────────────
+
+[1.1] FILE LOCATION IDENTIFIER
+  The very first line of EVERY code file must be its path relative to the root.
+  Example:  # Project/module/models.py
+
+[1.2] SINGLE RESPONSIBILITY FILE
+  Each file must perform exactly ONE primary task.
+  Do not pack distinct logic into a single file.
+  Ensure functions do not overlap or duplicate each other's responsibilities.
+
+[1.3] ABSOLUTE ISOLATION — HIGHEST PRIORITY
+  Changes in File A must never cause a chain reaction or break File B.
+  The foundational structure of all other files must remain completely intact.
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 2 — LANGUAGE & NAMING CONVENTIONS
+────────────────────────────────────────────────────────────────────────────────
+
+[2.1] CLASS NAMES       → English Nouns, PascalCase
+  Correct:  UserAccount, PaymentProcessor, TaskManager
+  Incorrect: userAccount, payment_processor, quanlyTask
+
+[2.2] FUNCTION NAMES    → English Verbs, camelCase
+  Correct:  calculateTotal(), saveData(), isValidUser()
+  Incorrect: TinhTong(), save_data(), valid()
+
+[2.3] VARIABLE NAMES    → English Nouns/Adjectives, camelCase, meaningful
+  Correct:  currentSpeed, totalAmount, isLoggedIn
+  Incorrect: sp, amt, logged, x, tmp
+
+[2.4] TERMINAL LOGS & COMMENTS → Unaccented Vietnamese (Tiếng Việt không dấu)
+  Log Examples:     [INFO] Khoi tao module thanh cong
+                    [WARN] Ket noi cham, thu lai
+                    [ERROR] Khong tim thay file cau hinh
+                    [DEBUG] Gia tri bien: ...
+                    [SUCCESS] Luu du lieu thanh cong
+  Comment Example:  // Day la ly do tai sao xu ly theo cach nay
+
+[2.5] UX/UI TEXT         → Accented Vietnamese (Tiếng Việt có dấu)
+  Correct:  "Cấu hình đã được lưu thành công."
+  Incorrect: "Cau hinh da duoc luu." or "Config saved."
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 3 — COMMENTING RULES
+────────────────────────────────────────────────────────────────────────────────
+
+ONLY comment "WHY" — NEVER comment "WHAT".
+
+  INCORRECT — explaining the obvious:
+    // Tang toc do len 1.5 lan
+    currentSpeed = currentSpeed * 1.5;
+
+  CORRECT — explaining business logic/rationale:
+    // Bat buoc nhan 1.5 vi khach hang VIP duoc uu dai dac biet khung gio vang
+    if (isVip && isGoldenHour) {
+        currentSpeed = currentSpeed * 1.5;
+    }
+
+If function and variable names are self-explanatory → no comment is required.
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 4 — SOLID PRINCIPLES
+────────────────────────────────────────────────────────────────────────────────
+
+[S] Single Responsibility Principle (SRP)
+  Each Class/File/Function must have exactly ONE reason to change.
+  If an entity handles multiple roles → refactor and split it immediately.
+
+[O] Open / Closed Principle (OCP)
+  Open for extension (adding new features).
+  Closed for modification (do not alter stable, working legacy code).
+
+[L] Liskov Substitution Principle (LSP)
+  Subtypes must be completely substitutable for their base types without breaking the program.
+
+[I] Interface Segregation Principle (ISP)
+  Many client-specific interfaces > One bloated, general-purpose interface.
+  Never force a Class to implement methods it does not use.
+
+[D] Dependency Inversion Principle (DIP)
+  High-level modules must not depend on low-level modules. Both must depend on abstractions.
+  Abstractions must not depend on details. Details must depend on abstractions.
+  Do not hardcode concrete dependencies.
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 5 — CRUD STANDARDS
+────────────────────────────────────────────────────────────────────────────────
+
+[5.1] DATA LAYER SEPARATION
+  CRUD logic must reside EXCLUSIVELY in the Repository / Service / Model layer.
+  NEVER write DB queries, file I/O operations, or direct API calls inside UI components or Controllers.
+
+[5.2] CRUD FUNCTION NAMING CONVENTIONS
+  CREATE → create...  | add...    | insert...
+           Examples: createUser(), addOrder(), insertRecord()
+
+  READ   → get...     | find...   | search...
+           Examples: getUserById(), findActiveProducts(), searchByKeyword()
+
+  UPDATE → update...  | modify...
+           Examples: updateProfile(), modifyStatus()
+
+  DELETE → delete...  | remove...
+           Examples: deleteAccount(), removeItemFromCart()
+
+[5.3] DELETION INTEGRITY
+  Before implementing a Delete action, explicitly define the strategy:
+    - Hard Delete: Physical, permanent removal from the system.
+    - Soft Delete: Logical removal by hiding or updating state (e.g., isActive = false); data persists.
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 6 — COMPLEMENTARY CLEAN CODE STANDARDS
+────────────────────────────────────────────────────────────────────────────────
+
+[KISS]  Keep It Simple, Stupid. Write clear, explicit code.
+        Do not abuse complex one-liners or cryptic shorthand that hurts readability.
+
+[DRY]   Don't Repeat Yourself. Do not duplicate logic more than twice.
+        If duplication is detected → immediately consolidate into a shared function or module.
+
+[PARAM] Maximum of 2 parameters per function.
+        If more parameters are required → bundle them into a single configuration Object or Class.
+
+[FAIL-FAST / GUARD CLAUSE]
+        Validate inputs at the VERY BEGINNING of the function.
+        Return errors or exit early if data is invalid.
+        Avoid deep, nested if-else structures.
+
+  Correct:
+    function processOrder(order) {
+        if (!order) return;           // guard clause
+        if (!order.items.length) return;
+        // ... core logic execution
+    }
+
+  Incorrect:
+    function processOrder(order) {
+        if (order) {
+            if (order.items.length) {
+                // ... deeply nested core logic
+            }
+        }
+    }
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 7 — CODE CHANGE & REFACTORING PROCESS
+────────────────────────────────────────────────────────────────────────────────
+
+[7.1] SCOPE ADHERENCE
+  Only modify files/modules explicitly requested.
+  Do not modify surrounding or unrelated files without authorization.
+
+[7.2] FUNCTIONALITY PRESERVATION
+  Retain active core features.
+  Clean up dead, unused code.
+  Do not implement extra features outside the original scope.
+
+[7.3] OPTIMIZATION PROPOSALS
+  If a superior architecture is identified → clearly document the pros/cons and explain why.
+  Await user confirmation BEFORE proceeding with the refactor.
+  Never execute unauthorized refactoring.
+
+[7.4] BOY SCOUT RULE
+  When editing a file, if you discover:
+    - Outdated or meaningless variable names
+    - Bloated functions or violations of the principles above
+  → Clean up and optimize them concurrently.
+  The codebase must be left cleaner than how you found it.
+
+
+────────────────────────────────────────────────────────────────────────────────
+PRE-CODING CHECKLIST
+────────────────────────────────────────────────────────────────────────────────
+
+  [ ] Ingested the entire Agent.txt / standards file.
+  [ ] The first line of the file contains the exact relative path.
+  [ ] Class names → PascalCase, English.
+  [ ] Function names → camelCase, English verbs.
+  [ ] Variable names → camelCase, meaningful, no abbreviations.
+  [ ] Terminal logs / Comments → Unaccented Vietnamese.
+  [ ] UI text → Accented Vietnamese.
+  [ ] Comments explain WHY, not WHAT.
+  [ ] SOLID principles strictly applied.
+  [ ] CRUD functions properly named and data layers separated.
+  [ ] Functions have ≤ 2 parameters (or use an Object/DTO).
+  [ ] Guard clauses used at the beginning instead of nested if-else statements.
+  [ ] No features implemented outside the requested scope.
+
+================================================================================
+                          NVH CODING STANDARDS — END OF FILE
+================================================================================

@@ -1,6 +1,4 @@
-// backend/src/index.js
-// Version: 5.0
-// Cap nhat: Tich hop globalLimiter, JWT middleware, all 8 routes duoc bao ve
+﻿// backend/src/index.js
 
 require('dotenv').config();
 const express = require('express');
@@ -9,6 +7,7 @@ const cors = require('cors');
 const { initializeDatabaseSchema } = require('./repositories/repositories.database');
 const { seedJobsSeedTable } = require('./repositories/repositories.jobsSeed');
 const { seedItemTemplatesAndRecipes } = require('./repositories/repositories.itemsSeed');
+const { seedSkillTree } = require('./repositories/repositories.skillsSeed');
 const { globalErrorHandler, notFoundHandler } = require('./middleware/middleware.errorHandler');
 const { globalLimiter } = require('./middleware/middleware.rateLimit');
 
@@ -21,6 +20,7 @@ const zonesRouter        = require('./routes/routes.zones');
 const achievementsRouter = require('./routes/routes.achievements');
 const jobsRouter         = require('./routes/routes.jobs');
 const itemsRouter        = require('./routes/routes.items');
+const skillsRouter       = require('./routes/routes.skills');
 
 const app = express();
 const serverPort = process.env.PORT || 5000;
@@ -50,6 +50,7 @@ app.use('/api/zones',        zonesRouter);        // Protected
 app.use('/api/achievements', achievementsRouter); // Protected
 app.use('/api/jobs',         jobsRouter);         // Protected
 app.use('/api/items',        itemsRouter);        // Protected
+app.use('/api/skills',       skillsRouter);       // Protected
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
@@ -65,6 +66,7 @@ async function bootUpWebApplication() {
 
     await seedJobsSeedTable();
     await seedItemTemplatesAndRecipes();
+    await seedSkillTree();
 
     app.listen(serverPort, () => {
         console.log(`[SUCCESS] Zystem API dang chay tai: http://localhost:${serverPort}`);
@@ -82,6 +84,7 @@ async function bootUpWebApplication() {
         console.log('  [PROTECTED] GET  /api/achievements      | POST /claim-sp | POST /equip-title');
         console.log('  [PROTECTED] GET  /api/jobs              | POST /unlock   | POST /forget');
         console.log('  [PROTECTED] GET  /api/items/templates   | GET /player/:id | POST /equip | POST /unequip');
+        console.log('  [PROTECTED] GET  /api/skills/player/:id | POST /unlock | POST /refund');;
     });
 }
 
