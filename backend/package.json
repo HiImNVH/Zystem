@@ -9,7 +9,8 @@
     "dev:full": "docker start zystem-postgres && sleep 2 && nodemon src/index.js",
     "db:start": "docker start zystem-postgres",
     "db:stop": "docker stop zystem-postgres",
-    "db:status": "docker ps --filter name=zystem-postgres"
+    "db:status": "docker ps --filter name=zystem-postgres",
+    "test:logic": "node scripts/loadLogicSmokeTest.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

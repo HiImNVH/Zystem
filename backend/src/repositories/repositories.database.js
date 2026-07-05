@@ -39,14 +39,21 @@ async function initializeDatabaseSchema() {
         await client.query(`
             DROP TABLE IF EXISTS player_achievements CASCADE;
             DROP TABLE IF EXISTS achievements CASCADE;
+            DROP TABLE IF EXISTS user_progress_timestamps CASCADE;
             DROP TABLE IF EXISTS skill_refund_log CASCADE;
             DROP TABLE IF EXISTS player_skills CASCADE;
             DROP TABLE IF EXISTS job_skills CASCADE;
+            DROP TABLE IF EXISTS recipe_tag_inputs CASCADE;
             DROP TABLE IF EXISTS player_recipes CASCADE;
             DROP TABLE IF EXISTS recipe_ingredients CASCADE;
             DROP TABLE IF EXISTS recipes CASCADE;
             DROP TABLE IF EXISTS items CASCADE;
             DROP TABLE IF EXISTS item_templates CASCADE;
+            DROP TABLE IF EXISTS stat_definitions CASCADE;
+            DROP TABLE IF EXISTS item_type_rules CASCADE;
+            DROP TABLE IF EXISTS curel_rarity_weights CASCADE;
+            DROP TABLE IF EXISTS curel_item_power_matrix CASCADE;
+            DROP TABLE IF EXISTS leveling_rules CASCADE;
             DROP TABLE IF EXISTS wallet_transactions CASCADE;
             DROP TABLE IF EXISTS wallets CASCADE;
             DROP TABLE IF EXISTS action_queue CASCADE;
@@ -216,7 +223,79 @@ async function initializeDatabaseSchema() {
         await client.query(`CREATE INDEX idx_wallet_tx_created ON wallet_transactions(created_at DESC);`);
 
         // ============================================================
-        // BANG 9: ITEM TEMPLATES
+        // BANG 9: LEVELING RULES
+        // ============================================================
+        await client.query(`
+            CREATE TABLE leveling_rules (
+                level SMALLINT PRIMARY KEY,
+                player_exp_required BIGINT NOT NULL,
+                total_player_exp BIGINT NOT NULL,
+                skill_exp_required BIGINT NOT NULL,
+                total_skill_exp BIGINT NOT NULL,
+                breakthrough_time VARCHAR(20),
+                notes TEXT
+            );
+        `);
+
+        // ============================================================
+        // BANG 10: CUREL ITEM POWER MATRIX
+        // ============================================================
+        await client.query(`
+            CREATE TABLE curel_item_power_matrix (
+                item_level SMALLINT PRIMARY KEY,
+                base_item_power SMALLINT NOT NULL,
+                common_power SMALLINT NOT NULL,
+                uncommon_power SMALLINT NOT NULL,
+                rare_power SMALLINT NOT NULL,
+                epic_power SMALLINT NOT NULL,
+                legendary_power SMALLINT NOT NULL
+            );
+        `);
+
+        // ============================================================
+        // BANG 11: CUREL RARITY WEIGHTS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE curel_rarity_weights (
+                curel_level SMALLINT PRIMARY KEY,
+                common_weight SMALLINT NOT NULL,
+                uncommon_weight SMALLINT NOT NULL,
+                rare_weight SMALLINT NOT NULL,
+                epic_weight SMALLINT NOT NULL,
+                legendary_weight SMALLINT NOT NULL,
+                total_weight SMALLINT NOT NULL
+            );
+        `);
+
+        // ============================================================
+        // BANG 12: ITEM TYPE RULES
+        // ============================================================
+        await client.query(`
+            CREATE TABLE item_type_rules (
+                id SMALLSERIAL PRIMARY KEY,
+                main_tag VARCHAR(40) NOT NULL UNIQUE,
+                sub_tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+                item_count INT NOT NULL DEFAULT 0
+            );
+        `);
+
+        // ============================================================
+        // BANG 13: STAT DEFINITIONS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE stat_definitions (
+                id SMALLSERIAL PRIMARY KEY,
+                stat_type VARCHAR(30) NOT NULL,
+                code VARCHAR(50) NOT NULL,
+                full_name VARCHAR(100) NOT NULL,
+                purpose TEXT,
+                notes TEXT,
+                UNIQUE(stat_type, code)
+            );
+        `);
+
+        // ============================================================
+        // BANG 14: ITEM TEMPLATES
         // ============================================================
         await client.query(`
             CREATE TABLE item_templates (
@@ -247,7 +326,7 @@ async function initializeDatabaseSchema() {
         `);
 
         // ============================================================
-        // BANG 10: ITEMS (instances)
+        // BANG 15: ITEMS (instances)
         // ============================================================
         await client.query(`
             CREATE TABLE items (
@@ -277,18 +356,30 @@ async function initializeDatabaseSchema() {
         await client.query(`CREATE INDEX idx_items_equipped ON items(owner_player_id, is_equipped) WHERE is_equipped = TRUE;`);
 
         // ============================================================
-        // BANG 11: RECIPES
+        // BANG 16: RECIPES
         // ============================================================
         await client.query(`
             CREATE TABLE recipes (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 code VARCHAR(64) UNIQUE,
+                recipe_number SMALLINT UNIQUE,
                 output_template_id UUID NOT NULL REFERENCES item_templates(id) ON DELETE CASCADE,
+                output_category VARCHAR(30),
                 output_qty SMALLINT DEFAULT 1,
                 required_job_id SMALLINT REFERENCES jobs_seed(id) ON DELETE CASCADE,
                 required_job_level SMALLINT DEFAULT 1,
                 sp_to_unlock SMALLINT DEFAULT 0,
                 base_craft_time_s INT DEFAULT 5,
+                workstation_access TEXT,
+                required_tool_name VARCHAR(100),
+                tool_durability_cost SMALLINT,
+                output_level_formula TEXT,
+                workstation_queue_slot VARCHAR(80),
+                curel_rule_key VARCHAR(80),
+                design_notes TEXT,
+                main_material_slots VARCHAR(30),
+                curel_mechanic TEXT,
+                required_use_case_tags TEXT,
                 fail_output_template_id UUID REFERENCES item_templates(id) ON DELETE SET NULL,
                 is_auto_unlock BOOLEAN DEFAULT TRUE,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -296,7 +387,22 @@ async function initializeDatabaseSchema() {
         `);
 
         // ============================================================
-        // BANG 12: RECIPE INGREDIENTS
+        // BANG 17: RECIPE TAG INPUTS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE recipe_tag_inputs (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
+                slot_index SMALLINT NOT NULL CHECK (slot_index BETWEEN 1 AND 4),
+                tag_query TEXT NOT NULL,
+                quantity SMALLINT DEFAULT 1 CHECK (quantity > 0),
+                UNIQUE(recipe_id, slot_index)
+            );
+        `);
+        await client.query(`CREATE INDEX idx_recipe_tag_inputs_recipe ON recipe_tag_inputs(recipe_id);`);
+
+        // ============================================================
+        // BANG 18: RECIPE INGREDIENTS
         // ============================================================
         await client.query(`
             CREATE TABLE recipe_ingredients (
@@ -309,7 +415,7 @@ async function initializeDatabaseSchema() {
         `);
 
         // ============================================================
-        // BANG 13: PLAYER RECIPES (junction)
+        // BANG 19: PLAYER RECIPES (junction)
         // ============================================================
         await client.query(`
             CREATE TABLE player_recipes (
@@ -321,7 +427,7 @@ async function initializeDatabaseSchema() {
         `);
 
         // ============================================================
-        // BANG 14: ACHIEVEMENTS (seed data)
+        // BANG 20: ACHIEVEMENTS (seed data)
         // ============================================================
         await client.query(`
             CREATE TABLE achievements (
@@ -346,7 +452,7 @@ async function initializeDatabaseSchema() {
         `);
 
         // ============================================================
-        // BANG 15: PLAYER ACHIEVEMENTS
+        // BANG 21: PLAYER ACHIEVEMENTS
         // ============================================================
         await client.query(`
             CREATE TABLE player_achievements (
@@ -362,6 +468,24 @@ async function initializeDatabaseSchema() {
             );
         `);
         await client.query(`CREATE INDEX idx_player_ach ON player_achievements(player_id);`);
+
+        // ============================================================
+        // BANG 22: USER PROGRESS TIMESTAMPS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE user_progress_timestamps (
+                player_id UUID PRIMARY KEY REFERENCES players(id) ON DELETE CASCADE,
+                last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                last_saved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                last_action_claimed_at TIMESTAMPTZ,
+                last_inventory_updated_at TIMESTAMPTZ,
+                last_character_updated_at TIMESTAMPTZ,
+                save_revision BIGINT NOT NULL DEFAULT 1,
+                progress_snapshot JSONB NOT NULL DEFAULT '{}'::JSONB,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+        await client.query(`CREATE INDEX idx_user_progress_saved ON user_progress_timestamps(last_saved_at DESC);`);
 
         // FK vong cho players.equipped_title_id -> player_achievements
         await client.query(`
@@ -424,7 +548,7 @@ async function initializeDatabaseSchema() {
         await client.query(`CREATE INDEX IF NOT EXISTS idx_refund_log_player_date ON skill_refund_log(player_id, refunded_at);`);
 
         await client.query('COMMIT');
-        console.log('[SUCCESS] Toan bo 18 bang he thong Zystem da khoi tao thanh cong!');
+        console.log('[SUCCESS] Toan bo he thong bang Zystem da khoi tao thanh cong!');
         return true;
 
     } catch (error) {

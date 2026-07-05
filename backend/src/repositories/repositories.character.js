@@ -220,6 +220,7 @@ async function updateCharacterStats(characterId, statsUpdate) {
 }
 
 module.exports = {
+    calculateStartingJobBonus,
     createCharacter,
     findCharacterById,
     findCharacterByAccount,

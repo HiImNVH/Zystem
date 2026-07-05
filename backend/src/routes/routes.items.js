@@ -49,6 +49,69 @@ itemsRouter.get('/templates', verifyToken, async (req, res, next) => {
     }
 });
 
+itemsRouter.get('/recipes', verifyToken, async (req, res, next) => {
+    try {
+        const result = await dbPool.query(`
+            SELECT
+                r.id, r.code, r.recipe_number, r.output_category, r.output_qty,
+                r.required_job_level, r.base_craft_time_s, r.workstation_access,
+                r.required_tool_name, r.tool_durability_cost, r.output_level_formula,
+                r.workstation_queue_slot, r.curel_rule_key, r.design_notes,
+                r.main_material_slots, r.curel_mechanic, r.required_use_case_tags,
+                it.display_name AS output_item_name,
+                it.tags AS output_item_tags,
+                js.code AS required_job_code,
+                js.display_name AS required_job_name
+            FROM recipes r
+            JOIN item_templates it ON it.id = r.output_template_id
+            LEFT JOIN jobs_seed js ON js.id = r.required_job_id
+            ORDER BY r.recipe_number ASC;
+        `);
+
+        return res.json({ success: true, data: result.rows });
+    } catch (error) {
+        next(error);
+    }
+});
+
+itemsRouter.get('/recipes/:code', verifyToken, async (req, res, next) => {
+    try {
+        const recipeResult = await dbPool.query(`
+            SELECT
+                r.*,
+                it.display_name AS output_item_name,
+                it.tags AS output_item_tags,
+                js.code AS required_job_code,
+                js.display_name AS required_job_name
+            FROM recipes r
+            JOIN item_templates it ON it.id = r.output_template_id
+            LEFT JOIN jobs_seed js ON js.id = r.required_job_id
+            WHERE r.code = $1;
+        `, [req.params.code.toUpperCase()]);
+
+        if (recipeResult.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Khong tim thay cong thuc.' });
+        }
+
+        const inputResult = await dbPool.query(`
+            SELECT slot_index, tag_query, quantity
+            FROM recipe_tag_inputs
+            WHERE recipe_id = $1
+            ORDER BY slot_index ASC;
+        `, [recipeResult.rows[0].id]);
+
+        return res.json({
+            success: true,
+            data: {
+                ...recipeResult.rows[0],
+                inputs: inputResult.rows,
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 /**
  * @route   GET /api/items/player/:playerId
  * @desc    Lay toan bo inventory cua nhan vat

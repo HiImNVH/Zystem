@@ -8,6 +8,7 @@ const { initializeDatabaseSchema } = require('./repositories/repositories.databa
 const { seedJobsSeedTable } = require('./repositories/repositories.jobsSeed');
 const { seedItemTemplatesAndRecipes } = require('./repositories/repositories.itemsSeed');
 const { seedSkillTree } = require('./repositories/repositories.skillsSeed');
+const { seedDesignDatabase } = require('./repositories/repositories.designSeed');
 const { globalErrorHandler, notFoundHandler } = require('./middleware/middleware.errorHandler');
 const { globalLimiter } = require('./middleware/middleware.rateLimit');
 
@@ -21,6 +22,7 @@ const achievementsRouter = require('./routes/routes.achievements');
 const jobsRouter         = require('./routes/routes.jobs');
 const itemsRouter        = require('./routes/routes.items');
 const skillsRouter       = require('./routes/routes.skills');
+const progressRouter     = require('./routes/routes.progress');
 
 const app = express();
 const serverPort = process.env.PORT || 5000;
@@ -51,6 +53,7 @@ app.use('/api/achievements', achievementsRouter); // Protected
 app.use('/api/jobs',         jobsRouter);         // Protected
 app.use('/api/items',        itemsRouter);        // Protected
 app.use('/api/skills',       skillsRouter);       // Protected
+app.use('/api/progress',     progressRouter);     // Protected
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
@@ -66,6 +69,7 @@ async function bootUpWebApplication() {
 
     await seedJobsSeedTable();
     await seedItemTemplatesAndRecipes();
+    await seedDesignDatabase();
     await seedSkillTree();
 
     app.listen(serverPort, () => {
@@ -83,8 +87,9 @@ async function bootUpWebApplication() {
         console.log('  [PROTECTED] GET  /api/zones             | GET /api/zones/:code');
         console.log('  [PROTECTED] GET  /api/achievements      | POST /claim-sp | POST /equip-title');
         console.log('  [PROTECTED] GET  /api/jobs              | POST /unlock   | POST /forget');
-        console.log('  [PROTECTED] GET  /api/items/templates   | GET /player/:id | POST /equip | POST /unequip');
+        console.log('  [PROTECTED] GET  /api/items/templates   | GET /recipes | GET /player/:id | POST /equip | POST /unequip');
         console.log('  [PROTECTED] GET  /api/skills/player/:id | POST /unlock | POST /refund');;
+        console.log('  [PROTECTED] GET  /api/progress/:id      | POST /api/progress/touch');
     });
 }
 
