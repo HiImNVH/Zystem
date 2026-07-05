@@ -30,7 +30,7 @@ async function createCharacter(characterData) {
             [characterData.accountId]
         );
         if (existingCheck.rows.length > 0) {
-            return { error: `Tai khoan nay da co nhan vat: "${existingCheck.rows[0].character_name}". Moi tai khoan chi duoc tao 1 nhan vat.` };
+            return { error: `This account already has a character: "${existingCheck.rows[0].character_name}". Each account can only create one character.` };
         }
 
         // Lay thong tin nghe khoi dau
@@ -41,7 +41,7 @@ async function createCharacter(characterData) {
                 [characterData.startingJobCode.toLowerCase()]
             );
             if (jobResult.rows.length === 0) {
-                return { error: `Nghe khoi dau khong hop le: ${characterData.startingJobCode}` };
+                return { error: `Invalid starting job: ${characterData.startingJobCode}` };
             }
             startingJob = jobResult.rows[0];
         }
@@ -124,7 +124,7 @@ async function createCharacter(characterData) {
         await client.query('ROLLBACK');
         if (error.code === '23505') {
             console.warn(`[WARN] Ten nhan vat da ton tai: ${characterData.characterName}`);
-            return { error: 'Ten nhan vat nay da duoc su dung boi nguoi choi khac.' };
+            return { error: 'This character name is already used by another player.' };
         }
         console.error('[ERROR] Loi khi createCharacter:', error.message);
         return null;

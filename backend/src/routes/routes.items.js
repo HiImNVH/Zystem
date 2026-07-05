@@ -90,7 +90,7 @@ itemsRouter.get('/recipes/:code', verifyToken, async (req, res, next) => {
         `, [req.params.code.toUpperCase()]);
 
         if (recipeResult.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay cong thuc.' });
+            return res.status(404).json({ success: false, message: 'Recipe not found.' });
         }
 
         const inputResult = await dbPool.query(`
@@ -162,7 +162,7 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
     if (!playerId || !itemId) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va itemId.'
+            message: 'Missing parameters: playerId and itemId.'
         });
     }
 
@@ -176,7 +176,7 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
         `, [itemId, playerId]);
 
         if (itemResult.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay vat pham.' });
+            return res.status(404).json({ success: false, message: 'Item not found.' });
         }
 
         const item = itemResult.rows[0];
@@ -188,7 +188,7 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
         );
 
         if (playerResult.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character not found.' });
         }
 
         const playerLevel = playerResult.rows[0].player_level;
@@ -197,7 +197,7 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
         if (playerLevel < item.item_level) {
             return res.status(400).json({
                 success: false,
-                message: `Yeu cau Player Level >= ${item.item_level} de trang bi ${item.display_name}. Player Level hien tai: ${playerLevel}.`
+                message: `Player Level >= ${item.item_level} is required to equip ${item.display_name}. Current Player Level: ${playerLevel}.`
             });
         }
 
@@ -218,7 +218,7 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: `Da trang bi: ${item.display_name} vao slot [${equipSlot}].`,
+            message: `Equipped ${item.display_name} into slot [${equipSlot}].`,
             data: { item_id: itemId, equip_slot: equipSlot }
         });
     } catch (error) {
@@ -237,7 +237,7 @@ itemsRouter.post('/unequip', verifyToken, async (req, res, next) => {
     if (!playerId || !itemId) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va itemId.'
+            message: 'Missing parameters: playerId and itemId.'
         });
     }
 
@@ -250,10 +250,10 @@ itemsRouter.post('/unequip', verifyToken, async (req, res, next) => {
         `, [itemId, playerId]);
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay vat pham.' });
+            return res.status(404).json({ success: false, message: 'Item not found.' });
         }
 
-        return res.json({ success: true, message: 'Da thao trang bi.', data: result.rows[0] });
+        return res.json({ success: true, message: 'Equipment removed.', data: result.rows[0] });
     } catch (error) {
         next(error);
     }

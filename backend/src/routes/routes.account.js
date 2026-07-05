@@ -19,21 +19,21 @@ accountRouter.post('/register', authLimiter, async (req, res, next) => {
     if (!username || !email || !password) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu thong tin bat buoc: username, email, password.'
+            message: 'Missing required fields: username, email, password.'
         });
     }
 
     if (username.trim().length < 3 || username.trim().length > 32) {
         return res.status(400).json({
             success: false,
-            message: 'Ten dang nhap phai tu 3 den 32 ky tu.'
+            message: 'Username must be 3 to 32 characters.'
         });
     }
 
     if (password.length < 6) {
         return res.status(400).json({
             success: false,
-            message: 'Mat khau phai co it nhat 6 ky tu.'
+            message: 'Password must be at least 6 characters.'
         });
     }
 
@@ -41,7 +41,7 @@ accountRouter.post('/register', authLimiter, async (req, res, next) => {
         const result = await accountRepository.createAccount(username, email, password);
 
         if (!result) {
-            return res.status(500).json({ success: false, message: 'Khong the tao tai khoan. Vui long thu lai.' });
+            return res.status(500).json({ success: false, message: 'Could not create account. Please try again.' });
         }
 
         if (result.error) {
@@ -53,7 +53,7 @@ accountRouter.post('/register', authLimiter, async (req, res, next) => {
 
         return res.status(201).json({
             success: true,
-            message: 'Dang ky tai khoan thanh cong!',
+            message: 'Account registered successfully!',
             data: {
                 account: result,
                 token
@@ -76,7 +76,7 @@ accountRouter.post('/login', authLimiter, async (req, res, next) => {
     if (!username || !password) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu thong tin: username va password.'
+            message: 'Missing fields: username and password.'
         });
     }
 
@@ -91,7 +91,7 @@ accountRouter.post('/login', authLimiter, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: 'Dang nhap thanh cong!',
+            message: 'Logged in successfully!',
             data: {
                 account: result.account,
                 token
@@ -111,7 +111,7 @@ accountRouter.get('/me', verifyToken, async (req, res, next) => {
     try {
         const account = await accountRepository.findAccountById(req.accountId);
         if (!account) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay tai khoan.' });
+            return res.status(404).json({ success: false, message: 'Account not found.' });
         }
 
         return res.json({ success: true, data: account });

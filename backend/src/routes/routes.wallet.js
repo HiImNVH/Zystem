@@ -15,7 +15,7 @@ walletRouter.get('/:playerId', verifyToken, verifyPlayerOwnership, async (req, r
     try {
         const wallet = await walletRepository.getWalletByPlayer(playerId);
         if (!wallet) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay vi cua nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character wallet not found.' });
         }
 
         return res.json({ success: true, data: wallet });
@@ -53,7 +53,7 @@ walletRouter.post('/modify', verifyToken, async (req, res, next) => {
     if (!playerId || !currency || !amount || !transactionType) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId, currency, amount, transactionType.'
+            message: 'Missing parameters: playerId, currency, amount, transactionType.'
         });
     }
 
@@ -61,7 +61,7 @@ walletRouter.post('/modify', verifyToken, async (req, res, next) => {
     if (!validCurrencies.includes(currency.toLowerCase())) {
         return res.status(400).json({
             success: false,
-            message: `Loai tien te khong hop le. Chi chap nhan: ${validCurrencies.join(', ')}`
+            message: `Invalid currency type. Accepted values: ${validCurrencies.join(', ')}`
         });
     }
 
@@ -69,7 +69,7 @@ walletRouter.post('/modify', verifyToken, async (req, res, next) => {
     if (!validTypes.includes(transactionType.toUpperCase())) {
         return res.status(400).json({
             success: false,
-            message: 'transactionType chi chap nhan: DEPOSIT hoac WITHDRAW.'
+            message: 'transactionType only accepts: DEPOSIT or WITHDRAW.'
         });
     }
 
@@ -82,7 +82,7 @@ walletRouter.post('/modify', verifyToken, async (req, res, next) => {
             return res.status(400).json({ success: false, message: result.message });
         }
 
-        return res.json({ success: true, message: 'Bien dong so du thanh cong!', data: result });
+        return res.json({ success: true, message: 'Balance updated successfully!', data: result });
     } catch (error) {
         next(error);
     }

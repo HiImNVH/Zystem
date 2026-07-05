@@ -45,7 +45,7 @@ zonesRouter.get('/:code', async (req, res, next) => {
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: `Zone khong ton tai: ${code}` });
+            return res.status(404).json({ success: false, message: `Zone does not exist: ${code}` });
         }
 
         return res.json({ success: true, data: result.rows[0] });

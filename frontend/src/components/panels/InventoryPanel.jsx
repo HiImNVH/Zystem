@@ -21,13 +21,13 @@ const CATEGORY_MARKS = {
 };
 
 const FILTERS = [
-    { value: 'ALL', label: 'Tất cả' },
-    { value: 'RUBBISH', label: 'Rác' },
-    { value: 'MATERIAL', label: 'Nguyên liệu' },
-    { value: 'WEAPON', label: 'Vũ khí' },
-    { value: 'EQUIPMENT', label: 'Trang bị' },
-    { value: 'TOOL', label: 'Công cụ' },
-    { value: 'BUILDING', label: 'Xây dựng' },
+    { value: 'ALL', label: 'All' },
+    { value: 'RUBBISH', label: 'Junk' },
+    { value: 'MATERIAL', label: 'Materials' },
+    { value: 'WEAPON', label: 'Weapons' },
+    { value: 'EQUIPMENT', label: 'Gear' },
+    { value: 'TOOL', label: 'Tools' },
+    { value: 'BUILDING', label: 'Building' },
 ];
 
 const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
@@ -102,7 +102,7 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                         <p className="font-mono font-semibold text-accent">{item.item_power}</p>
                     </div>
                     <div className="card p-3">
-                        <p className="text-textMuted text-xs mb-1">Cấp yêu cầu</p>
+                        <p className="text-textMuted text-xs mb-1">Required level</p>
                         <p className="font-mono font-semibold">{item.item_level}</p>
                     </div>
                 </div>
@@ -122,14 +122,14 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
 
                 {(item.origin || item.note) && (
                     <div className="card p-3 mb-3">
-                        {item.origin && <p className="text-xs text-textMuted">Nguồn: <span className="text-textSecondary">{item.origin}</span></p>}
+                        {item.origin && <p className="text-xs text-textMuted">Source: <span className="text-textSecondary">{item.origin}</span></p>}
                         {item.note && <p className="text-xs text-textMuted mt-1">{item.note}</p>}
                     </div>
                 )}
 
                 {itemStats.length > 0 && (
                     <div className="card p-3 mb-3">
-                        <p className="text-textMuted text-xs mb-2">Chỉ số cộng thêm</p>
+                        <p className="text-textMuted text-xs mb-2">Bonus stats</p>
                         <div className="flex flex-wrap gap-3">
                             {itemStats.map((stat, index) => (
                                 <span key={index} className="text-sm">
@@ -142,16 +142,16 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                 )}
 
                 {item.quantity > 1 && (
-                    <p className="text-xs text-textMuted mb-3">Số lượng: x{item.quantity}</p>
+                    <p className="text-xs text-textMuted mb-3">Quantity: x{item.quantity}</p>
                 )}
 
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
 
                 {item.is_equipped ? (
-                    <div className="text-center text-sm text-success py-2">Đang trang bị</div>
+                    <div className="text-center text-sm text-success py-2">Equipped</div>
                 ) : canEquip ? (
                     <button onClick={handleEquip} disabled={isLoading} className="btn-primary w-full">
-                        {isLoading ? 'Đang trang bị...' : 'Trang bị'}
+                        {isLoading ? 'Equipping...' : 'Equip'}
                     </button>
                 ) : null}
             </div>
@@ -169,8 +169,8 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
         <div className="h-full flex flex-col">
             <div className="px-4 py-3 border-b border-border flex-shrink-0">
                 <div className="flex items-center justify-between mb-3">
-                    <h2 className="font-semibold text-sm">Túi đồ</h2>
-                    <span className="text-xs text-textMuted font-mono">{items?.length || 0} vật phẩm</span>
+                    <h2 className="font-semibold text-sm">Inventory</h2>
+                    <span className="text-xs text-textMuted font-mono">{items?.length || 0} items</span>
                 </div>
                 <div className="flex gap-1.5 overflow-x-auto pb-1">
                     {FILTERS.map(filterItem => (
@@ -190,8 +190,8 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
                     <div className="flex items-center justify-center h-full">
                         <div className="text-center max-w-[200px]">
                             <div className="text-3xl mb-3 opacity-20">0</div>
-                            <p className="text-sm text-textSecondary mb-1">Chưa có vật phẩm</p>
-                            <p className="text-xs text-textMuted">Hoàn thành hành động để thu thập loot.</p>
+                            <p className="text-sm text-textSecondary mb-1">No items yet</p>
+                            <p className="text-xs text-textMuted">Complete actions to collect loot.</p>
                         </div>
                     </div>
                 ) : (

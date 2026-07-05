@@ -64,7 +64,7 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
     const { playerId, skillCode } = req.body;
 
     if (!playerId || !skillCode) {
-        return res.status(400).json({ success: false, message: 'Thieu tham so: playerId, skillCode.' });
+        return res.status(400).json({ success: false, message: 'Missing parameters: playerId, skillCode.' });
     }
 
     const client = await dbPool.connect();
@@ -77,7 +77,7 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
             [skillCode]
         );
         if (skillResult.rows.length === 0) {
-            throw new Error(`Skill khong ton tai: ${skillCode}`);
+            throw new Error(`Skill does not exist: ${skillCode}`);
         }
         const skill = skillResult.rows[0];
 
@@ -89,7 +89,7 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
         `, [playerId, skill.job_code]);
 
         if (jobResult.rows.length === 0) {
-            throw new Error(`Chua mo khoa nghe ${skill.job_code}. Mo khoa nghe truoc.`);
+            throw new Error(`Job ${skill.job_code} is not unlocked. Unlock the job first.`);
         }
 
         const jobLevel = jobResult.rows[0].job_level;
@@ -97,8 +97,8 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
         // Kiem tra level requirement
         if (jobLevel < skill.lv_required) {
             throw new Error(
-                `Yeu cau cap nghe ${skill.lv_required} de mo skill nay. ` +
-                `Cap nghe ${skill.job_code} hien tai: ${jobLevel}.`
+                `Job level ${skill.lv_required} is required to unlock this skill. ` +
+                `Current ${skill.job_code} level: ${jobLevel}.`
             );
         }
 
@@ -108,7 +108,7 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
             [playerId, skill.id]
         );
         if (existCheck.rows.length > 0 && existCheck.rows[0].is_unlocked) {
-            throw new Error('Skill nay da duoc mo khoa roi.');
+            throw new Error('This skill is already unlocked.');
         }
 
         // Kiem tra prerequisite
@@ -120,7 +120,7 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
             `, [playerId, skill.prerequisite_skill_code]);
 
             if (preResult.rows.length === 0 || !preResult.rows[0].is_unlocked) {
-                throw new Error(`Phai mo khoa skill tien quyet truoc: ${skill.prerequisite_skill_code}`);
+                throw new Error(`Prerequisite skill must be unlocked first: ${skill.prerequisite_skill_code}`);
             }
         }
 
@@ -132,7 +132,7 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
             );
             if (playerResult.rows[0].skill_points < skill.sp_cost) {
                 throw new Error(
-                    `Khong du SP. Can ${skill.sp_cost} SP, hien co ${playerResult.rows[0].skill_points} SP.`
+                    `Not enough SP. Required: ${skill.sp_cost} SP, current: ${playerResult.rows[0].skill_points} SP.`
                 );
             }
             await client.query(
@@ -154,7 +154,7 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: `Da mo khoa ky nang: ${skill.skill_name}!`,
+            message: `Unlocked skill: ${skill.skill_name}!`,
             data: { skill_code: skillCode, sp_spent: skill.sp_cost }
         });
     } catch (error) {
@@ -176,7 +176,7 @@ skillsRouter.post('/refund', verifyToken, async (req, res, next) => {
     const { playerId, skillCode } = req.body;
 
     if (!playerId || !skillCode) {
-        return res.status(400).json({ success: false, message: 'Thieu tham so: playerId, skillCode.' });
+        return res.status(400).json({ success: false, message: 'Missing parameters: playerId, skillCode.' });
     }
 
     const client = await dbPool.connect();
@@ -187,7 +187,7 @@ skillsRouter.post('/refund', verifyToken, async (req, res, next) => {
         const refundToday = await getRefundCountToday(playerId);
         if (refundToday >= MAX_REFUNDS_PER_DAY) {
             throw new Error(
-                `Da het luot thu hoi hom nay (${MAX_REFUNDS_PER_DAY} lan/ngay). Thu lai vao ngay mai.`
+                `No refunds left today (${MAX_REFUNDS_PER_DAY} per day). Try again tomorrow.`
             );
         }
 
@@ -196,12 +196,12 @@ skillsRouter.post('/refund', verifyToken, async (req, res, next) => {
             `SELECT * FROM job_skills WHERE skill_code = $1;`,
             [skillCode]
         );
-        if (skillResult.rows.length === 0) throw new Error(`Skill khong ton tai: ${skillCode}`);
+        if (skillResult.rows.length === 0) throw new Error(`Skill does not exist: ${skillCode}`);
         const skill = skillResult.rows[0];
 
         // Skill lv1 free khong the thu hoi
         if (skill.sp_cost === 0) {
-            throw new Error('Skill khoi dau (free) khong the thu hoi diem.');
+            throw new Error('Starting skills (free) cannot be refunded.');
         }
 
         // Kiem tra da mo chua
@@ -210,7 +210,7 @@ skillsRouter.post('/refund', verifyToken, async (req, res, next) => {
             [playerId, skill.id]
         );
         if (unlockedCheck.rows.length === 0) {
-            throw new Error('Skill nay chua duoc mo khoa.');
+            throw new Error('This skill is not unlocked.');
         }
 
         // Tim tat ca skill con chau can xoa (BFS)
@@ -264,7 +264,7 @@ skillsRouter.post('/refund', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: `Thu hoi thanh cong! Hoan lai ${totalSpRefund} SP. Con ${remainingRefunds} luot thu hoi hom nay.`,
+            message: `Refund successful! Refunded ${totalSpRefund} SP. ${remainingRefunds} refunds left today.`,
             data: {
                 revoked_skills:    toRevoke.map(s => s.skill_code),
                 sp_refunded:       totalSpRefund,
@@ -294,7 +294,7 @@ skillsRouter.get('/refund-status/:playerId', verifyToken, verifyPlayerOwnership,
                 used_today:        usedToday,
                 remaining_today:   MAX_REFUNDS_PER_DAY - usedToday,
                 max_per_day:       MAX_REFUNDS_PER_DAY,
-                resets_at:         'Nua dem (00:00 server time)'
+                resets_at:         'Midnight (00:00 server time)'
             }
         });
     } catch (error) {

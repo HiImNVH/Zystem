@@ -11,7 +11,7 @@ const globalLimiter = rateLimit({
     legacyHeaders: false,
     message: {
         success: false,
-        message: 'Qua nhieu yeu cau. Vui long thu lai sau 15 phut.'
+        message: 'Too many requests. Please try again in 15 minutes.'
     }
 });
 
@@ -24,7 +24,7 @@ const authLimiter = rateLimit({
     legacyHeaders: false,
     message: {
         success: false,
-        message: 'Qua nhieu lan thu dang nhap. Vui long thu lai sau 15 phut.'
+        message: 'Too many login attempts. Please try again in 15 minutes.'
     }
 });
 
@@ -37,7 +37,7 @@ const actionLimiter = rateLimit({
     legacyHeaders: false,
     message: {
         success: false,
-        message: 'Qua nhieu hanh dong. Vui long thu lai sau 1 phut.'
+        message: 'Too many actions. Please try again in 1 minute.'
     }
 });
 

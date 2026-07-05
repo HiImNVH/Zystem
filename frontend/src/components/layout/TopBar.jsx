@@ -2,8 +2,8 @@
 
 const DESKTOP_NAV = [
     { key: 'CHAT', label: 'Chat' },
-    { key: 'QUEST', label: 'Ky nang' },
-    { key: 'PROFILE', label: 'Ho so' },
+    { key: 'QUEST', label: 'Skills' },
+    { key: 'PROFILE', label: 'Profile' },
 ];
 
 export default function TopBar({ character, activeDesktopTab, onChangeDesktopTab, onOpenSettings }) {
@@ -53,7 +53,7 @@ export default function TopBar({ character, activeDesktopTab, onChangeDesktopTab
                 onClick={onOpenSettings}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-textSecondary hover:text-textPrimary hover:bg-elevated transition-colors flex-shrink-0"
             >
-                Cai
+                Set
             </button>
         </div>
     );

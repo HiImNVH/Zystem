@@ -1,16 +1,16 @@
 ﻿// frontend/src/components/layout/BottomNav.jsx
 
 const NAV_ITEMS = [
-    { key: 'MAIN',      label: 'Bản đồ', mark: 'MAP' },
-    { key: 'INVENTORY', label: 'Túi đồ', mark: 'BAG' },
-    { key: 'QUEST',     label: 'Kỹ năng', mark: 'SP' },
+    { key: 'MAIN',      label: 'Map', mark: 'MAP' },
+    { key: 'INVENTORY', label: 'Inventory', mark: 'BAG' },
+    { key: 'QUEST',     label: 'Skills', mark: 'SP' },
     { key: 'CHAT',      label: 'Chat', mark: 'CHAT' },
-    { key: 'PROFILE',   label: 'Hồ sơ', mark: 'ME' },
+    { key: 'PROFILE',   label: 'Profile', mark: 'ME' },
 ];
 
-export default function BottomNav({ activeTab, onChangeTab }) {
+export default function BottomNav({ activeTab, onChangeTab, className = '' }) {
     return (
-        <div className="md:hidden h-16 flex items-center border-t border-border bg-panel flex-shrink-0">
+        <div className={`h-16 flex items-center border-t border-border bg-panel flex-shrink-0 ${className}`}>
             {NAV_ITEMS.map(item => (
                 <button
                     key={item.key}

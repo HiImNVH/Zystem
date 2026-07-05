@@ -6,9 +6,9 @@ import JobCard from './JobCard';
 
 const CATEGORY_ORDER = ['combat', 'survival', 'production'];
 const CATEGORY_LABELS = {
-    combat: 'Chiến đấu',
-    survival: 'Sinh tồn',
-    production: 'Sản xuất',
+    combat: 'Combat',
+    survival: 'Survival',
+    production: 'Production',
 };
 
 export default function CreateCharacter({ account, onCharacterCreated, onLogout }) {
@@ -23,13 +23,13 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
     useEffect(() => {
         getJobs()
             .then(result => setJobs(result.data.filter(job => job.is_available)))
-            .catch(() => setError('Không tải được danh sách kỹ năng.'))
+            .catch(() => setError('Could not load the skill list.'))
             .finally(() => setIsLoading(false));
     }, []);
 
     function handleNextStep() {
         if (!selectedJob) {
-            setError('Hãy chọn một kỹ năng khởi đầu.');
+            setError('Choose a starting skill.');
             return;
         }
         setStep(2);
@@ -38,7 +38,7 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
 
     async function handleCreate() {
         if (!characterName.trim() || characterName.trim().length < 3) {
-            setError('Tên nhân vật cần có ít nhất 3 ký tự.');
+            setError('Character name must be at least 3 characters.');
             return;
         }
 
@@ -62,7 +62,7 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-base">
-                <p className="text-sm text-textMuted">Đang tải...</p>
+                <p className="text-sm text-textMuted">Loading...</p>
             </div>
         );
     }
@@ -72,7 +72,7 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
             <div className="border-b border-border px-6 py-4 flex items-center justify-between flex-shrink-0">
                 <div>
                     <h1 className="font-bold">ZYSTEM</h1>
-                    <p className="text-xs text-textMuted">Chào {account?.username}, hãy tạo nhân vật của bạn</p>
+                    <p className="text-xs text-textMuted">Welcome {account?.username}, create your character</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
                     </div>
                     {onLogout && (
                         <button onClick={onLogout} className="text-xs text-textMuted hover:text-danger transition-colors">
-                            Đổi tài khoản
+                            Switch account
                         </button>
                     )}
                 </div>
@@ -95,9 +95,9 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
             {step === 1 && (
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <div className="px-6 py-5 flex-shrink-0 max-w-3xl">
-                        <h2 className="text-lg font-bold mb-1">Chọn kỹ năng khởi đầu</h2>
+                        <h2 className="text-lg font-bold mb-1">Choose a Starting Skill</h2>
                         <p className="text-sm text-textMuted">
-                            Kỹ năng được chọn sẽ bắt đầu ở cấp 20 và cộng chỉ số ngay khi tạo nhân vật.
+                            Your selected skill starts at level 20 and grants stat bonuses when the character is created.
                         </p>
                     </div>
 
@@ -123,10 +123,10 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
                         {error && <p className="text-sm text-danger mb-3">{error}</p>}
                         <div className="flex items-center justify-between">
                             <p className="text-sm text-textSecondary">
-                                {selectedJob ? `Đã chọn: ${selectedJob.display_name}` : 'Chưa chọn kỹ năng'}
+                                {selectedJob ? `Selected: ${selectedJob.display_name}` : 'No skill selected'}
                             </p>
                             <button onClick={handleNextStep} disabled={!selectedJob} className="btn-primary px-6">
-                                Tiếp tục
+                                Continue
                             </button>
                         </div>
                     </div>
@@ -136,10 +136,10 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
             {step === 2 && (
                 <div className="flex-1 flex items-center justify-center p-6">
                     <div className="w-full max-w-md">
-                        <h2 className="text-lg font-bold mb-5">Đặt tên nhân vật</h2>
+                        <h2 className="text-lg font-bold mb-5">Name Your Character</h2>
 
                         <div className="card p-4 mb-5">
-                            <p className="text-xs text-textMuted mb-2">Kỹ năng khởi đầu</p>
+                            <p className="text-xs text-textMuted mb-2">Starting skill</p>
                             <p className="font-semibold mb-3">{selectedJob.display_name}</p>
                             <div className="flex flex-wrap gap-3 text-xs">
                                 {['str_per_lv','agi_per_lv','dex_per_lv','vit_per_lv','int_per_lv','chr_per_lv']
@@ -153,7 +153,7 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
                             </div>
                         </div>
 
-                        <label className="block text-xs font-medium text-textSecondary mb-1.5">Tên nhân vật</label>
+                        <label className="block text-xs font-medium text-textSecondary mb-1.5">Character name</label>
                         <input
                             type="text"
                             value={characterName}
@@ -168,7 +168,7 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
 
                         <div className="bg-danger/10 rounded-lg p-3 mb-5">
                             <p className="text-xs text-danger">
-                                Tên nhân vật và kỹ năng khởi đầu sẽ không đổi sau khi tạo.
+                                Character name and starting skill cannot be changed after creation.
                             </p>
                         </div>
 
@@ -176,10 +176,10 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
 
                         <div className="flex gap-3">
                             <button onClick={() => { setStep(1); setError(''); }} disabled={isSubmitting} className="btn-secondary">
-                                Quay lại
+                                Back
                             </button>
                             <button onClick={handleCreate} disabled={isSubmitting || !characterName.trim()} className="btn-primary flex-1">
-                                {isSubmitting ? 'Đang tạo...' : 'Tạo nhân vật'}
+                                {isSubmitting ? 'Creating...' : 'Create Character'}
                             </button>
                         </div>
                     </div>

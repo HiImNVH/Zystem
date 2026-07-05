@@ -69,7 +69,7 @@ jobsRouter.post('/unlock', verifyToken, async (req, res, next) => {
     if (!playerId || !jobCode) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va jobCode.'
+            message: 'Missing parameters: playerId and jobCode.'
         });
     }
 
@@ -84,7 +84,7 @@ jobsRouter.post('/unlock', verifyToken, async (req, res, next) => {
         );
 
         if (jobResult.rows.length === 0) {
-            throw new Error(`Nghe khong ton tai hoac chua duoc mo khoa: ${jobCode}`);
+            throw new Error(`Job does not exist or is not available: ${jobCode}`);
         }
 
         const job = jobResult.rows[0];
@@ -96,7 +96,7 @@ jobsRouter.post('/unlock', verifyToken, async (req, res, next) => {
         );
 
         if (existCheck.rows.length > 0) {
-            throw new Error(`Nghe ${job.display_name} da duoc mo khoa roi.`);
+            throw new Error(`Job ${job.display_name} is already unlocked.`);
         }
 
         // Kiem tra SP (moi nghe can it nhat 1 SP de mo)
@@ -106,11 +106,11 @@ jobsRouter.post('/unlock', verifyToken, async (req, res, next) => {
             [playerId]
         );
 
-        if (playerResult.rows.length === 0) throw new Error('Khong tim thay nhan vat.');
+        if (playerResult.rows.length === 0) throw new Error('Character not found.');
         const player = playerResult.rows[0];
 
         if (player.skill_points < spCost) {
-            throw new Error(`Khong du SP. Can ${spCost} SP, hien co ${player.skill_points} SP.`);
+            throw new Error(`Not enough SP. Required: ${spCost} SP, current: ${player.skill_points} SP.`);
         }
 
         // Tru SP va them ban ghi nghe moi
@@ -130,7 +130,7 @@ jobsRouter.post('/unlock', verifyToken, async (req, res, next) => {
 
         return res.status(201).json({
             success: true,
-            message: `Da mo khoa nghe: ${job.display_name}!`,
+            message: `Unlocked job: ${job.display_name}!`,
             data: newJobRecord.rows[0]
         });
     } catch (error) {
@@ -153,7 +153,7 @@ jobsRouter.post('/forget', verifyToken, async (req, res, next) => {
     if (!playerId || !jobCode) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va jobCode.'
+            message: 'Missing parameters: playerId and jobCode.'
         });
     }
 
@@ -171,7 +171,7 @@ jobsRouter.post('/forget', verifyToken, async (req, res, next) => {
         `, [playerId, jobCode.toLowerCase()]);
 
         if (jobResult.rows.length === 0) {
-            throw new Error(`Nhan vat chua hoc nghe: ${jobCode}`);
+            throw new Error(`Character has not learned job: ${jobCode}`);
         }
 
         const playerJob = jobResult.rows[0];
@@ -198,7 +198,7 @@ jobsRouter.post('/forget', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: `Da quen nghe: ${playerJob.display_name}. Hoan lai ${spToRefund} SP.`,
+            message: `Forgot job: ${playerJob.display_name}. Refunded ${spToRefund} SP.`,
             data: { sp_refunded: spToRefund }
         });
     } catch (error) {
@@ -225,7 +225,7 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
     if (!playerId || !jobCode || !spAmount) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId, jobCode, spAmount.'
+            message: 'Missing parameters: playerId, jobCode, spAmount.'
         });
     }
 
@@ -233,7 +233,7 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
     if (isNaN(investAmount) || investAmount < 1) {
         return res.status(400).json({
             success: false,
-            message: 'spAmount phai la so nguyen duong.'
+            message: 'spAmount must be a positive integer.'
         });
     }
 
@@ -247,7 +247,7 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
             [playerId]
         );
 
-        if (playerResult.rows.length === 0) throw new Error('Khong tim thay nhan vat.');
+        if (playerResult.rows.length === 0) throw new Error('Character not found.');
 
         const player = playerResult.rows[0];
 
@@ -256,11 +256,11 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
             `SELECT account_id FROM players WHERE id = $1;`, [playerId]
         );
         if (ownerResult.rows[0].account_id !== req.accountId) {
-            throw new Error('Khong co quyen dau tu SP cho nhan vat nay.');
+            throw new Error('You do not have permission to invest SP for this character.');
         }
 
         if (player.skill_points < investAmount) {
-            throw new Error(`Khong du SP. Can ${investAmount} SP, hien co ${player.skill_points} SP.`);
+            throw new Error(`Not enough SP. Required: ${investAmount} SP, current: ${player.skill_points} SP.`);
         }
 
         // Lay thong tin nghe
@@ -274,7 +274,7 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
         );
 
         if (jobResult.rows.length === 0) {
-            throw new Error(`Chua mo khoa nghe: ${jobCode}. Mo khoa truoc khi dau tu SP.`);
+            throw new Error(`Job is not unlocked: ${jobCode}. Unlock it before investing SP.`);
         }
 
         const playerJob = jobResult.rows[0];
@@ -283,8 +283,8 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
         // Kiem tra gioi han cung: job_level <= player_level
         if (currentJobLevel >= player.player_level) {
             throw new Error(
-                `Cap nghe ${jobCode} (${currentJobLevel}) da dat gioi han Player Level (${player.player_level}). ` +
-                `Can nang Player Level len ${currentJobLevel + 1} truoc.`
+                `Job level ${jobCode} (${currentJobLevel}) has reached the Player Level cap (${player.player_level}). ` +
+                `Raise Player Level to ${currentJobLevel + 1} first.`
             );
         }
 
@@ -295,7 +295,7 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
         );
 
         if (maxPossibleLevels <= 0) {
-            throw new Error('Khong the nang cap nghe them. Kiem tra lai Player Level va SP.');
+            throw new Error('Cannot upgrade this job further. Check Player Level and SP.');
         }
 
         const newJobLevel = currentJobLevel + maxPossibleLevels;
@@ -319,7 +319,7 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: `Nang cap ${jobCode} len cap ${newJobLevel}! Dau tu ${actualSpSpent} SP.`,
+            message: `Upgraded ${jobCode} to level ${newJobLevel}! Invested ${actualSpSpent} SP.`,
             data: {
                 job_code:       jobCode,
                 old_level:      currentJobLevel,

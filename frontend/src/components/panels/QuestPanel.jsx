@@ -79,7 +79,7 @@ function SkillRow({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction 
             <div className="flex-shrink-0">
                 {isUnlocked && !isFree && (
                     <button onClick={handleRefund} disabled={isLoading || refundsLeft <= 0} className="btn-ghost text-xs">
-                        {isLoading ? '...' : 'Thu hồi'}
+                        {isLoading ? '...' : 'Refund'}
                     </button>
                 )}
                 {!isUnlocked && !isFree && meetsLevel && canUnlock && (
@@ -89,11 +89,11 @@ function SkillRow({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction 
                 )}
                 {!isUnlocked && isFree && meetsLevel && canUnlock && (
                     <button onClick={handleUnlock} disabled={isLoading} className="btn-secondary text-xs py-1.5 px-3">
-                        {isLoading ? '...' : 'Miễn phí'}
+                        {isLoading ? '...' : 'Free'}
                     </button>
                 )}
                 {!isUnlocked && (!meetsLevel || !canUnlock) && (
-                    <span className="text-xs text-textMuted">Khóa</span>
+                    <span className="text-xs text-textMuted">Locked</span>
                 )}
             </div>
         </div>
@@ -153,7 +153,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         <div className="h-full flex flex-col">
             <div className="p-4 border-b border-border flex-shrink-0">
                 <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-semibold">Cây kỹ năng</h2>
+                    <h2 className="text-sm font-semibold">Skill Tree</h2>
                     <span className="text-xs font-mono text-accent">{skillPoints} SP</span>
                 </div>
                 {unlockedJobs.length > 0 && (
@@ -181,16 +181,16 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
 
             <div className="flex-1 overflow-y-auto p-4">
                 {isLoading ? (
-                    <p className="text-sm text-textMuted">Đang tải...</p>
+                    <p className="text-sm text-textMuted">Loading...</p>
                 ) : unlockedJobs.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
                         <div className="text-center max-w-[240px]">
                             <div className="text-3xl mb-3 opacity-20">SP</div>
                             <p className="text-sm text-textSecondary mb-1">
-                                {hasAnyJobLeveled ? 'Chưa có cây kỹ năng' : 'Chưa mở kỹ năng'}
+                                {hasAnyJobLeveled ? 'No skill tree yet' : 'No skills unlocked'}
                             </p>
                             <p className="text-xs text-textMuted">
-                                Hoàn thành hành động AFK để tăng cấp và mở nhánh kỹ năng.
+                                Complete AFK actions to level up and unlock skill branches.
                             </p>
                         </div>
                     </div>

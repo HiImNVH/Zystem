@@ -20,7 +20,7 @@ progressRouter.post('/touch', verifyToken, verifyPlayerOwnership, async (req, re
     if (!playerId) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId.'
+            message: 'Missing parameter: playerId.'
         });
     }
 
@@ -34,13 +34,13 @@ progressRouter.post('/touch', verifyToken, verifyPlayerOwnership, async (req, re
         if (!progress) {
             return res.status(500).json({
                 success: false,
-                message: 'Khong the cap nhat timestamp tien trinh.'
+                message: 'Could not update progress timestamp.'
             });
         }
 
         return res.json({
             success: true,
-            message: 'Da cap nhat timestamp tien trinh.',
+            message: 'Progress timestamp updated.',
             data: progress
         });
     } catch (error) {

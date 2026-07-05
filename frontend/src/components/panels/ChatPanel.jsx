@@ -26,9 +26,9 @@ export default function ChatPanel() {
                 <div className="flex items-center justify-center h-full">
                     <div className="text-center max-w-[200px]">
                         <div className="text-3xl mb-3 opacity-20">CHAT</div>
-                        <p className="text-sm text-textSecondary mb-1">Chat sẽ mở sau</p>
+                        <p className="text-sm text-textSecondary mb-1">Chat is coming later</p>
                         <p className="text-xs text-textMuted leading-relaxed">
-                            Hệ thống giao tiếp giữa người chơi chưa được kích hoạt trong bản này.
+                            Player communication is not enabled in this build yet.
                         </p>
                     </div>
                 </div>
@@ -40,13 +40,13 @@ export default function ChatPanel() {
                         type="text"
                         value={message}
                         onChange={event => setMessage(event.target.value)}
-                        placeholder="Nhập tin nhắn..."
+                        placeholder="Type a message..."
                         className="input-field flex-1"
                         disabled
                         maxLength={256}
                     />
                     <button className="btn-primary px-4" disabled>
-                        Gửi
+                        Send
                     </button>
                 </div>
             </div>

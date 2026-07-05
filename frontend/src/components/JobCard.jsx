@@ -1,9 +1,9 @@
 ﻿// frontend/src/components/JobCard.jsx
 
 const CATEGORY_LABELS = {
-    combat: 'Chiến đấu',
-    survival: 'Sinh tồn',
-    production: 'Sản xuất',
+    combat: 'Combat',
+    survival: 'Survival',
+    production: 'Production',
 };
 
 const CATEGORY_COLORS = {
@@ -22,12 +22,12 @@ const STAT_LABELS = {
 };
 
 const JOB_DISPLAY = {
-    fighting:   { name: 'Fighting',   sub: 'Cận chiến và tầm xa', mark: 'FG' },
-    scavenging: { name: 'Scavenging', sub: 'Lục lọi và tìm kiếm', mark: 'SC' },
-    cooking:    { name: 'Cooking',    sub: 'Nấu ăn và sơ cứu', mark: 'CO' },
-    gathering:  { name: 'Gathering',  sub: 'Thu thập tài nguyên', mark: 'GA' },
-    crafting:   { name: 'Crafting',   sub: 'Công cụ và trang bị', mark: 'CR' },
-    building:   { name: 'Building',   sub: 'Công trình và trạm làm việc', mark: 'BU' },
+    fighting:   { name: 'Fighting',   sub: 'Melee and ranged combat', mark: 'FG' },
+    scavenging: { name: 'Scavenging', sub: 'Looting and searching', mark: 'SC' },
+    cooking:    { name: 'Cooking',    sub: 'Food and first aid', mark: 'CO' },
+    gathering:  { name: 'Gathering',  sub: 'Resource collection', mark: 'GA' },
+    crafting:   { name: 'Crafting',   sub: 'Tools and equipment', mark: 'CR' },
+    building:   { name: 'Building',   sub: 'Structures and workstations', mark: 'BU' },
 };
 
 export default function JobCard({ job, isSelected, onClick }) {

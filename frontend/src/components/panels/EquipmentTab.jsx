@@ -4,17 +4,17 @@ import { useState, useEffect } from 'react';
 import { getEquippedItems, unequipItem } from '../../api/api.game';
 
 const SLOT_LAYOUT = [
-    { key: 'armor',       label: 'Giáp' },
-    { key: 'backpack',    label: 'Balo' },
-    { key: 'head',        label: 'Đầu' },
-    { key: 'upper_body',  label: 'Thân trên' },
-    { key: 'lower_body',  label: 'Thân dưới' },
-    { key: 'hands',       label: 'Tay' },
-    { key: 'feet',        label: 'Chân' },
-    { key: 'accessory_1', label: 'Trang sức 1' },
-    { key: 'accessory_2', label: 'Trang sức 2' },
-    { key: 'weapon',      label: 'Vũ khí' },
-    { key: 'tool',        label: 'Công cụ' },
+    { key: 'armor',       label: 'Armor' },
+    { key: 'backpack',    label: 'Backpack' },
+    { key: 'head',        label: 'Head' },
+    { key: 'upper_body',  label: 'Upper body' },
+    { key: 'lower_body',  label: 'Lower body' },
+    { key: 'hands',       label: 'Hands' },
+    { key: 'feet',        label: 'Feet' },
+    { key: 'accessory_1', label: 'Accessory 1' },
+    { key: 'accessory_2', label: 'Accessory 2' },
+    { key: 'weapon',      label: 'Weapon' },
+    { key: 'tool',        label: 'Tool' },
 ];
 
 const RARITY_TEXT = {
@@ -56,7 +56,7 @@ function EquipSlot({ label, item, onUnequip, isLoading }) {
                 </span>
             )}
             <span className="absolute inset-0 rounded-lg bg-danger/0 group-hover:bg-danger/10 transition-colors flex items-center justify-center">
-                <span className="opacity-0 group-hover:opacity-100 text-[9px] text-danger transition-opacity">Tháo</span>
+                <span className="opacity-0 group-hover:opacity-100 text-[9px] text-danger transition-opacity">Unequip</span>
             </span>
         </button>
     );
@@ -96,9 +96,9 @@ export default function EquipmentTab({ playerId, gearStats, onUpdate }) {
     return (
         <div className="p-4 space-y-4">
             <div>
-                <p className="text-xs font-semibold text-textMuted mb-3">TRANG BỊ</p>
+                <p className="text-xs font-semibold text-textMuted mb-3">EQUIPMENT</p>
                 {isLoading ? (
-                    <p className="text-xs text-textMuted">Đang tải...</p>
+                    <p className="text-xs text-textMuted">Loading...</p>
                 ) : (
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                         {SLOT_LAYOUT.map(slot => (
@@ -116,7 +116,7 @@ export default function EquipmentTab({ playerId, gearStats, onUpdate }) {
 
             {hasGearBonus && (
                 <div className="card p-4">
-                    <p className="text-xs font-semibold text-textMuted mb-3">CHỈ SỐ TỪ TRANG BỊ</p>
+                    <p className="text-xs font-semibold text-textMuted mb-3">GEAR STATS</p>
                     <div className="grid grid-cols-3 gap-3 text-center">
                         {Object.entries(STAT_LABELS).map(([key, label]) => {
                             const value = parseFloat(gearStats?.[key] || 0);
@@ -133,7 +133,7 @@ export default function EquipmentTab({ playerId, gearStats, onUpdate }) {
             )}
 
             <p className="text-xs text-textMuted text-center px-4">
-                Chọn vật phẩm trong túi đồ để trang bị vào slot phù hợp.
+                Select items from your inventory to equip matching slots.
             </p>
         </div>
     );

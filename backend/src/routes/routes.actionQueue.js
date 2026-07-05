@@ -20,7 +20,7 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
     if (!playerId || !actionType || !durationSeconds) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId, actionType, durationSeconds.'
+            message: 'Missing parameters: playerId, actionType, durationSeconds.'
         });
     }
 
@@ -28,7 +28,7 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
     if (isNaN(duration) || duration <= 0) {
         return res.status(400).json({
             success: false,
-            message: 'durationSeconds phai la so nguyen duong.'
+            message: 'durationSeconds must be a positive integer.'
         });
     }
 
@@ -40,11 +40,11 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
         );
 
         if (ownerCheck.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character not found.' });
         }
 
         if (ownerCheck.rows[0].account_id !== req.accountId) {
-            return res.status(403).json({ success: false, message: 'Khong co quyen dang ky hanh dong cho nhan vat nay.' });
+            return res.status(403).json({ success: false, message: 'You do not have permission to register actions for this character.' });
         }
 
         const playerResult = await dbPool.query(
@@ -59,7 +59,7 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
         );
 
         if (!result) {
-            return res.status(500).json({ success: false, message: 'Khong the dang ky hanh dong.' });
+            return res.status(500).json({ success: false, message: 'Could not register action.' });
         }
 
         if (result.error) {
@@ -68,7 +68,7 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
 
         return res.status(201).json({
             success: true,
-            message: `Dang ky hanh dong ${actionType} thanh cong!`,
+            message: `Action ${actionType} registered successfully!`,
             data: {
                 ...result,
                 note: `AGI=${agiStat}: ${duration}s -> ${actualDuration}s`
@@ -130,7 +130,7 @@ actionQueueRouter.post('/claim', verifyToken, async (req, res, next) => {
     if (!playerId || !actionId) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va actionId.'
+            message: 'Missing parameters: playerId and actionId.'
         });
     }
 
@@ -142,18 +142,18 @@ actionQueueRouter.post('/claim', verifyToken, async (req, res, next) => {
         );
 
         if (ownerCheck.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character not found.' });
         }
 
         if (ownerCheck.rows[0].account_id !== req.accountId) {
-            return res.status(403).json({ success: false, message: 'Khong co quyen claim hanh dong nay.' });
+            return res.status(403).json({ success: false, message: 'You do not have permission to claim this action.' });
         }
 
         // Claim action — tra ve ket qua co zone data
         const claimedAction = await actionQueueRepository.claimActionSlot(actionId, playerId);
 
         if (!claimedAction) {
-            return res.status(500).json({ success: false, message: 'Loi khi claim hanh dong.' });
+            return res.status(500).json({ success: false, message: 'Error while claiming action.' });
         }
 
         if (claimedAction.error) {
@@ -165,7 +165,7 @@ actionQueueRouter.post('/claim', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: 'Claim hanh dong thanh cong!',
+            message: 'Action claimed successfully!',
             data: {
                 action:  claimedAction,
                 rewards: rewards
@@ -187,7 +187,7 @@ actionQueueRouter.post('/cancel', verifyToken, async (req, res, next) => {
     if (!playerId || !actionId) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va actionId.'
+            message: 'Missing parameters: playerId and actionId.'
         });
     }
 
@@ -198,24 +198,24 @@ actionQueueRouter.post('/cancel', verifyToken, async (req, res, next) => {
         );
 
         if (ownerCheck.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character not found.' });
         }
 
         if (ownerCheck.rows[0].account_id !== req.accountId) {
-            return res.status(403).json({ success: false, message: 'Khong co quyen huy hanh dong nay.' });
+            return res.status(403).json({ success: false, message: 'You do not have permission to cancel this action.' });
         }
 
         const result = await actionQueueRepository.cancelActionSlot(actionId, playerId);
 
         if (!result) {
-            return res.status(500).json({ success: false, message: 'Loi khi huy hanh dong.' });
+            return res.status(500).json({ success: false, message: 'Error while canceling action.' });
         }
 
         if (result.error) {
             return res.status(400).json({ success: false, message: result.error });
         }
 
-        return res.json({ success: true, message: 'Huy hanh dong thanh cong!', data: result });
+        return res.json({ success: true, message: 'Action canceled successfully!', data: result });
     } catch (error) {
         next(error);
     }

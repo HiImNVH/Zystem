@@ -32,13 +32,13 @@ async function getWalletByPlayer(playerId) {
 }
 
 async function modifyWalletBalance(playerId, currencyType, amount, transactionType) {
-    if (!playerId || !currencyType || !amount || !transactionType) return { success: false, message: 'Thieu tham so.' };
+    if (!playerId || !currencyType || !amount || !transactionType) return { success: false, message: 'Missing parameters.' };
 
     const validCurrencies = ['copper', 'silver', 'gold'];
     const currency = currencyType.toLowerCase();
 
     if (!validCurrencies.includes(currency)) {
-        return { success: false, message: `Loai tien te khong hop le: ${currencyType}` };
+        return { success: false, message: `Invalid currency type: ${currencyType}` };
     }
 
     const client = await dbPool.connect();
@@ -53,7 +53,7 @@ async function modifyWalletBalance(playerId, currencyType, amount, transactionTy
         );
 
         if (lockResult.rows.length === 0) {
-            throw new Error(`Khong tim thay vi cua nguoi choi ID: ${playerId}`);
+            throw new Error(`Wallet not found for player ID: ${playerId}`);
         }
 
         const currentWallet = lockResult.rows[0];
@@ -66,10 +66,10 @@ async function modifyWalletBalance(playerId, currencyType, amount, transactionTy
         } else if (transactionType === 'WITHDRAW') {
             balanceAfter = currentBalance - changeAmount;
             if (balanceAfter < 0n) {
-                throw new Error(`So du ${currency} khong du de rut ${amount}.`);
+                throw new Error(`Insufficient ${currency} balance to withdraw ${amount}.`);
             }
         } else {
-            throw new Error('transactionType chi chap nhan DEPOSIT hoac WITHDRAW.');
+            throw new Error('transactionType only accepts DEPOSIT or WITHDRAW.');
         }
 
         await client.query(

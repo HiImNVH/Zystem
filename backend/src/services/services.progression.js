@@ -40,15 +40,15 @@ function calculateLevelFromExp(totalExp) {
 
 // Kiem tra gioi han nghe: cap nghe <= player_level (luat cung)
 async function verifySkillProgression(playerId, jobCode, currentJobLevel) {
-    if (!playerId || !jobCode) return { allowed: false, reason: 'Thieu tham so.' };
+    if (!playerId || !jobCode) return { allowed: false, reason: 'Missing parameters.' };
 
     const character = await characterRepository.findCharacterById(playerId);
-    if (!character) return { allowed: false, reason: 'Khong tim thay nhan vat.' };
+    if (!character) return { allowed: false, reason: 'Character not found.' };
 
     if (currentJobLevel >= character.player_level) {
         return {
             allowed: false,
-            reason: `Cap nghe ${jobCode} dang bi chan o muc ${currentJobLevel}. Can nang Player Level len ${currentJobLevel + 1} truoc.`
+            reason: `Job ${jobCode} is capped at level ${currentJobLevel}. Raise Player Level to ${currentJobLevel + 1} first.`
         };
     }
 

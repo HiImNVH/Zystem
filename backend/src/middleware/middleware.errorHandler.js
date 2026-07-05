@@ -13,7 +13,7 @@ function globalErrorHandler(error, req, res, next) {
 
     return res.status(statusCode).json({
         success: false,
-        message: statusCode === 500 ? 'Loi he thong noi bo. Vui long thu lai sau.' : error.message,
+        message: statusCode === 500 ? 'Internal server error. Please try again later.' : error.message,
         // Chi hien stack trace trong moi truong development
         ...(isDev && { stack: error.stack })
     });
@@ -25,7 +25,7 @@ function globalErrorHandler(error, req, res, next) {
 function notFoundHandler(req, res) {
     return res.status(404).json({
         success: false,
-        message: `Endpoint khong ton tai: ${req.method} ${req.path}`
+        message: `Endpoint not found: ${req.method} ${req.path}`
     });
 }
 

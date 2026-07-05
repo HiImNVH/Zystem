@@ -62,7 +62,7 @@ achievementsRouter.post('/claim-sp', verifyToken, async (req, res, next) => {
     if (!playerId || !playerAchievementId) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va playerAchievementId.'
+            message: 'Missing parameters: playerId and playerAchievementId.'
         });
     }
 
@@ -80,17 +80,17 @@ achievementsRouter.post('/claim-sp', verifyToken, async (req, res, next) => {
         `, [playerAchievementId, playerId]);
 
         if (achResult.rows.length === 0) {
-            throw new Error('Khong tim thay ban ghi thanh tuu cua nguoi choi nay.');
+            throw new Error('Player achievement record not found.');
         }
 
         const playerAch = achResult.rows[0];
 
         if (!playerAch.is_completed) {
-            throw new Error('Thanh tuu nay chua hoan thanh. Chua the nhan SP.');
+            throw new Error('This achievement is not complete yet. SP cannot be claimed.');
         }
 
         if (playerAch.sp_claimed) {
-            throw new Error('SP cua thanh tuu nay da duoc nhan roi.');
+            throw new Error('SP for this achievement has already been claimed.');
         }
 
         // Danh dau da nhan SP
@@ -110,7 +110,7 @@ achievementsRouter.post('/claim-sp', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: `Nhan thanh cong ${playerAch.sp_bonus} SP!`,
+            message: `Claimed ${playerAch.sp_bonus} SP successfully!`,
             data: { sp_claimed: playerAch.sp_bonus }
         });
     } catch (error) {
@@ -134,7 +134,7 @@ achievementsRouter.post('/equip-title', verifyToken, async (req, res, next) => {
     if (!playerId || !playerAchievementId) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va playerAchievementId.'
+            message: 'Missing parameters: playerId and playerAchievementId.'
         });
     }
 
@@ -148,11 +148,11 @@ achievementsRouter.post('/equip-title', verifyToken, async (req, res, next) => {
         `, [playerAchievementId, playerId]);
 
         if (achResult.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay thanh tuu.' });
+            return res.status(404).json({ success: false, message: 'Achievement not found.' });
         }
 
         if (!achResult.rows[0].is_completed) {
-            return res.status(400).json({ success: false, message: 'Chi co the trang bi title tu thanh tuu da hoan thanh.' });
+            return res.status(400).json({ success: false, message: 'Only titles from completed achievements can be equipped.' });
         }
 
         // Cap nhat equipped_title_id cua nhan vat
@@ -163,7 +163,7 @@ achievementsRouter.post('/equip-title', verifyToken, async (req, res, next) => {
 
         return res.json({
             success: true,
-            message: `Da trang bi danh hieu: ${achResult.rows[0].display_name}. Stats se ap dung sau 15 phut.`,
+            message: `Equipped title: ${achResult.rows[0].display_name}. Stats will apply after 15 minutes.`,
             data: { equipped_title_id: playerAchievementId }
         });
     } catch (error) {
@@ -182,7 +182,7 @@ achievementsRouter.post('/update-progress', verifyToken, async (req, res, next) 
     if (!playerId || !conditionType) {
         return res.status(400).json({
             success: false,
-            message: 'Thieu tham so: playerId va conditionType.'
+            message: 'Missing parameters: playerId and conditionType.'
         });
     }
 

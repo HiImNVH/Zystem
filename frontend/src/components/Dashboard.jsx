@@ -1,7 +1,7 @@
 ﻿// frontend/src/components/Dashboard.jsx
 
 import { useState, useEffect, useCallback } from 'react';
-import TopBar from './layout/TopBar';
+import BottomNav from './layout/BottomNav';
 import MainPanel from './panels/MainPanel';
 import InventoryPanel from './panels/InventoryPanel';
 import ChatPanel from './panels/ChatPanel';
@@ -14,6 +14,11 @@ import {
 import { getMyCharacter } from '../api/api.character';
 
 const TAB = { MAIN: 'MAIN', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
+const SIDE_TABS = [
+    { key: TAB.INVENTORY, label: 'Inventory' },
+    { key: TAB.CHAT, label: 'Chat' },
+];
+const RIGHT_TABS = ['Chat', 'Gang', 'Mail', 'Noti.'];
 
 export default function Dashboard({ initialCharacter, onLogout }) {
     const [character, setCharacter] = useState(initialCharacter);
@@ -22,7 +27,8 @@ export default function Dashboard({ initialCharacter, onLogout }) {
     const [queue, setQueue]         = useState([]);
     const [inventory, setInventory] = useState([]);
     const [jobs, setJobs]           = useState([]);
-    const [rightPanel, setRightPanel] = useState(TAB.CHAT);
+    const [leftTab, setLeftTab]     = useState(TAB.INVENTORY);
+    const [centerTab, setCenterTab] = useState(TAB.MAIN);
 
     const playerId = character?.id;
 
@@ -46,37 +52,92 @@ export default function Dashboard({ initialCharacter, onLogout }) {
         return () => clearInterval(id);
     }, [loadAll]);
 
-    return (
-        <div className="h-screen flex flex-col bg-base text-textPrimary">
-            <TopBar
-                character={character}
-                activeDesktopTab={rightPanel}
-                onChangeDesktopTab={setRightPanel}
-                onOpenSettings={() => {}}
-            />
+    function renderPanel(tab) {
+        if (tab === TAB.MAIN) {
+            return <MainPanel playerId={playerId} character={character} zones={zones} queue={queue} onUpdate={loadAll} />;
+        }
 
-            <div className="hidden md:block flex-1 overflow-y-auto">
-                <div className="dashboard-phone-grid">
-                    <div className="dashboard-phone-panel dashboard-panel-main">
-                        <MainPanel playerId={playerId} character={character} zones={zones} queue={queue} onUpdate={loadAll} />
-                    </div>
-                    <div className="dashboard-phone-panel dashboard-panel-inventory">
-                        <InventoryPanel items={inventory} playerId={playerId} onUpdate={loadAll} />
-                    </div>
-                    <div className="dashboard-phone-panel dashboard-panel-secondary">
-                        {rightPanel === TAB.CHAT && <ChatPanel character={character} />}
-                        {rightPanel === TAB.QUEST && (
-                            <QuestPanel playerId={playerId} jobs={jobs} skillPoints={character?.skill_points || 0} />
-                        )}
-                        {rightPanel === TAB.PROFILE && (
-                            <ProfilePanel character={character} stats={stats} jobs={jobs} playerId={playerId} onUpdate={loadAll} onLogout={onLogout} />
-                        )}
-                    </div>
-                </div>
+        if (tab === TAB.INVENTORY) {
+            return <InventoryPanel items={inventory} playerId={playerId} onUpdate={loadAll} />;
+        }
+
+        if (tab === TAB.QUEST) {
+            return <QuestPanel playerId={playerId} jobs={jobs} skillPoints={character?.skill_points || 0} />;
+        }
+
+        if (tab === TAB.PROFILE) {
+            return <ProfilePanel character={character} stats={stats} jobs={jobs} playerId={playerId} onUpdate={loadAll} onLogout={onLogout} />;
+        }
+
+        return <ChatPanel character={character} />;
+    }
+
+    function SideTabs({ items, activeTab, onChangeTab }) {
+        return (
+            <div className="workspace-tabs">
+                {items.map(item => (
+                    <button
+                        key={item.key}
+                        onClick={() => onChangeTab(item.key)}
+                        className={`workspace-tab ${activeTab === item.key ? 'workspace-tab-active' : ''}`}
+                    >
+                        {item.label}
+                    </button>
+                ))}
             </div>
+        );
+    }
 
-            <div className="flex md:hidden flex-1 overflow-hidden">
-                <MainPanel playerId={playerId} character={character} zones={zones} queue={queue} onUpdate={loadAll} />
+    function LeftViewport() {
+        return (
+            <section className="workspace-pane workspace-pane-left">
+                <SideTabs items={SIDE_TABS} activeTab={leftTab} onChangeTab={setLeftTab} />
+                <div className="workspace-pane-body">
+                    {renderPanel(leftTab)}
+                </div>
+            </section>
+        );
+    }
+
+    function CenterViewport() {
+        return (
+            <section className="workspace-pane workspace-pane-center">
+                <div className="workspace-pane-body">
+                    {renderPanel(centerTab)}
+                </div>
+                <BottomNav activeTab={centerTab} onChangeTab={setCenterTab} />
+            </section>
+        );
+    }
+
+    function RightViewport() {
+        return (
+            <section className="workspace-pane workspace-pane-right">
+                <div className="workspace-tabs workspace-tabs-right">
+                    {RIGHT_TABS.map((label, index) => (
+                        <button
+                            key={label}
+                            className={`workspace-tab ${index === 0 ? 'workspace-tab-active' : ''}`}
+                            type="button"
+                        >
+                            {label}
+                            {label === 'Mail' && <span className="mail-badge">1</span>}
+                        </button>
+                    ))}
+                </div>
+                <div className="workspace-pane-body">
+                    <ChatPanel character={character} />
+                </div>
+            </section>
+        );
+    }
+
+    return (
+        <div className="h-screen bg-base text-textPrimary overflow-hidden">
+            <div className="workspace-shell">
+                <LeftViewport />
+                <CenterViewport />
+                <RightViewport />
             </div>
         </div>
     );

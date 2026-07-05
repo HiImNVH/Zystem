@@ -14,36 +14,36 @@ const jobsList = [
 const achievementsList = [
     {
         code: 'first_blood',
-        name: 'Mau Dau Tien',
-        desc: 'Lan dau tieu diet thanh cong mot muc tieu nguy hiem.',
+        name: 'First Blood',
+        desc: 'Defeat a dangerous target for the first time.',
         cond_type: 'kill_count', cond_val: 1, sp: 5,
         str: 2, agi: 0, dex: 0, vit: 0, int: 0, chr: 0
     },
     {
         code: 'resource_hoarder',
-        name: 'Ke Tich Tru',
-        desc: 'Thu thap tong cong 10000 don vi tai nguyen.',
+        name: 'Resource Hoarder',
+        desc: 'Gather a total of 10000 resource units.',
         cond_type: 'resource_gather', cond_val: 10000, sp: 10,
         str: 0, agi: 0, dex: 0, vit: 5, int: 5, chr: 0
     },
     {
         code: 'survivor_week',
-        name: 'Ke Truong Ton',
-        desc: 'Ton tai 7 ngay lien tuc khong bi ha guc.',
+        name: 'One-Week Survivor',
+        desc: 'Survive 7 consecutive days without being defeated.',
         cond_type: 'days_survived', cond_val: 7, sp: 10,
         str: 0, agi: 0, dex: 0, vit: 5, int: 0, chr: 5
     },
 ];
 
 const zonesList = [
-    { code: 'ZONE_SAFE_CAMP',        name: 'Trai An Toan',             type: 'safe',    min_lv: 1,  duration: 0,   inf: 0.00, rad: 0.00 },
-    { code: 'ZONE_RUINS_LV1',        name: 'Khu Phe Tich Cap 1',       type: 'ruins',   min_lv: 1,  duration: 60,  inf: 1.00, rad: 0.20 },
-    { code: 'ZONE_FOREST_LV1',       name: 'Rung Hoang Cap 1',         type: 'forest',  min_lv: 1,  duration: 45,  inf: 0.50, rad: 0.00 },
-    { code: 'ZONE_MINE_LV1',         name: 'Mo Khoang Cap 1',          type: 'mine',    min_lv: 1,  duration: 60,  inf: 0.30, rad: 0.00 },
-    { code: 'ZONE_CITY_RUINS_LV5',   name: 'Do Thi Sup Do',            type: 'ruins',   min_lv: 5,  duration: 180, inf: 2.50, rad: 1.00 },
-    { code: 'ZONE_DEEP_FOREST_LV10', name: 'Rung Sau Cap 10',          type: 'forest',  min_lv: 10, duration: 240, inf: 2.00, rad: 0.50 },
-    { code: 'ZONE_BIOHAZARD_LV20',   name: 'Khu O Nhiem Sinh Hoc',     type: 'hazard',  min_lv: 20, duration: 600, inf: 8.00, rad: 5.00 },
-    { code: 'ZONE_NUCLEAR_LV40',     name: 'Khu Phong Xa Bo Hoang',    type: 'hazard',  min_lv: 40, duration: 900, inf: 5.00, rad: 15.00 },
+    { code: 'ZONE_SAFE_CAMP',        name: 'Safe Camp',                type: 'safe',    min_lv: 1,  duration: 0,   inf: 0.00, rad: 0.00 },
+    { code: 'ZONE_RUINS_LV1',        name: 'Ruins Level 1',            type: 'ruins',   min_lv: 1,  duration: 60,  inf: 1.00, rad: 0.20 },
+    { code: 'ZONE_FOREST_LV1',       name: 'Wild Forest Level 1',      type: 'forest',  min_lv: 1,  duration: 45,  inf: 0.50, rad: 0.00 },
+    { code: 'ZONE_MINE_LV1',         name: 'Ore Mine Level 1',         type: 'mine',    min_lv: 1,  duration: 60,  inf: 0.30, rad: 0.00 },
+    { code: 'ZONE_CITY_RUINS_LV5',   name: 'Collapsed City',           type: 'ruins',   min_lv: 5,  duration: 180, inf: 2.50, rad: 1.00 },
+    { code: 'ZONE_DEEP_FOREST_LV10', name: 'Deep Forest Level 10',     type: 'forest',  min_lv: 10, duration: 240, inf: 2.00, rad: 0.50 },
+    { code: 'ZONE_BIOHAZARD_LV20',   name: 'Biohazard Zone',           type: 'hazard',  min_lv: 20, duration: 600, inf: 8.00, rad: 5.00 },
+    { code: 'ZONE_NUCLEAR_LV40',     name: 'Abandoned Nuclear Zone',   type: 'hazard',  min_lv: 40, duration: 900, inf: 5.00, rad: 15.00 },
 ];
 
 async function seedJobsSeedTable() {
@@ -65,6 +65,12 @@ async function seedJobsSeedTable() {
         } else {
             console.log('[INFO] Bang jobs_seed da co du lieu. Bo qua seeding.');
         }
+        for (const job of jobsList) {
+            await dbPool.query(
+                `UPDATE jobs_seed SET display_name = $2, category = $3 WHERE code = $1;`,
+                [job.code, job.name, job.cat]
+            );
+        }
 
         const achievementCount = await dbPool.query('SELECT COUNT(*) FROM achievements;');
         if (parseInt(achievementCount.rows[0].count) === 0) {
@@ -83,6 +89,12 @@ async function seedJobsSeedTable() {
             }
             console.log('[SUCCESS] Da nap thanh tuu nen tang thanh cong!');
         }
+        for (const achievement of achievementsList) {
+            await dbPool.query(
+                `UPDATE achievements SET display_name = $2, description = $3 WHERE code = $1;`,
+                [achievement.code, achievement.name, achievement.desc]
+            );
+        }
 
         const zoneCount = await dbPool.query('SELECT COUNT(*) FROM zones;');
         if (parseInt(zoneCount.rows[0].count) === 0) {
@@ -97,6 +109,12 @@ async function seedJobsSeedTable() {
                 ]);
             }
             console.log('[SUCCESS] Da nap khu vuc co ban thanh cong!');
+        }
+        for (const zone of zonesList) {
+            await dbPool.query(
+                `UPDATE zones SET display_name = $2, zone_type = $3 WHERE code = $1;`,
+                [zone.code, zone.name, zone.type]
+            );
         }
     } catch (error) {
         console.error('[ERROR] Loi khi seed du lieu nen tang:', error.message);

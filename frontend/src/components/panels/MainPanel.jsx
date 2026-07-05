@@ -5,26 +5,26 @@ import { registerAction, claimAction, cancelAction } from '../../api/api.game';
 
 const DESTINATIONS = {
     EXPEDITION: {
-        label: 'Di kham pha',
+        label: 'Go exploring',
         mark: 'EX',
-        helper: 'Chien dau, tham hiem va thu thap tai nguyen ngoai vung an toan.',
+        helper: 'Fight, explore, and gather resources outside the safe zone.',
     },
     HOME: {
-        label: 'Ve nha',
+        label: 'Stay home',
         mark: 'HM',
-        helper: 'Che tao, trao doi va bien tai nguyen thanh thuc luc.',
+        helper: 'Craft, trade, and turn resources into power.',
     },
 };
 
 const ACTION_CONFIG = {
-    BATTLE:  { label: 'Chien dau', mark: 'BT', destination: 'EXPEDITION', zones: ['ruins', 'hazard', 'dungeon'], helper: 'Rui ro cao, nhieu EXP va co co hoi nhan trang bi.' },
-    EXPLORE: { label: 'Tham hiem khu vuc', mark: 'EX', destination: 'EXPEDITION', zones: ['forest', 'mine', 'ruins', 'hazard', 'dungeon'], helper: 'Mo rong loot pool, tim vat pham hiem va rac co gia tri.' },
-    MINE:    { label: 'Khai khoang', mark: 'MI', destination: 'EXPEDITION', zones: ['mine'], helper: 'Lay da, quang va vat lieu nen.' },
-    CHOP:    { label: 'Chat go', mark: 'CH', destination: 'EXPEDITION', zones: ['forest'], helper: 'Lay go, nhanh cay va vat lieu xay dung.' },
-    HUNT:    { label: 'San bat', mark: 'HU', destination: 'EXPEDITION', zones: ['forest', 'ruins', 'dungeon'], helper: 'Lay vat lieu sinh ton va EXP chien dau nhe.' },
-    FORAGE:  { label: 'Hai luom', mark: 'FO', destination: 'EXPEDITION', zones: ['forest'], helper: 'Lay thuc pham, cay thuoc va nguyen lieu nho.' },
-    CRAFT:   { label: 'Che tao', mark: 'CR', destination: 'HOME', zones: ['safe'], helper: 'Dung thoi gian o nha de tao vat pham craftable.' },
-    TRADE:   { label: 'Trao doi', mark: 'TR', destination: 'HOME', zones: ['safe'], helper: 'Ban bot rac/nguyen lieu thuong de lay copper.' },
+    BATTLE:  { label: 'Battle', mark: 'BT', destination: 'EXPEDITION', zones: ['ruins', 'hazard', 'dungeon'], helper: 'High risk, high EXP, and a chance to find equipment.' },
+    EXPLORE: { label: 'Explore Area', mark: 'EX', destination: 'EXPEDITION', zones: ['forest', 'mine', 'ruins', 'hazard', 'dungeon'], helper: 'Expand the loot pool and search for rare items or valuable junk.' },
+    MINE:    { label: 'Mine', mark: 'MI', destination: 'EXPEDITION', zones: ['mine'], helper: 'Gather stone, ore, and base materials.' },
+    CHOP:    { label: 'Chop Wood', mark: 'CH', destination: 'EXPEDITION', zones: ['forest'], helper: 'Gather wood, branches, and building materials.' },
+    HUNT:    { label: 'Hunt', mark: 'HU', destination: 'EXPEDITION', zones: ['forest', 'ruins', 'dungeon'], helper: 'Gather survival materials and light combat EXP.' },
+    FORAGE:  { label: 'Forage', mark: 'FO', destination: 'EXPEDITION', zones: ['forest'], helper: 'Gather food, herbs, and small materials.' },
+    CRAFT:   { label: 'Craft', mark: 'CR', destination: 'HOME', zones: ['safe'], helper: 'Use time at home to create craftable items.' },
+    TRADE:   { label: 'Trade', mark: 'TR', destination: 'HOME', zones: ['safe'], helper: 'Sell junk and common materials for copper.' },
 };
 
 const RESOURCE_ACTION_BY_ZONE = {
@@ -36,13 +36,13 @@ const RESOURCE_ACTION_BY_ZONE = {
 };
 
 const DURATION_OPTIONS = [
-    { label: '10 giay', value: 10 },
-    { label: '5 phut', value: 300 },
-    { label: '15 phut', value: 900 },
-    { label: '30 phut', value: 1800 },
-    { label: '1 gio', value: 3600 },
-    { label: '4 gio', value: 14400 },
-    { label: '8 gio', value: 28800 },
+    { label: '10 seconds', value: 10 },
+    { label: '5 minutes', value: 300 },
+    { label: '15 minutes', value: 900 },
+    { label: '30 minutes', value: 1800 },
+    { label: '1 hour', value: 3600 },
+    { label: '4 hours', value: 14400 },
+    { label: '8 hours', value: 28800 },
 ];
 
 const ZONE_BANNERS = {
@@ -74,7 +74,7 @@ function CountdownDisplay({ completesAt, onComplete }) {
     const pad = value => String(value).padStart(2, '0');
 
     return remaining === 0
-        ? <span className="text-accent font-semibold animate-pulse2">Co the nhan</span>
+        ? <span className="text-accent font-semibold animate-pulse2">Ready to claim</span>
         : <span className="font-mono">{pad(hours)}:{pad(minutes)}:{pad(seconds)}</span>;
 }
 
@@ -90,11 +90,11 @@ function ActiveActionCard({ slot, playerId, onUpdate, onNotify }) {
             const rewards = result.data.rewards;
             const rewardParts = [
                 `+${rewards.exp_gained} EXP`,
-                `+${rewards.items_dropped?.length || 0} vat pham`,
+                `+${rewards.items_dropped?.length || 0} items`,
             ];
             if (rewards.copper_gained) rewardParts.push(`+${rewards.copper_gained} copper`);
-            if (rewards.sold_items?.length) rewardParts.push(`ban ${rewards.sold_items.length} mon`);
-            onNotify(`Da nhan: ${rewardParts.join(', ')}`, 'success');
+            if (rewards.sold_items?.length) rewardParts.push(`sold ${rewards.sold_items.length} items`);
+            onNotify(`Claimed: ${rewardParts.join(', ')}`, 'success');
             onUpdate();
         } catch (err) {
             onNotify(err.message, 'error');
@@ -107,7 +107,7 @@ function ActiveActionCard({ slot, playerId, onUpdate, onNotify }) {
         setIsLoading(true);
         try {
             await cancelAction(playerId, slot.id);
-            onNotify('Da huy hanh dong', 'success');
+            onNotify('Action canceled', 'success');
             onUpdate();
         } catch (err) {
             onNotify(err.message, 'error');
@@ -123,17 +123,17 @@ function ActiveActionCard({ slot, playerId, onUpdate, onNotify }) {
             </div>
             <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{config.label}</p>
-                <p className="text-xs text-textMuted truncate">{slot.zone_name || 'Nha an toan'}</p>
+                <p className="text-xs text-textMuted truncate">{slot.zone_name || 'Safe home'}</p>
             </div>
             <div className="text-right flex-shrink-0">
                 <p className="text-xs mb-1.5"><CountdownDisplay completesAt={slot.completes_at} onComplete={onUpdate} /></p>
                 {isComplete ? (
                     <button onClick={handleClaim} disabled={isLoading} className="btn-primary text-xs py-1.5 px-3">
-                        {isLoading ? '...' : 'Nhan'}
+                        {isLoading ? '...' : 'Claim'}
                     </button>
                 ) : (
                     <button onClick={handleCancel} disabled={isLoading} className="btn-ghost text-xs py-1 px-2">
-                        {isLoading ? '...' : 'Huy'}
+                        {isLoading ? '...' : 'Cancel'}
                     </button>
                 )}
             </div>
@@ -172,13 +172,13 @@ function RegisterActionSheet({ zones, playerId, initialDestination, initialActio
 
     async function handleSubmit() {
         if (!selectedZone) {
-            onNotify('Hay chon khu vuc truoc.', 'error');
+            onNotify('Choose an area first.', 'error');
             return;
         }
         setIsLoading(true);
         try {
             await registerAction(playerId, selectedAction, selectedZone.code, selectedDuration.value);
-            onNotify(`${config.label} da bat dau`, 'success');
+            onNotify(`${config.label} started`, 'success');
             onUpdate();
             onClose();
         } catch (err) {
@@ -192,11 +192,11 @@ function RegisterActionSheet({ zones, playerId, initialDestination, initialActio
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
             <div className="card w-full sm:max-w-lg max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold">Chon viec can lam</h3>
+                    <h3 className="font-semibold">Choose an Action</h3>
                     <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
                 </div>
 
-                <p className="text-xs text-textMuted mb-2">DIEM DEN</p>
+                <p className="text-xs text-textMuted mb-2">DESTINATION</p>
                 <div className="grid grid-cols-2 gap-2 mb-4">
                     {Object.entries(DESTINATIONS).map(([key, destination]) => (
                         <button
@@ -215,7 +215,7 @@ function RegisterActionSheet({ zones, playerId, initialDestination, initialActio
                     ))}
                 </div>
 
-                <p className="text-xs text-textMuted mb-2">THAO TAC</p>
+                <p className="text-xs text-textMuted mb-2">ACTION</p>
                 <div className="grid grid-cols-2 gap-2 mb-4">
                     {actions.map(([key, action]) => (
                         <button
@@ -234,10 +234,10 @@ function RegisterActionSheet({ zones, playerId, initialDestination, initialActio
                     ))}
                 </div>
 
-                <p className="text-xs text-textMuted mb-2">{selectedDestination === 'HOME' ? 'NOI O' : 'KHU VUC'}</p>
+                <p className="text-xs text-textMuted mb-2">{selectedDestination === 'HOME' ? 'HOME' : 'AREA'}</p>
                 <div className="space-y-1.5 mb-4">
                     {compatibleZones.length === 0 && (
-                        <p className="text-xs text-danger">Khong co khu vuc phu hop cho thao tac nay.</p>
+                        <p className="text-xs text-danger">No compatible area for this action.</p>
                     )}
                     {compatibleZones.map(zone => (
                         <button
@@ -250,12 +250,12 @@ function RegisterActionSheet({ zones, playerId, initialDestination, initialActio
                             }`}
                         >
                             <p className="text-sm font-medium">{zone.display_name}</p>
-                            <p className="text-xs text-textMuted">Lv.{zone.min_player_lv}+ | Nhiem {zone.infection_risk}% | Xa {zone.radiation_risk}%</p>
+                            <p className="text-xs text-textMuted">Lv.{zone.min_player_lv}+ | Infection {zone.infection_risk}% | Radiation {zone.radiation_risk}%</p>
                         </button>
                     ))}
                 </div>
 
-                <p className="text-xs text-textMuted mb-2">THOI LUONG</p>
+                <p className="text-xs text-textMuted mb-2">DURATION</p>
                 <select
                     value={selectedDuration.value}
                     onChange={event => setSelectedDuration(DURATION_OPTIONS.find(item => item.value === parseInt(event.target.value)))}
@@ -265,7 +265,7 @@ function RegisterActionSheet({ zones, playerId, initialDestination, initialActio
                 </select>
 
                 <button onClick={handleSubmit} disabled={isLoading || !selectedZone} className="btn-primary w-full">
-                    {isLoading ? 'Dang bat dau...' : 'Bat dau'}
+                    {isLoading ? 'Starting...' : 'Start'}
                 </button>
             </div>
         </div>
@@ -317,13 +317,13 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                 <span className="absolute top-4 right-4 text-3xl font-bold opacity-20">{banner.mark}</span>
                 <div>
                     <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">
-                        {isExploring ? 'DANG KHAM PHA' : 'TRAI TI NAN'}
+                        {isExploring ? 'EXPLORING' : 'REFUGEE CAMP'}
                     </span>
                     <h1 className="text-xl font-bold">{isExploring ? currentZone.display_name : (character?.character_name || 'Survivor')}</h1>
                     <p className="text-sm text-textSecondary mt-1">
                         {isExploring
-                            ? `Lv.${currentZone.min_player_lv}+ | Nhiem ${currentZone.infection_risk}% | Xa ${currentZone.radiation_risk}%`
-                            : 'O nha quan ly can cu, gap NPC, roi chon khu vuc de di kham pha'}
+                            ? `Lv.${currentZone.min_player_lv}+ | Infection ${currentZone.infection_risk}% | Radiation ${currentZone.radiation_risk}%`
+                            : 'Manage your base, meet NPCs, then choose an area to explore.'}
                     </p>
                 </div>
             </div>
@@ -347,50 +347,56 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                                 AC
                             </span>
                             <div className="min-w-0">
-                                <p className="text-sm font-semibold">Dang co hanh dong ngoai nen</p>
+                                <p className="text-sm font-semibold">Background actions active</p>
                                 <p className="text-xs text-textMuted truncate">
-                                    {completedCount > 0 ? `${completedCount} hanh dong da xong, san sang nhan thuong` : `${queue.length} hanh dong dang dien ra`}
+                                    {completedCount > 0 ? `${completedCount} actions complete, rewards ready` : `${queue.length} actions in progress`}
                                 </p>
                             </div>
                         </div>
-                        <span className="text-xs text-accent font-semibold">Mo</span>
+                        <span className="text-xs text-accent font-semibold">Open</span>
                     </button>
                 </div>
             )}
 
             {!isExploring ? (
                 <div className="p-4 space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <button onClick={() => setShowZonePicker(true)} className="card card-hover p-4 text-left">
+                    <div className="space-y-3">
+                        <button onClick={() => setShowZonePicker(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">EX</span>
-                                <p className="font-semibold">Di kham pha</p>
                             </div>
-                            <p className="text-xs text-textMuted leading-relaxed">Chon mot khu vuc phu hop level de roi khoi trai.</p>
+                            <div className="min-w-0">
+                                <p className="font-semibold">Go Exploring</p>
+                                <p className="text-xs text-textMuted leading-relaxed mt-1">Choose a level-appropriate area and leave camp.</p>
+                            </div>
                         </button>
-                        <button onClick={() => openAction('HOME', 'CRAFT', safeZone)} className="card card-hover p-4 text-left">
+                        <button onClick={() => openAction('HOME', 'CRAFT', safeZone)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">HM</span>
-                                <p className="font-semibold">Nha ca nhan</p>
                             </div>
-                            <p className="text-xs text-textMuted leading-relaxed">Che tao, sua soan va bien tai nguyen thanh trang bi.</p>
+                            <div className="min-w-0">
+                                <p className="font-semibold">Personal Home</p>
+                                <p className="text-xs text-textMuted leading-relaxed mt-1">Craft, repair, and turn resources into gear.</p>
+                            </div>
                         </button>
-                        <button onClick={() => openAction('HOME', 'TRADE', safeZone)} className="card card-hover p-4 text-left">
+                        <button onClick={() => openAction('HOME', 'TRADE', safeZone)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">NPC</span>
-                                <p className="font-semibold">Trai ti nan</p>
                             </div>
-                            <p className="text-xs text-textMuted leading-relaxed">Gap NPC, trao doi vat pham va lay copper.</p>
+                            <div className="min-w-0">
+                                <p className="font-semibold">Refugee Camp</p>
+                                <p className="text-xs text-textMuted leading-relaxed mt-1">Meet NPCs, trade items, and earn copper.</p>
+                            </div>
                         </button>
                     </div>
 
                     {showZonePicker && (
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <h2 className="text-sm font-semibold">Chon khu vuc kham pha</h2>
-                                <button onClick={() => setShowZonePicker(false)} className="text-xs text-textMuted hover:text-textPrimary">Dong</button>
+                                <h2 className="text-sm font-semibold">Choose Exploration Area</h2>
+                                <button onClick={() => setShowZonePicker(false)} className="text-xs text-textMuted hover:text-textPrimary">Close</button>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="space-y-2">
                                 {expeditionZones.map(zone => (
                                     <button
                                         key={zone.id}
@@ -401,11 +407,11 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                                         className="card card-hover p-3 text-left"
                                     >
                                         <p className="text-sm font-medium truncate mb-1">{zone.display_name}</p>
-                                        <p className="text-xs text-textMuted">Lv.{zone.min_player_lv}+ | {zone.zone_type} | Nhiem {zone.infection_risk}%</p>
+                                        <p className="text-xs text-textMuted">Lv.{zone.min_player_lv}+ | {zone.zone_type} | Infection {zone.infection_risk}%</p>
                                     </button>
                                 ))}
                                 {expeditionZones.length === 0 && (
-                                    <p className="text-sm text-textMuted">Chua co khu vuc phu hop level hien tai.</p>
+                                    <p className="text-sm text-textMuted">No areas match your current level.</p>
                                 )}
                             </div>
                         </div>
@@ -417,27 +423,29 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                         onClick={() => setCurrentExpeditionZone(null)}
                         className="w-full btn-secondary text-left"
                     >
-                        Quay ve trai ti nan
+                        Return to Refugee Camp
                     </button>
 
                     <div>
-                        <h2 className="text-sm font-semibold mb-3">Hanh dong tai khu vuc</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <h2 className="text-sm font-semibold mb-3">Area Actions</h2>
+                        <div className="space-y-3">
                             {expeditionActions.map(actionCode => {
                                 const action = ACTION_CONFIG[actionCode];
                                 return (
                                     <button
                                         key={actionCode}
                                         onClick={() => openAction('EXPEDITION', actionCode, currentExpeditionZone)}
-                                        className="card card-hover p-4 text-left"
+                                        className="w-full card card-hover p-4 text-left flex items-start gap-4"
                                     >
-                                        <div className="flex items-center gap-3 mb-2">
+                                        <div className="flex items-center gap-3">
                                             <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">
                                                 {action.mark}
                                             </span>
-                                            <p className="font-semibold">{action.label}</p>
                                         </div>
-                                        <p className="text-xs text-textMuted leading-relaxed">{action.helper}</p>
+                                        <div className="min-w-0">
+                                            <p className="font-semibold">{action.label}</p>
+                                            <p className="text-xs text-textMuted leading-relaxed mt-1">{action.helper}</p>
+                                        </div>
                                     </button>
                                 );
                             })}
@@ -448,8 +456,8 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
 
             {!isExploring && !showZonePicker && (
             <div className="px-4 pb-4">
-                <h2 className="text-sm font-semibold mb-3">Vung kham pha</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <h2 className="text-sm font-semibold mb-3">Exploration Areas</h2>
+                <div className="space-y-2">
                     {expeditionZones.map(zone => (
                         <button
                             key={zone.id}
@@ -482,8 +490,8 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                     <div className="card w-full sm:max-w-md max-h-[85vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h3 className="font-semibold">Hanh dong dang dien ra</h3>
-                                <p className="text-xs text-textMuted mt-1">{queue.length}/3 hanh dong ngoai nen</p>
+                                <h3 className="font-semibold">Active Actions</h3>
+                                <p className="text-xs text-textMuted mt-1">{queue.length}/3 background actions</p>
                             </div>
                             <button onClick={() => setShowActiveActions(false)} className="text-textMuted hover:text-textPrimary">x</button>
                         </div>
@@ -504,7 +512,7 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                                     }}
                                     className="w-full p-3 rounded-lg border border-dashed border-border text-textMuted hover:border-accent/40 hover:text-accent transition-colors text-sm"
                                 >
-                                    + Di hanh dong tiep
+                                    + Start another action
                                 </button>
                             )}
                         </div>

@@ -4,12 +4,12 @@ import { useState } from 'react';
 import EquipmentTab from './EquipmentTab';
 
 const STAT_INFO = {
-    str: { label: 'STR', desc: 'Sát thương vật lý và khả năng mang vác' },
-    agi: { label: 'AGI', desc: 'Phản xạ, né tránh và tốc độ hành động' },
-    dex: { label: 'DEX', desc: 'Khéo léo, chính xác và tỉ lệ chí mạng' },
-    vit: { label: 'VIT', desc: 'Máu tối đa, chống chịu và sức bền' },
-    int: { label: 'INT', desc: 'Tư duy, học công thức và dùng công cụ' },
-    chr: { label: 'CHR', desc: 'Giao tiếp, thương lượng và sức hút' },
+    str: { label: 'STR', desc: 'Physical damage and carry capacity' },
+    agi: { label: 'AGI', desc: 'Reflexes, evasion, and action speed' },
+    dex: { label: 'DEX', desc: 'Precision, accuracy, and critical chance' },
+    vit: { label: 'VIT', desc: 'Max HP, toughness, and endurance' },
+    int: { label: 'INT', desc: 'Reasoning, recipes, and tool use' },
+    chr: { label: 'CHR', desc: 'Communication, trade, and presence' },
 };
 
 const JOB_MARKS = {
@@ -23,13 +23,13 @@ const JOB_MARKS = {
 
 const CATEGORY_ORDER = ['combat', 'survival', 'production'];
 const CATEGORY_LABELS = {
-    combat: 'Chiến đấu',
-    survival: 'Sinh tồn',
-    production: 'Sản xuất',
+    combat: 'Combat',
+    survival: 'Survival',
+    production: 'Production',
 };
 
 function StatsTab({ stats }) {
-    if (!stats) return <p className="text-sm text-textMuted p-4">Đang tải...</p>;
+    if (!stats) return <p className="text-sm text-textMuted p-4">Loading...</p>;
 
     return (
         <div className="p-4 space-y-4">
@@ -51,7 +51,7 @@ function StatsTab({ stats }) {
             </div>
 
             <div className="card p-4">
-                <p className="text-xs font-semibold text-textMuted mb-3">CHIẾN ĐẤU</p>
+                <p className="text-xs font-semibold text-textMuted mb-3">COMBAT</p>
                 <div className="grid grid-cols-3 gap-3 text-center">
                     <div>
                         <p className="text-lg font-bold font-mono">{stats.derived?.max_hp}</p>
@@ -106,7 +106,7 @@ function JobsTab({ jobs, playerLevel }) {
                                                 </div>
                                             </>
                                         ) : (
-                                            <p className="text-[10px] text-textMuted">Chưa mở</p>
+                                            <p className="text-[10px] text-textMuted">Locked</p>
                                         )}
                                     </div>
                                 );
@@ -131,18 +131,18 @@ export default function ProfilePanel({ character, stats, jobs, playerId, onUpdat
                     </div>
                     <div>
                         <p className="font-semibold">{character?.character_name}</p>
-                        <p className="text-xs text-textMuted">Cấp {character?.player_level} · SP: {character?.skill_points}</p>
+                        <p className="text-xs text-textMuted">Level {character?.player_level} · SP: {character?.skill_points}</p>
                     </div>
                 </div>
                 <div className="flex gap-1.5">
                     <button onClick={() => setTab('STATS')} className={`tab-pill ${tab === 'STATS' ? 'tab-pill-active' : 'tab-pill-inactive'}`}>
-                        Chỉ số
+                        Stats
                     </button>
                     <button onClick={() => setTab('GEAR')} className={`tab-pill ${tab === 'GEAR' ? 'tab-pill-active' : 'tab-pill-inactive'}`}>
-                        Trang bị
+                        Gear
                     </button>
                     <button onClick={() => setTab('JOBS')} className={`tab-pill ${tab === 'JOBS' ? 'tab-pill-active' : 'tab-pill-inactive'}`}>
-                        Kỹ năng
+                        Skills
                     </button>
                 </div>
             </div>
@@ -155,7 +155,7 @@ export default function ProfilePanel({ character, stats, jobs, playerId, onUpdat
 
             <div className="p-4 border-t border-border flex-shrink-0">
                 <button onClick={onLogout} className="btn-secondary w-full text-sm">
-                    Đăng xuất
+                    Log out
                 </button>
             </div>
         </div>

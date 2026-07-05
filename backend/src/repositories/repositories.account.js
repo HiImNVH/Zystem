@@ -26,9 +26,9 @@ async function createAccount(username, email, password) {
         return result.rows[0];
     } catch (error) {
         if (error.code === '23505') {
-            const field = error.detail?.includes('username') ? 'Ten dang nhap' : 'Email';
+            const field = error.detail?.includes('username') ? 'Username' : 'Email';
             console.warn(`[WARN] ${field} da ton tai: ${username}`);
-            return { error: `${field} da duoc su dung.` };
+            return { error: `${field} is already in use.` };
         }
         console.error('[ERROR] Loi khi tao tai khoan:', error.message);
         return null;
@@ -68,13 +68,13 @@ async function findAccountById(accountId) {
 async function verifyLogin(username, password) {
     const account = await findAccountByUsername(username);
     if (!account) {
-        return { success: false, message: 'Ten dang nhap hoac mat khau khong chinh xac.' };
+        return { success: false, message: 'Incorrect username or password.' };
     }
 
     // So sanh mat khau bang bcrypt
     const isPasswordValid = await bcrypt.compare(password, account.password_hash);
     if (!isPasswordValid) {
-        return { success: false, message: 'Ten dang nhap hoac mat khau khong chinh xac.' };
+        return { success: false, message: 'Incorrect username or password.' };
     }
 
     await dbPool.query(

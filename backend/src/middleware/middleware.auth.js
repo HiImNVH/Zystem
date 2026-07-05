@@ -27,7 +27,7 @@ function verifyToken(req, res, next) {
     if (!token) {
         return res.status(401).json({
             success: false,
-            message: 'Yeu cau dang nhap. Khong tim thay token xac thuc.'
+            message: 'Login required. Authentication token was not found.'
         });
     }
 
@@ -40,7 +40,7 @@ function verifyToken(req, res, next) {
     } catch (error) {
         // Token het han hoac bi gia mao
         const message = error.name === 'TokenExpiredError'
-            ? 'Phien dang nhap da het han. Vui long dang nhap lai.'
+            ? 'Your session has expired. Please log in again.'
             : 'Token khong hop le.';
 
         return res.status(401).json({ success: false, message });
@@ -62,7 +62,7 @@ async function verifyPlayerOwnership(req, res, next) {
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character not found.' });
         }
 
         const playerAccountId = result.rows[0].account_id;
@@ -71,7 +71,7 @@ async function verifyPlayerOwnership(req, res, next) {
         if (playerAccountId && playerAccountId !== req.accountId) {
             return res.status(403).json({
                 success: false,
-                message: 'Khong co quyen truy cap nhan vat nay.'
+                message: 'You do not have permission to access this character.'
             });
         }
 

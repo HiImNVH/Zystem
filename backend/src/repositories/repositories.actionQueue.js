@@ -12,7 +12,7 @@ async function insertActionSlot(playerId, zoneCode, actionType, baseDurationS, a
     );
     const activeCount = parseInt(activeCheck.rows[0].count);
     if (activeCount >= 3) {
-        return { error: 'Da day slot hanh dong (toi da 3 slot). Hay cho hanh dong cu hoan tat.' };
+        return { error: 'Action slots are full (maximum 3 slots). Wait for an existing action to finish.' };
     }
 
     let zoneId = null;
@@ -22,7 +22,7 @@ async function insertActionSlot(playerId, zoneCode, actionType, baseDurationS, a
             [zoneCode]
         );
         if (zoneResult.rows.length === 0) {
-            return { error: `Zone khong ton tai hoac da bi khoa: ${zoneCode}` };
+            return { error: `Zone does not exist or is locked: ${zoneCode}` };
         }
         zoneId = zoneResult.rows[0].id;
     }
@@ -101,19 +101,19 @@ async function claimActionSlot(actionId, playerId) {
         );
 
         if (lockResult.rows.length === 0) {
-            throw new Error('Khong tim thay hanh dong hoac khong co quyen truy cap.');
+            throw new Error('Action not found or you do not have permission to access it.');
         }
 
         const slot = lockResult.rows[0];
 
         if (slot.status !== 'PENDING') {
-            throw new Error(`Hanh dong nay da o trang thai: ${slot.status}. Khong the Claim.`);
+            throw new Error(`This action is already in status: ${slot.status}. It cannot be claimed.`);
         }
 
         const now = new Date();
         if (now < new Date(slot.completes_at)) {
             const remaining = Math.ceil((new Date(slot.completes_at) - now) / 1000);
-            throw new Error(`Hanh dong chua hoan tat. Con lai ${remaining} giay.`);
+            throw new Error(`Action is not complete yet. ${remaining} seconds remaining.`);
         }
 
         // Danh dau COMPLETED
@@ -181,7 +181,7 @@ async function cancelActionSlot(actionId, playerId) {
         `, [actionId, playerId]);
 
         if (result.rows.length === 0) {
-            return { error: 'Khong tim thay hanh dong PENDING de huy.' };
+            return { error: 'No pending action found to cancel.' };
         }
 
         console.log(`[INFO] Da huy hanh dong ${actionId}`);

@@ -19,15 +19,15 @@ characterRouter.post('/', verifyToken, async (req, res, next) => {
     const { characterName, startingJobCode } = req.body;
 
     if (!characterName || characterName.trim() === '') {
-        return res.status(400).json({ success: false, message: 'Ten nhan vat khong duoc de trong.' });
+        return res.status(400).json({ success: false, message: 'Character name cannot be empty.' });
     }
 
     if (characterName.trim().length < 3 || characterName.trim().length > 50) {
-        return res.status(400).json({ success: false, message: 'Ten nhan vat phai tu 3 den 50 ky tu.' });
+        return res.status(400).json({ success: false, message: 'Character name must be 3 to 50 characters.' });
     }
 
     if (!startingJobCode) {
-        return res.status(400).json({ success: false, message: 'Phai chon nghe khoi dau (startingJobCode).' });
+        return res.status(400).json({ success: false, message: 'You must choose a starting job (startingJobCode).' });
     }
 
     try {
@@ -38,7 +38,7 @@ characterRouter.post('/', verifyToken, async (req, res, next) => {
         });
 
         if (!newPlayer) {
-            return res.status(500).json({ success: false, message: 'Khong the tao nhan vat. Vui long thu lai.' });
+            return res.status(500).json({ success: false, message: 'Could not create character. Please try again.' });
         }
 
         if (newPlayer.error) {
@@ -47,7 +47,7 @@ characterRouter.post('/', verifyToken, async (req, res, next) => {
 
         return res.status(201).json({
             success: true,
-            message: `Tao nhan vat "${newPlayer.character_name}" thanh cong! Nghe khoi dau: ${newPlayer.starting_job?.display_name} (cap 20).`,
+            message: `Character "${newPlayer.character_name}" created successfully! Starting job: ${newPlayer.starting_job?.display_name} (level 20).`,
             data: newPlayer
         });
     } catch (error) {
@@ -84,13 +84,13 @@ characterRouter.get('/:id', verifyToken, verifyPlayerOwnership, async (req, res,
     const { id } = req.params;
 
     if (!id || id.length < 10) {
-        return res.status(400).json({ success: false, message: 'ID nhan vat khong hop le.' });
+        return res.status(400).json({ success: false, message: 'Invalid character ID.' });
     }
 
     try {
         const player = await characterRepository.findCharacterById(id);
         if (!player) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character not found.' });
         }
 
         return res.json({ success: true, data: player });
@@ -109,7 +109,7 @@ characterRouter.get('/:id/stats', verifyToken, verifyPlayerOwnership, async (req
     try {
         const totalStats = await characterService.calculateTotalStats(id);
         if (!totalStats) {
-            return res.status(404).json({ success: false, message: 'Khong tim thay nhan vat.' });
+            return res.status(404).json({ success: false, message: 'Character not found.' });
         }
 
         return res.json({ success: true, data: totalStats });

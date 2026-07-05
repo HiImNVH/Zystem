@@ -1,5 +1,5 @@
 ﻿// frontend/src/api/api.game.js
-// Goi API gameplay: zones, action queue, inventory, stats
+// Gameplay API: zones, action queue, inventory, stats
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -14,7 +14,7 @@ function getHeaders() {
 async function handleResponse(response) {
     const data = await response.json();
     if (!response.ok || !data.success) {
-        throw new Error(data.message || 'Co loi xay ra.');
+        throw new Error(data.message || 'Something went wrong.');
     }
     return data;
 }
