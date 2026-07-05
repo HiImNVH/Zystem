@@ -180,6 +180,10 @@ async function seedJobsSeedTable() {
                 ]
             );
         }
+        await dbPool.query(
+            `UPDATE zones SET is_active = FALSE WHERE code <> ALL($1::TEXT[]);`,
+            [zonesList.map(zone => zone.code)]
+        );
         console.log('[SUCCESS] Da nap/cap nhat world maps Lv.5-40 thanh cong!');
 
         const insertPoiQuery = `
