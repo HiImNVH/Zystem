@@ -8,7 +8,7 @@ import ChatPanel from './panels/ChatPanel';
 import ProfilePanel from './panels/ProfilePanel';
 import QuestPanel from './panels/QuestPanel';
 import {
-    getCharacterStats, getZones, getActionQueue,
+    getCharacterStats, getZones,
     getInventory, getPlayerJobs,
 } from '../api/api.game';
 import { getMyCharacter } from '../api/api.character';
@@ -24,7 +24,6 @@ export default function Dashboard({ initialCharacter, onLogout }) {
     const [character, setCharacter] = useState(initialCharacter);
     const [stats, setStats]         = useState(null);
     const [zones, setZones]         = useState([]);
-    const [queue, setQueue]         = useState([]);
     const [inventory, setInventory] = useState([]);
     const [jobs, setJobs]           = useState([]);
     const [leftTab, setLeftTab]     = useState(TAB.INVENTORY);
@@ -34,14 +33,13 @@ export default function Dashboard({ initialCharacter, onLogout }) {
 
     const loadAll = useCallback(async () => {
         if (!playerId) return;
-        const [charRes, statsRes, zonesRes, queueRes, invRes, jobsRes] = await Promise.allSettled([
+        const [charRes, statsRes, zonesRes, invRes, jobsRes] = await Promise.allSettled([
             getMyCharacter(), getCharacterStats(playerId), getZones(),
-            getActionQueue(playerId), getInventory(playerId), getPlayerJobs(playerId),
+            getInventory(playerId), getPlayerJobs(playerId),
         ]);
         if (charRes.status  === 'fulfilled') setCharacter(charRes.value.data);
         if (statsRes.status === 'fulfilled') setStats(statsRes.value.data);
         if (zonesRes.status === 'fulfilled') setZones(zonesRes.value.data);
-        if (queueRes.status === 'fulfilled') setQueue(queueRes.value.data);
         if (invRes.status   === 'fulfilled') setInventory(invRes.value.data);
         if (jobsRes.status  === 'fulfilled') setJobs(jobsRes.value.data);
     }, [playerId]);
@@ -54,7 +52,7 @@ export default function Dashboard({ initialCharacter, onLogout }) {
 
     function renderPanel(tab) {
         if (tab === TAB.MAIN) {
-            return <MainPanel playerId={playerId} character={character} zones={zones} queue={queue} inventory={inventory} onUpdate={loadAll} />;
+            return <MainPanel playerId={playerId} character={character} zones={zones} inventory={inventory} onUpdate={loadAll} />;
         }
 
         if (tab === TAB.INVENTORY) {
