@@ -55,6 +55,7 @@ function runPureLogicChecks(modulesByPath) {
     const character = modulesByPath['src/repositories/repositories.character.js'];
     const auth = modulesByPath['src/middleware/middleware.auth.js'];
     const loot = modulesByPath['src/services/services.loot.js'];
+    const curelPower = modulesByPath['src/services/services.curelPower.js'];
     const designSeed = modulesByPath['src/repositories/repositories.designSeed.js'];
     const itemsSeed = modulesByPath['src/repositories/repositories.itemsSeed.js'];
     const skillsSeed = modulesByPath['src/repositories/repositories.skillsSeed.js'];
@@ -110,6 +111,17 @@ function runPureLogicChecks(modulesByPath) {
 
     assertExportedFunction(loot, 'calculateDropCount');
     assert.equal(loot.calculateDropCount('EXPLORE', 600), 4);
+
+    assertExportedFunction(curelPower, 'calculateCurelPowerFromRows');
+    assert.equal(curelPower.normalizePowerMode('BATTLE'), 'COMBAT_GATHERING');
+    assert.equal(curelPower.calculateCurelPowerFromRows(5, [
+        { code: 'gathering', job_level: 20 },
+        { code: 'scavenging', job_level: 12 },
+    ], 'MINE'), 28);
+    assert.equal(curelPower.calculateCurelPowerFromRows(8, [
+        { code: 'fighting', job_level: 30 },
+        { code: 'scavenging', job_level: 20 },
+    ], 'DUNGEON'), 40);
 
     assert.equal(itemsSeed.ITEM_TEMPLATES.length, 391);
     assert.equal(skillsSeed.ALL_SKILLS.length, 196);

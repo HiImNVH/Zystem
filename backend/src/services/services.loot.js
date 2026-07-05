@@ -3,6 +3,7 @@
 const { dbPool } = require('../repositories/repositories.database');
 const craftingService = require('./services.crafting');
 const itemStatsService = require('./services.itemStats');
+const curelPowerService = require('./services.curelPower');
 
 const ACTION_DROP_POOL = {
     MINE:    ['MATERIAL'],
@@ -78,11 +79,11 @@ async function getCandidateTemplates(categories, zoneMinLevel, origins) {
     }
 }
 
-function rollOneItem(candidates, crafterDex) {
+function rollOneItem(candidates, curelPower) {
     if (!candidates || candidates.length === 0) return null;
 
     const template = candidates[Math.floor(Math.random() * candidates.length)];
-    const rarity = craftingService.rollCurelRarity(template.item_level);
+    const rarity = craftingService.rollCurelRarity(curelPower);
     const itemPower = craftingService.calculateItemPower(template.item_level, rarity);
     const rolledStats = itemStatsService.rollItemStats(template.category, itemPower, rarity);
 
@@ -132,7 +133,7 @@ async function insertDroppedItems(playerId, droppedItems, actionId) {
     return insertedItems;
 }
 
-async function processLootDrop(playerId, claimedAction, playerDex) {
+async function processLootDrop(playerId, claimedAction) {
     const actionType = claimedAction.action_type?.toUpperCase();
     const categories = ACTION_DROP_POOL[actionType];
 
@@ -148,10 +149,12 @@ async function processLootDrop(playerId, claimedAction, playerDex) {
         return { items_dropped: [] };
     }
 
+    const curelPower = await curelPowerService.calculateLootCurelPower(playerId, actionType);
+
     const droppedItems = [];
     for (let index = 0; index < dropCount; index++) {
         if (Math.random() > 0.70) continue;
-        const item = rollOneItem(candidates, playerDex);
+        const item = rollOneItem(candidates, curelPower);
         if (item) droppedItems.push(item);
     }
 

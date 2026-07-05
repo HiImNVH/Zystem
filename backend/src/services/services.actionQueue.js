@@ -285,9 +285,7 @@ async function processClaimedAction(playerId, claimedAction) {
     }
 
     // 4. Roll loot drop
-    const lootResult = await lootService.processLootDrop(
-        playerId, claimedAction, character.base_dex
-    );
+    const lootResult = await lootService.processLootDrop(playerId, claimedAction);
 
     // 5. Home economy: TRADE turns surplus resources into copper.
     let economyResult = { copper_gained: 0, sold_items: [] };
