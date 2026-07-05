@@ -136,6 +136,33 @@ export async function getRefundStatus(playerId) {
     return handleResponse(res);
 }
 
+export async function getPlayerEvents(playerId, limit = 50) {
+    const res = await fetch(`${BASE_URL}/api/events/${playerId}?limit=${limit}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function markPlayerEventsRead(playerId) {
+    const res = await fetch(`${BASE_URL}/api/events/${playerId}/read`, {
+        method: 'POST',
+        headers: getHeaders(),
+    });
+    return handleResponse(res);
+}
+
+export async function getChatMessages(channel = 'GLOBAL', limit = 50) {
+    const res = await fetch(`${BASE_URL}/api/chat/messages?channel=${encodeURIComponent(channel)}&limit=${limit}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function sendChatMessage(playerId, channel, message) {
+    const res = await fetch(`${BASE_URL}/api/chat/messages`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, channel, message }),
+    });
+    return handleResponse(res);
+}
+
 // === EQUIPMENT API ===
 export async function getEquippedItems(playerId) {
     const res = await fetch(`${BASE_URL}/api/items/player/${playerId}/equipped`, { headers: getHeaders() });

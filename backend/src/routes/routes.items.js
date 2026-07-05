@@ -9,6 +9,7 @@ const craftingService = require('../services/services.crafting');
 const curelPowerService = require('../services/services.curelPower');
 const itemStatsService = require('../services/services.itemStats');
 const itemLifecycleService = require('../services/services.itemLifecycle');
+const playerEventsService = require('../services/services.playerEvents');
 
 function calculateFoodRestore(item) {
     const tags = (item.tags || []).map(tag => String(tag).toLowerCase());
@@ -268,6 +269,13 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
             `UPDATE items SET is_equipped = TRUE, equip_slot = $1 WHERE id = $2;`,
             [equipSlot, itemId]
         );
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: 'ITEM_EQUIPPED',
+            source: 'Zystem',
+            title: 'Item Equipped',
+            message: `Equipped ${item.display_name}.`,
+            payload: { item_id: itemId, item_name: item.display_name, equip_slot: equipSlot },
+        });
 
         return res.json({
             success: true,
@@ -443,6 +451,25 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
         ]);
 
         await client.query('COMMIT');
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: 'ITEM_CRAFTED',
+            source: 'Zystem',
+            title: 'Craft Successful',
+            message: `Crafted ${recipe.output_item_name}.`,
+            payload: {
+                item_id: createdItem.rows[0]?.id,
+                item_name: recipe.output_item_name,
+                output_level: outputLevel,
+                rarity,
+                item_power: itemPower,
+                consumed_items: selectedItems.map(item => ({
+                    id: item.id,
+                    name: item.display_name,
+                    quantity: item.required_quantity,
+                    slot_index: item.slot_index,
+                })),
+            },
+        });
 
         return res.status(201).json({
             success: true,
@@ -551,6 +578,18 @@ itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
         }
 
         await client.query('COMMIT');
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: 'FOOD_USED',
+            source: 'Zystem',
+            title: 'Food Used',
+            message: `Ate ${item.display_name}. Energy +${restore.energyRestore}, fatigue -${restore.fatigueRestore}.`,
+            payload: {
+                item_id: itemId,
+                item_name: item.display_name,
+                energy_restored: restore.energyRestore,
+                fatigue_restored: restore.fatigueRestore,
+            },
+        });
 
         return res.json({
             success: true,
@@ -597,6 +636,14 @@ itemsRouter.post('/unequip', verifyToken, async (req, res, next) => {
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Item not found.' });
         }
+
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: 'ITEM_UNEQUIPPED',
+            source: 'Zystem',
+            title: 'Item Unequipped',
+            message: 'Equipment removed.',
+            payload: { item_id: itemId },
+        });
 
         return res.json({ success: true, message: 'Equipment removed.', data: result.rows[0] });
     } catch (error) {

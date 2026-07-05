@@ -55,6 +55,8 @@ async function initializeDatabaseSchema() {
                 DROP TABLE IF EXISTS player_achievements CASCADE;
                 DROP TABLE IF EXISTS achievements CASCADE;
                 DROP TABLE IF EXISTS user_progress_timestamps CASCADE;
+                DROP TABLE IF EXISTS chat_messages CASCADE;
+                DROP TABLE IF EXISTS player_events CASCADE;
                 DROP TABLE IF EXISTS skill_refund_log CASCADE;
                 DROP TABLE IF EXISTS player_skills CASCADE;
                 DROP TABLE IF EXISTS job_skills CASCADE;
@@ -646,6 +648,35 @@ async function initializeDatabaseSchema() {
         await client.query(`CREATE INDEX IF NOT EXISTS idx_player_skills_player ON player_skills(player_id);`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_job_skills_job_code ON job_skills(job_code);`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_refund_log_player_date ON skill_refund_log(player_id, refunded_at);`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS player_events (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+                event_type VARCHAR(50) NOT NULL DEFAULT 'SYSTEM',
+                source VARCHAR(50) NOT NULL DEFAULT 'Zystem',
+                title VARCHAR(120) NOT NULL,
+                message TEXT NOT NULL,
+                payload JSONB NOT NULL DEFAULT '{}'::JSONB,
+                is_read BOOLEAN NOT NULL DEFAULT FALSE,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_player_events_player_created ON player_events(player_id, created_at DESC);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_player_events_unread ON player_events(player_id, is_read) WHERE is_read = FALSE;`);
+
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS chat_messages (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                channel VARCHAR(20) NOT NULL DEFAULT 'GLOBAL',
+                zone_code VARCHAR(64),
+                sender_player_id UUID REFERENCES players(id) ON DELETE SET NULL,
+                sender_name VARCHAR(50) NOT NULL,
+                message TEXT NOT NULL CHECK (char_length(message) BETWEEN 1 AND 256),
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_chat_messages_channel_created ON chat_messages(channel, created_at DESC);`);
 
         await client.query('COMMIT');
         console.log('[SUCCESS] Toan bo he thong bang Zystem da khoi tao thanh cong!');

@@ -57,6 +57,7 @@ function runPureLogicChecks(modulesByPath) {
     const loot = modulesByPath['src/services/services.loot.js'];
     const curelPower = modulesByPath['src/services/services.curelPower.js'];
     const itemLifecycle = modulesByPath['src/services/services.itemLifecycle.js'];
+    const playerEvents = modulesByPath['src/services/services.playerEvents.js'];
     const designSeed = modulesByPath['src/repositories/repositories.designSeed.js'];
     const itemsSeed = modulesByPath['src/repositories/repositories.itemsSeed.js'];
     const skillsSeed = modulesByPath['src/repositories/repositories.skillsSeed.js'];
@@ -158,6 +159,10 @@ function runPureLogicChecks(modulesByPath) {
         '2026-01-01T02:00:00.000Z'
     );
     assert.equal(itemLifecycle.isExpired('2026-01-01T00:00:00Z', new Date('2026-01-01T00:00:01Z')), true);
+
+    assertExportedFunction(playerEvents, 'logPlayerEvent');
+    assertExportedFunction(playerEvents, 'getPlayerEvents');
+    assertExportedFunction(playerEvents, 'markPlayerEventsRead');
 
     assert.equal(itemsSeed.ITEM_TEMPLATES.length, 391);
     assert.equal(skillsSeed.ALL_SKILLS.length, 196);

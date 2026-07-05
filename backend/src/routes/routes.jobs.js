@@ -5,6 +5,7 @@ const express = require('express');
 const jobsRouter = express.Router();
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 const { dbPool } = require('../repositories/repositories.database');
+const playerEventsService = require('../services/services.playerEvents');
 
 /**
  * @route   GET /api/jobs
@@ -316,6 +317,18 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
         await client.query('COMMIT');
 
         console.log(`[SUCCESS] Player ${playerId} dau tu ${actualSpSpent} SP vao nghe ${jobCode}: cap ${currentJobLevel} -> ${newJobLevel}`);
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: 'SKILL_LEVEL_UP',
+            source: 'Zystem',
+            title: 'Skill Upgraded',
+            message: `${jobCode} increased from level ${currentJobLevel} to ${newJobLevel}.`,
+            payload: {
+                job_code: jobCode,
+                old_level: currentJobLevel,
+                new_level: newJobLevel,
+                sp_spent: actualSpSpent,
+            },
+        });
 
         return res.json({
             success: true,

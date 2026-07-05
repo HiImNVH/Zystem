@@ -3,6 +3,7 @@
 
 const { dbPool } = require('../repositories/repositories.database');
 const characterRepository = require('../repositories/repositories.character');
+const playerEventsService = require('./services.playerEvents');
 
 // Cong thuc EXP can de len cap theo Balance Sheet: 0.7L^3 + 20L^2 + 100L + 50
 function calculateExpRequired(targetLevel) {
@@ -95,6 +96,13 @@ async function processPlayerExpGain(playerId, expAmount) {
 
     if (leveledUp) {
         console.log(`[SUCCESS] Nhan vat ${playerId} len cap ${newLevel}! Nhan +${spGained} SP.`);
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: 'PLAYER_LEVEL_UP',
+            source: 'Zystem',
+            title: 'Player Level Up',
+            message: `Your player level increased from ${currentLevel} to ${newLevel}.`,
+            payload: { old_level: currentLevel, new_level: newLevel, sp_gained: spGained },
+        });
     }
 
     await characterRepository.updateCharacterStats(playerId, updates);
@@ -151,6 +159,18 @@ async function processJobExpGain(playerId, jobId, expAmount) {
 
         if (newJobLevel > currentJob.job_level) {
             console.log(`[INFO] Ky nang job_id=${jobId} cua nhan vat ${playerId} len cap ${newJobLevel}`);
+            await playerEventsService.logPlayerEvent(playerId, {
+                eventType: 'SKILL_LEVEL_UP',
+                source: 'Zystem',
+                title: 'Skill Level Up',
+                message: `${currentJob.code} increased from level ${currentJob.job_level} to ${newJobLevel}.`,
+                payload: {
+                    job_id: jobId,
+                    job_code: currentJob.code,
+                    old_level: currentJob.job_level,
+                    new_level: newJobLevel,
+                },
+            });
         }
 
         await dbPool.query(

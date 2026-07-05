@@ -28,6 +28,7 @@ export default function Dashboard({ initialCharacter, onLogout }) {
     const [jobs, setJobs]           = useState([]);
     const [leftTab, setLeftTab]     = useState(TAB.INVENTORY);
     const [centerTab, setCenterTab] = useState(TAB.MAIN);
+    const [rightTab, setRightTab]   = useState('Chat');
 
     const playerId = character?.id;
 
@@ -115,7 +116,8 @@ export default function Dashboard({ initialCharacter, onLogout }) {
                     {RIGHT_TABS.map((label, index) => (
                         <button
                             key={label}
-                            className={`workspace-tab ${index === 0 ? 'workspace-tab-active' : ''}`}
+                            onClick={() => setRightTab(label)}
+                            className={`workspace-tab ${rightTab === label ? 'workspace-tab-active' : ''}`}
                             type="button"
                         >
                             {label}
@@ -124,7 +126,7 @@ export default function Dashboard({ initialCharacter, onLogout }) {
                     ))}
                 </div>
                 <div className="workspace-pane-body">
-                    <ChatPanel character={character} />
+                    <ChatPanel character={character} initialChannel={rightTab === 'Noti.' ? 'NOTI' : 'GLOBAL'} />
                 </div>
             </section>
         );

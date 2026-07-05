@@ -1,6 +1,7 @@
 ﻿// backend/src/repositories/repositories.wallet.js
 
 const { dbPool } = require('./repositories.database');
+const playerEventsService = require('../services/services.playerEvents');
 
 async function initializeWallet(playerId) {
     const sqlQuery = `
@@ -84,6 +85,18 @@ async function modifyWalletBalance(playerId, currencyType, amount, transactionTy
 
         await client.query('COMMIT');
         console.log(`[SUCCESS] [${transactionType}] ${amount} ${currency} cho player ${playerId}. So du moi: ${balanceAfter}`);
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: `WALLET_${transactionType}`,
+            source: 'Zystem',
+            title: transactionType === 'DEPOSIT' ? 'Currency Received' : 'Currency Spent',
+            message: `${transactionType === 'DEPOSIT' ? 'Received' : 'Spent'} ${amount} ${currency}.`,
+            payload: {
+                currency,
+                amount: changeAmount.toString(),
+                transaction_type: transactionType,
+                balance_after: balanceAfter.toString(),
+            },
+        });
 
         return {
             success: true,
