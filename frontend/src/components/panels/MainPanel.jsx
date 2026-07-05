@@ -1,7 +1,7 @@
 ﻿// frontend/src/components/panels/MainPanel.jsx
 
 import { useState, useEffect } from 'react';
-import { registerAction, claimAction, cancelAction } from '../../api/api.game';
+import { registerAction, claimAction, cancelAction, getPoiActivities } from '../../api/api.game';
 
 const DESTINATIONS = {
     EXPEDITION: {
@@ -206,14 +206,14 @@ function ActiveActionCard({ slot, playerId, onUpdate, onNotify }) {
 
 function RegisterActionSheet({
     zones, playerId, character, initialDestination, initialAction, initialZone,
-    initialPoi, initialGameplayTag, onClose, onUpdate, onNotify
+    initialPoi, initialGameplayTag, initialDungeonMode, onClose, onUpdate, onNotify
 }) {
     const [selectedDestination, setSelectedDestination] = useState(initialDestination || 'EXPEDITION');
     const [selectedAction, setSelectedAction] = useState(initialAction || 'BATTLE');
     const [selectedZone, setSelectedZone] = useState(initialZone || null);
     const [selectedPoi, setSelectedPoi] = useState(initialPoi || null);
     const [selectedGameplayTag, setSelectedGameplayTag] = useState(initialGameplayTag || null);
-    const [dungeonMode, setDungeonMode] = useState('NORMAL');
+    const [dungeonMode, setDungeonMode] = useState(initialDungeonMode || 'NORMAL');
     const [selectedDuration, setSelectedDuration] = useState(DURATION_OPTIONS[0]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -256,7 +256,8 @@ function RegisterActionSheet({
     useEffect(() => {
         setSelectedPoi(initialPoi || null);
         setSelectedGameplayTag(initialGameplayTag || null);
-    }, [initialPoi, initialGameplayTag]);
+        setDungeonMode(initialDungeonMode || 'NORMAL');
+    }, [initialPoi, initialGameplayTag, initialDungeonMode]);
 
     async function handleSubmit() {
         if (!selectedZone) {
@@ -407,6 +408,95 @@ function RegisterActionSheet({
     );
 }
 
+function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onStart }) {
+    if (!activityType) return null;
+
+    const titleMap = {
+        enemy: 'Enemy List',
+        gather: 'Gather List',
+        dungeon: 'Dungeon',
+    };
+    const list = activityType === 'enemy'
+        ? (activityData?.enemies || [])
+        : (activityType === 'gather' ? (activityData?.gatherables || []) : []);
+    const dungeon = activityData?.dungeon;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
+            <div className="card w-full sm:max-w-lg max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="min-w-0">
+                        <h3 className="font-semibold">{titleMap[activityType]}</h3>
+                        <p className="text-xs text-textMuted mt-1 truncate">
+                            {activityData?.poi?.display_name || 'POI'} | Lv.{activityData?.zone?.level_gap || activityData?.zone?.min_player_lv || 1}
+                        </p>
+                    </div>
+                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
+                </div>
+
+                {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
+                {error && <p className="text-sm text-danger mb-3">{error}</p>}
+
+                {!isLoading && activityType !== 'dungeon' && (
+                    <div className="space-y-2">
+                        {list.map(item => (
+                            <div key={item.id} className="card p-3 flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-[10px] font-bold text-accent flex-shrink-0">
+                                    {activityType === 'enemy' ? item.threat?.slice(0, 2).toUpperCase() : 'GA'}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold truncate">{item.name}</p>
+                                    <p className="text-xs text-textMuted truncate">
+                                        {activityType === 'enemy'
+                                            ? `Lv.${item.level} | ${item.reward_hint}`
+                                            : `Item Lv.${item.item_level} | ${item.rarity_hint}`}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => onStart(item)}
+                                    className="btn-primary text-xs py-1.5 px-3 flex-shrink-0"
+                                >
+                                    Start
+                                </button>
+                            </div>
+                        ))}
+                        {list.length === 0 && (
+                            <p className="text-sm text-textMuted py-6 text-center">Nothing available here.</p>
+                        )}
+                    </div>
+                )}
+
+                {!isLoading && activityType === 'dungeon' && (
+                    dungeon ? (
+                        <div className="space-y-3">
+                            <div className="card p-4">
+                                <p className="font-semibold">{dungeon.name}</p>
+                                <p className="text-xs text-textMuted mt-1">Map Level {dungeon.map_level}</p>
+                            </div>
+                            <button
+                                onClick={() => onStart(dungeon, 'NORMAL')}
+                                className="w-full card card-hover p-3 text-left"
+                            >
+                                <p className="text-sm font-semibold">Normal</p>
+                                <p className="text-xs text-textMuted mt-1">Monster Lv.{dungeon.normal.monster_level} | {dungeon.normal.reward_hint}</p>
+                            </button>
+                            <button
+                                onClick={() => onStart(dungeon, 'HARD')}
+                                className="w-full card card-hover p-3 text-left"
+                            >
+                                <p className="text-sm font-semibold">Hard</p>
+                                <p className="text-xs text-textMuted mt-1">{dungeon.hard.monster_level_rule} | {dungeon.hard.reward_hint}</p>
+                            </button>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-textMuted py-6 text-center">No dungeon entrance here.</p>
+                    )
+                )}
+            </div>
+        </div>
+    );
+}
+
 export default function MainPanel({ playerId, character, zones, queue, onUpdate }) {
     const [showRegister, setShowRegister] = useState(false);
     const [showActiveActions, setShowActiveActions] = useState(false);
@@ -416,7 +506,9 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
     const [registerZone, setRegisterZone] = useState(null);
     const [registerPoi, setRegisterPoi] = useState(null);
     const [registerGameplayTag, setRegisterGameplayTag] = useState(null);
+    const [registerDungeonMode, setRegisterDungeonMode] = useState('NORMAL');
     const [currentExpeditionZone, setCurrentExpeditionZone] = useState(null);
+    const [activitySheet, setActivitySheet] = useState(null);
     const [notification, setNotification] = useState(null);
 
     function notify(message, type) {
@@ -424,13 +516,34 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
         setTimeout(() => setNotification(null), 3500);
     }
 
-    function openAction(destination, actionCode, zone, poi = null, gameplayTag = null) {
+    function openAction(destination, actionCode, zone, poi = null, gameplayTag = null, dungeonMode = 'NORMAL') {
         setRegisterDestination(destination);
         setRegisterAction(actionCode);
         setRegisterZone(zone || null);
         setRegisterPoi(poi);
         setRegisterGameplayTag(gameplayTag);
+        setRegisterDungeonMode(dungeonMode);
         setShowRegister(true);
+    }
+
+    async function openPoiActivity(poi, type) {
+        setActivitySheet({ type, poi, data: null, isLoading: true, error: '' });
+        try {
+            const result = await getPoiActivities(poi.id, type);
+            setActivitySheet({ type, poi, data: result.data, isLoading: false, error: '' });
+        } catch (err) {
+            setActivitySheet({ type, poi, data: null, isLoading: false, error: err.message });
+        }
+    }
+
+    function startPoiActivity(activity, dungeonMode = 'NORMAL') {
+        const tag = activity.gameplay_tag;
+        if (!tag) {
+            notify('This activity is not available here.', 'error');
+            return;
+        }
+        setActivitySheet(null);
+        openAction('EXPEDITION', tag.action_type, currentExpeditionZone, activitySheet?.poi, tag, dungeonMode);
     }
 
     const safeZone = zones.find(zone => zone.zone_type === 'safe') || zones[0];
@@ -579,17 +692,28 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                                         </div>
                                         <span className="text-[10px] font-bold text-accent">{poi.is_dungeon ? 'DG' : 'POI'}</span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {(poi.gameplay_tags || []).map(tag => {
-                                            const action = ACTION_CONFIG[tag.action_type] || ACTION_CONFIG.EXPLORE;
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {[
+                                            { type: 'enemy', label: 'Enemy List', tags: ['BATTLE', 'SKIRMISH'] },
+                                            { type: 'gather', label: 'Gather List', tags: ['EXPLORATION'] },
+                                            { type: 'dungeon', label: 'Dungeon', tags: ['DUNGEON'] },
+                                        ].map(item => {
+                                            const isAvailable = (poi.gameplay_tags || []).some(tag => item.tags.includes(tag.tag_type));
                                             return (
                                                 <button
-                                                    key={tag.id}
-                                                    onClick={() => openAction('EXPEDITION', tag.action_type, currentExpeditionZone, poi, tag)}
-                                                    className="p-2.5 rounded-lg border border-border hover:border-accent/50 text-left transition-colors"
+                                                    key={item.type}
+                                                    onClick={() => isAvailable && openPoiActivity(poi, item.type)}
+                                                    disabled={!isAvailable}
+                                                    className={`p-2.5 rounded-lg border text-left transition-colors ${
+                                                        isAvailable
+                                                            ? 'border-border hover:border-accent/50'
+                                                            : 'border-border/50 opacity-40 cursor-not-allowed'
+                                                    }`}
                                                 >
-                                                    <span className="text-[10px] font-bold text-accent block mb-1">{tag.tag_type}</span>
-                                                    <span className="text-xs font-semibold block">{action.label}</span>
+                                                    <span className="text-[10px] font-bold text-accent block mb-1">
+                                                        {item.type === 'enemy' ? 'EN' : item.type === 'gather' ? 'GA' : 'DG'}
+                                                    </span>
+                                                    <span className="text-xs font-semibold block">{item.label}</span>
                                                 </button>
                                             );
                                         })}
@@ -631,10 +755,22 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                     initialZone={registerZone}
                     initialPoi={registerPoi}
                     initialGameplayTag={registerGameplayTag}
+                    initialDungeonMode={registerDungeonMode}
                     onClose={() => setShowRegister(false)}
                     onUpdate={onUpdate}
                     onNotify={notify}
                     character={character}
+                />
+            )}
+
+            {activitySheet && (
+                <ActivityListSheet
+                    activityType={activitySheet.type}
+                    activityData={activitySheet.data}
+                    isLoading={activitySheet.isLoading}
+                    error={activitySheet.error}
+                    onClose={() => setActivitySheet(null)}
+                    onStart={startPoiActivity}
                 />
             )}
 

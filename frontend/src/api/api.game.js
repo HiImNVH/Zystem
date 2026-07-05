@@ -29,6 +29,12 @@ export async function getZones() {
     return handleResponse(res);
 }
 
+export async function getPoiActivities(poiId, type) {
+    const query = type ? `?type=${encodeURIComponent(type)}` : '';
+    const res = await fetch(`${BASE_URL}/api/zones/pois/${poiId}/activities${query}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
 export async function getActionQueue(playerId) {
     const res = await fetch(`${BASE_URL}/api/action-queue/${playerId}`, { headers: getHeaders() });
     return handleResponse(res);
