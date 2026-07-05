@@ -30,12 +30,30 @@ const corsOrigins = (process.env.CORS_ORIGIN || '')
     .split(',')
     .map(origin => origin.trim())
     .filter(Boolean);
+const defaultCorsOriginPatterns = [
+    /^https:\/\/zystem(?:-[a-z0-9-]+)?\.vercel\.app$/i,
+    /^http:\/\/localhost:\d+$/i,
+    /^http:\/\/127\.0\.0\.1:\d+$/i
+];
 
 if (process.env.NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
 
-app.use(cors(corsOrigins.length > 0 ? { origin: corsOrigins } : undefined));
+app.use(cors({
+    origin(origin, callback) {
+        if (!origin) {
+            callback(null, true);
+            return;
+        }
+
+        const isAllowedOrigin =
+            corsOrigins.includes(origin) ||
+            defaultCorsOriginPatterns.some(pattern => pattern.test(origin));
+
+        callback(null, isAllowedOrigin);
+    }
+}));
 app.use(express.json());
 // Rate limiting toan cuc cho toan bo API
 app.use(globalLimiter);
@@ -48,6 +66,14 @@ app.get('/health', (req, res) => {
         version: '5.0',
         timestamp: new Date(),
         environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+app.get('/', (req, res) => {
+    res.json({
+        status: 'OK',
+        game: 'Zystem API',
+        health: '/health'
     });
 });
 
