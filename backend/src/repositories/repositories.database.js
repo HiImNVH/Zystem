@@ -429,6 +429,7 @@ async function initializeDatabaseSchema() {
                 stat_2_value NUMERIC(6,2),
                 stat_3_type VARCHAR(10),
                 stat_3_value NUMERIC(6,2),
+                item_level SMALLINT,
                 max_durability SMALLINT DEFAULT 100,
                 current_durability SMALLINT DEFAULT 100,
                 owner_player_id UUID REFERENCES players(id) ON DELETE SET NULL,
@@ -441,6 +442,7 @@ async function initializeDatabaseSchema() {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
+        await client.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS item_level SMALLINT;`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_items_owner ON items(owner_player_id) WHERE owner_player_id IS NOT NULL;`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_items_equipped ON items(owner_player_id, is_equipped) WHERE is_equipped = TRUE;`);
 

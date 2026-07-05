@@ -227,7 +227,8 @@ function getRarityValue(rarity) {
 async function processTradeAction(playerId, durationSeconds, chrStat) {
     const itemLimit = Math.min(5, Math.max(1, Math.floor(durationSeconds / 300) + 1));
     const tradeItems = await dbPool.query(`
-        SELECT i.id, i.quantity, i.rarity, it.item_level, it.category, it.display_name
+        SELECT i.id, i.quantity, i.rarity, COALESCE(i.item_level, it.item_level) AS item_level,
+               it.category, it.display_name
         FROM items i
         JOIN item_templates it ON i.template_id = it.id
         WHERE i.owner_player_id = $1

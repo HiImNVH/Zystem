@@ -105,13 +105,13 @@ async function insertDroppedItems(playerId, droppedItems, actionId) {
         try {
             const result = await dbPool.query(`
                 INSERT INTO items
-                    (template_id, rarity, item_power, owner_player_id, source, quantity,
+                    (template_id, rarity, item_power, item_level, owner_player_id, source, quantity,
                      stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
-                VALUES ($1, $2, $3, $4, 'drop', 1, $5, $6, $7, $8, $9, $10)
+                VALUES ($1, $2, $3, $4, $5, 'drop', 1, $6, $7, $8, $9, $10, $11)
                 RETURNING id, template_id, rarity, item_power,
                           stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value;
             `, [
-                item.templateId, item.rarity, item.itemPower, playerId,
+                item.templateId, item.rarity, item.itemPower, item.itemLevel, playerId,
                 item.stat_1_type || null, item.stat_1_value || 0,
                 item.stat_2_type || null, item.stat_2_value || 0,
                 item.stat_3_type || null, item.stat_3_value || 0

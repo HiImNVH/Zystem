@@ -75,6 +75,17 @@ function runPureLogicChecks(modulesByPath) {
         legendary: 9,
     });
     assert.equal(crafting.calculateItemPower(11, 'RARE'), 21);
+    assert.deepEqual(crafting.parseMainMaterialSlots('1, 3'), [1, 3]);
+    assert.equal(crafting.calculateRecipeOutputItemLevel(
+        { required_job_level: 20, template_item_level: 40 },
+        [{ item_level: 15, category: 'MATERIAL' }, { item_level: 25, category: 'MATERIAL' }, { item_level: 40, category: 'TOOL' }],
+        18
+    ), 18);
+    assert.equal(crafting.resolveCraftedRarity(
+        { curel_rule_key: 'Material CUREL', main_material_slots: '1', curel_mechanic: 'Inherit' },
+        [{ slot_index: 1, rarity: 'EPIC' }, { slot_index: 2, rarity: 'COMMON' }],
+        1
+    ), 'EPIC');
 
     assertExportedFunction(itemStats, 'calculateBaseStatValue');
     assert.equal(itemStats.calculateBaseStatValue(21), 63);

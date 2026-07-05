@@ -8,6 +8,14 @@ const RARITY_BONUS = {
     LEGENDARY: 20,
 };
 
+const RARITY_RANK = {
+    COMMON: 1,
+    UNCOMMON: 2,
+    RARE: 3,
+    EPIC: 4,
+    LEGENDARY: 5,
+};
+
 const CUREL_RARITY_WEIGHT_BY_LEVEL = [
     { level: 0, common: 200, uncommon: 40, rare: 10, epic: 5, legendary: 1 },
     { level: 1, common: 199, uncommon: 41, rare: 10, epic: 5, legendary: 1 },
@@ -73,6 +81,67 @@ function calculateOutputItemLevel(craftJobLevel, materialItemLevel) {
     return craftJobLevel;
 }
 
+function clampItemLevel(itemLevel) {
+    return Math.min(Math.max(Math.floor(Number(itemLevel) || 1), 1), 80);
+}
+
+function parseMainMaterialSlots(mainMaterialSlots) {
+    if (!mainMaterialSlots) return [];
+
+    return String(mainMaterialSlots)
+        .split(/[^0-9]+/)
+        .map(slot => parseInt(slot))
+        .filter(slot => Number.isInteger(slot) && slot > 0);
+}
+
+function calculateRecipeOutputItemLevel(recipe, selectedMaterials, craftJobLevel) {
+    const materialRows = Array.isArray(selectedMaterials) ? selectedMaterials : [];
+    const nonToolLevels = materialRows
+        .filter(item => (item.category || '').toUpperCase() !== 'TOOL')
+        .map(item => parseInt(item.item_level) || 1);
+
+    const averageMaterialLevel = nonToolLevels.length > 0
+        ? Math.floor(nonToolLevels.reduce((sum, level) => sum + level, 0) / nonToolLevels.length)
+        : (parseInt(recipe?.template_item_level) || 1);
+
+    const requiredLevel = parseInt(recipe?.required_job_level) || averageMaterialLevel;
+    const jobLevel = parseInt(craftJobLevel) || 1;
+
+    return clampItemLevel(Math.min(averageMaterialLevel, requiredLevel, jobLevel));
+}
+
+function pickHighestRarity(items) {
+    const materialRows = Array.isArray(items) ? items : [];
+    return materialRows.reduce((best, item) => {
+        const rarity = (item.rarity || 'COMMON').toUpperCase();
+        return (RARITY_RANK[rarity] || 0) > (RARITY_RANK[best] || 0) ? rarity : best;
+    }, 'COMMON');
+}
+
+function resolveCraftedRarity(recipe, selectedMaterials, craftingPower) {
+    const ruleKey = String(recipe?.curel_rule_key || '').toLowerCase();
+    const mechanic = String(recipe?.curel_mechanic || '').toLowerCase();
+
+    if (ruleKey.includes('none') || mechanic === 'n/a') {
+        return 'COMMON';
+    }
+
+    if (ruleKey.includes('gear') || mechanic.includes('skill-based')) {
+        return rollCurelRarity(craftingPower);
+    }
+
+    if (ruleKey.includes('material') || mechanic.includes('inherit')) {
+        const mainSlots = parseMainMaterialSlots(recipe?.main_material_slots);
+        const mainMaterials = mainSlots.length > 0
+            ? selectedMaterials.filter(item => mainSlots.includes(parseInt(item.slot_index)))
+            : selectedMaterials;
+
+        return pickHighestRarity(mainMaterials);
+    }
+
+    return rollCurelRarity(craftingPower);
+}
+
 function rollWeightedRarity(weights) {
     const weightedEntries = [
         ['COMMON', weights.common],
@@ -112,10 +181,16 @@ function calculateCraftFailRate(intStat, itemLevel, craftJobLevel) {
 
 module.exports = {
     calculateOutputItemLevel,
+    calculateRecipeOutputItemLevel,
+    resolveCraftedRarity,
+    parseMainMaterialSlots,
+    pickHighestRarity,
+    clampItemLevel,
     rollCurelRarity,
     calculateItemPower,
     calculateCraftFailRate,
     getCurelRarityWeights,
     CUREL_RARITY_WEIGHT_BY_LEVEL,
     RARITY_BONUS,
+    RARITY_RANK,
 };
