@@ -87,6 +87,10 @@ function runPureLogicChecks(modulesByPath) {
 
     assertExportedFunction(actionQueue, 'calculateActualDuration');
     assert.equal(actionQueue.calculateActualDuration(100, 0), 100);
+    assert.equal(actionQueue.calculateActionSpeedReduction('CRAFT', { agi: 20, chr: 10 }), 0.02);
+    assert.equal(actionQueue.calculateActionSpeedReduction('FORAGE', { agi: 20, dex: 10 }), 0.02);
+    assert.equal(actionQueue.calculateActionSpeedReduction('EXPLORE', { agi: 10 }), 0.01);
+    assert.equal(actionQueue.calculateActionActualDuration(1000, 'FORAGE', { agi: 20, dex: 10 }), 980);
     assert.deepEqual(actionQueue.calculateExpReward('EXPLORE', 100, 1), { playerExp: 56, jobExp: 24 });
 
     assertExportedFunction(character, 'calculateStartingJobBonus');

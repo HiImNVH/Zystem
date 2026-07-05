@@ -56,6 +56,19 @@ const ZONE_FATIGUE_MULTIPLIER = {
     desert: 1.45,
 };
 
+const ACTION_SPEED_GROUP = {
+    CRAFT: 'COOKING',
+    TRADE: 'COOKING',
+    MINE: 'GATHERING',
+    CHOP: 'GATHERING',
+    HUNT: 'GATHERING',
+    FORAGE: 'GATHERING',
+    FARM: 'GATHERING',
+    EXPLORE: 'EXPLORING',
+    BATTLE: 'EXPLORING',
+    DUNGEON: 'EXPLORING',
+};
+
 function calculateMaxEnergy(vitStat, strStat) {
     const vit = parseFloat(vitStat) || 0;
     const str = parseFloat(strStat) || 0;
@@ -112,15 +125,57 @@ function calculateDungeonScaling(mapLevel, playerLevels, dungeonMode) {
     };
 }
 
-// AGI giam thoi gian hang doi: moi 1 AGI giam 0.2%, cap 70%
+function normalizeActionStats(statsOrAgi) {
+    if (typeof statsOrAgi === 'number' || typeof statsOrAgi === 'string') {
+        return {
+            agi: parseFloat(statsOrAgi) || 0,
+            dex: 0,
+            chr: 0,
+        };
+    }
+
+    return {
+        agi: parseFloat(statsOrAgi?.agi ?? statsOrAgi?.base_agi) || 0,
+        dex: parseFloat(statsOrAgi?.dex ?? statsOrAgi?.base_dex) || 0,
+        chr: parseFloat(statsOrAgi?.chr ?? statsOrAgi?.base_chr) || 0,
+    };
+}
+
+function calculateActionSpeedReduction(actionType, statsOrAgi) {
+    const action = (actionType || '').toUpperCase();
+    const speedGroup = ACTION_SPEED_GROUP[action] || 'EXPLORING';
+    const stats = normalizeActionStats(statsOrAgi);
+
+    const percentReduction = {
+        COOKING: (stats.agi / 20) + (stats.chr / 10),
+        GATHERING: (stats.agi / 20) + (stats.dex / 10),
+        EXPLORING: stats.agi / 10,
+    }[speedGroup] || 0;
+
+    return Math.min(Math.max(percentReduction / 100, 0), 0.70);
+}
+
+// Legacy fallback: AGI giam thoi gian hang doi, giu de tuong thich voi code/test cu.
 function calculateActualDuration(baseDurationS, agiStat) {
     const agi = agiStat || 0;
     const reduction = Math.min(agi * 0.002, 0.70);
     return Math.max(Math.floor(baseDurationS * (1 - reduction)), 10);
 }
 
+function calculateActionActualDuration(baseDurationS, actionType, statsOrAgi) {
+    const reduction = calculateActionSpeedReduction(actionType, statsOrAgi);
+    return Math.max(Math.floor(baseDurationS * (1 - reduction)), 10);
+}
+
 function calculateActualDurationWithFatigue(baseDurationS, agiStat, currentFatigue) {
     return Math.ceil(calculateActualDuration(baseDurationS, agiStat) * calculateFatigueDurationMultiplier(currentFatigue));
+}
+
+function calculateActionActualDurationWithFatigue(baseDurationS, actionType, statsOrAgi, currentFatigue) {
+    return Math.ceil(
+        calculateActionActualDuration(baseDurationS, actionType, statsOrAgi) *
+        calculateFatigueDurationMultiplier(currentFatigue)
+    );
 }
 
 function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
@@ -329,8 +384,11 @@ module.exports = {
     calculateActionResourceCost,
     calculateFatigueDurationMultiplier,
     calculateDungeonScaling,
+    calculateActionSpeedReduction,
     calculateActualDuration,
+    calculateActionActualDuration,
     calculateActualDurationWithFatigue,
+    calculateActionActualDurationWithFatigue,
     calculateExpReward,
     processClaimedAction
 };

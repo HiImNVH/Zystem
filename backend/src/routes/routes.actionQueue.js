@@ -5,6 +5,7 @@ const express = require('express');
 const actionQueueRouter = express.Router();
 const actionQueueRepository = require('../repositories/repositories.actionQueue');
 const actionQueueService = require('../services/services.actionQueue');
+const characterService = require('../services/services.character');
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 const { actionLimiter } = require('../middleware/middleware.rateLimit');
 const { dbPool } = require('../repositories/repositories.database');
@@ -48,10 +49,15 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
         }
 
         const playerResult = await dbPool.query(
-            `SELECT base_agi, current_fatigue FROM players WHERE id = $1;`,
+            `SELECT current_fatigue FROM players WHERE id = $1;`,
             [playerId]
         );
-        const agiStat = playerResult.rows[0]?.base_agi || 10;
+        const totalStats = await characterService.calculateTotalStats(playerId);
+        const actionStats = {
+            agi: totalStats?.total?.agi || 0,
+            dex: totalStats?.total?.dex || 0,
+            chr: totalStats?.total?.chr || 0,
+        };
         const currentFatigue = playerResult.rows[0]?.current_fatigue || 0;
 
         const zoneResult = zoneCode
@@ -89,7 +95,12 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
             }
         }
 
-        const actualDuration = actionQueueService.calculateActualDurationWithFatigue(duration, agiStat, currentFatigue);
+        const actualDuration = actionQueueService.calculateActionActualDurationWithFatigue(
+            duration,
+            resolvedActionType,
+            actionStats,
+            currentFatigue
+        );
         const resourceCost = actionQueueService.calculateActionResourceCost(resolvedActionType, duration, zoneType, tagMultipliers);
 
         const result = await actionQueueRepository.insertActionSlot(
@@ -120,7 +131,7 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
             data: {
                 ...result,
                 resource_cost: resourceCost,
-                note: `AGI=${agiStat}, fatigue=${currentFatigue}: ${duration}s -> ${actualDuration}s`
+                note: `speed stats AGI=${actionStats.agi}, DEX=${actionStats.dex}, CHR=${actionStats.chr}, fatigue=${currentFatigue}: ${duration}s -> ${actualDuration}s`
             }
         });
     } catch (error) {
