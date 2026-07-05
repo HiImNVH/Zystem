@@ -14,11 +14,103 @@ const ACTION_SKILL_CODE = {
     MINE: 'gathering',
     CHOP: 'gathering',
     HUNT: 'gathering',
+    DUNGEON: 'fighting',
     FORAGE: 'gathering',
     CRAFT: 'crafting',
     TRADE: 'crafting',
     FARM: 'gathering',
+    REST: null,
+    SLEEP: null,
 };
+
+const BASE_MAX_ENERGY = 100;
+const MAX_FATIGUE = 400;
+const FATIGUE_TIRED_THRESHOLD = 300;
+const FATIGUE_EXHAUSTED_THRESHOLD = 350;
+
+const ACTION_RESOURCE_RULES = {
+    EXPLORE: { energyPerUnit: 8, fatiguePerUnit: 10 },
+    BATTLE:  { energyPerUnit: 10, fatiguePerUnit: 12 },
+    MINE:    { energyPerUnit: 7, fatiguePerUnit: 9 },
+    CHOP:    { energyPerUnit: 6, fatiguePerUnit: 8 },
+    HUNT:    { energyPerUnit: 9, fatiguePerUnit: 11 },
+    DUNGEON: { energyPerUnit: 14, fatiguePerUnit: 18 },
+    FORAGE:  { energyPerUnit: 4, fatiguePerUnit: 6 },
+    CRAFT:   { energyPerUnit: 5, fatiguePerUnit: 5 },
+    TRADE:   { energyPerUnit: 2, fatiguePerUnit: 3 },
+    FARM:    { energyPerUnit: 4, fatiguePerUnit: 5 },
+    REST:    { energyPerUnit: 0, fatiguePerUnit: -16 },
+    SLEEP:   { energyPerUnit: 0, fatiguePerUnit: -28 },
+};
+
+const ZONE_FATIGUE_MULTIPLIER = {
+    safe: 0.75,
+    urban: 1.05,
+    rural: 0.95,
+    coast: 1.1,
+    forest: 1.0,
+    mine: 1.1,
+    ruins: 1.2,
+    dungeon: 1.25,
+    hazard: 1.35,
+    desert: 1.45,
+};
+
+function calculateMaxEnergy(vitStat, strStat) {
+    const vit = parseFloat(vitStat) || 0;
+    const str = parseFloat(strStat) || 0;
+    return Math.max(1, Math.floor(BASE_MAX_ENERGY + vit + (str * 0.2)));
+}
+
+function calculateActionResourceCost(actionType, durationSeconds, zoneType, tagMultipliers) {
+    const type = (actionType || '').toUpperCase();
+    const rule = ACTION_RESOURCE_RULES[type] || ACTION_RESOURCE_RULES.EXPLORE;
+    const actionUnits = Math.max(1, Math.ceil((parseInt(durationSeconds) || 0) / 1800));
+    const zoneKey = (zoneType || 'safe').toLowerCase();
+    const fatigueMultiplier = ZONE_FATIGUE_MULTIPLIER[zoneKey] || 1;
+    const isRecoveryAction = rule.fatiguePerUnit < 0;
+
+    const energyMultiplier = parseFloat(tagMultipliers?.energyCostMult) || 1;
+    const tagFatigueMultiplier = parseFloat(tagMultipliers?.fatigueMult) || 1;
+    const rawFatigue = rule.fatiguePerUnit * actionUnits * (isRecoveryAction ? 1 : fatigueMultiplier * tagFatigueMultiplier);
+
+    return {
+        energyCost: Math.max(0, Math.ceil(rule.energyPerUnit * actionUnits * energyMultiplier)),
+        fatigueChange: isRecoveryAction ? Math.floor(rawFatigue) : Math.ceil(rawFatigue),
+        actionUnits,
+        zoneFatigueMultiplier: fatigueMultiplier,
+        energyCostMultiplier: energyMultiplier,
+        tagFatigueMultiplier
+    };
+}
+
+function calculateFatigueDurationMultiplier(currentFatigue) {
+    const fatigue = parseFloat(currentFatigue) || 0;
+    if (fatigue >= FATIGUE_EXHAUSTED_THRESHOLD) return 1.35;
+    if (fatigue >= FATIGUE_TIRED_THRESHOLD) return 1.15;
+    return 1;
+}
+
+function calculateDungeonScaling(mapLevel, playerLevels, dungeonMode) {
+    const staticMapLevel = Math.max(1, parseInt(mapLevel) || 1);
+    const levels = (playerLevels || []).map(level => parseInt(level) || 1);
+    const highestPlayerLevel = Math.max(staticMapLevel, ...levels);
+    const isHardMode = (dungeonMode || 'NORMAL').toUpperCase() === 'HARD';
+    const dungeonLevel = isHardMode ? highestPlayerLevel : staticMapLevel;
+
+    return {
+        mode: isHardMode ? 'HARD' : 'NORMAL',
+        static_map_level: staticMapLevel,
+        dungeon_level: dungeonLevel,
+        highest_player_level: highestPlayerLevel,
+        aura_buff_enabled: isHardMode && highestPlayerLevel > staticMapLevel,
+        low_level_aura: {
+            max_hp_multiplier: isHardMode ? 2.5 : 1,
+            armor_multiplier: isHardMode ? 2.0 : 1,
+            damage_multiplier: 1,
+        },
+    };
+}
 
 // AGI giam thoi gian hang doi: moi 1 AGI giam 0.2%, cap 70%
 function calculateActualDuration(baseDurationS, agiStat) {
@@ -27,8 +119,17 @@ function calculateActualDuration(baseDurationS, agiStat) {
     return Math.max(Math.floor(baseDurationS * (1 - reduction)), 10);
 }
 
+function calculateActualDurationWithFatigue(baseDurationS, agiStat, currentFatigue) {
+    return Math.ceil(calculateActualDuration(baseDurationS, agiStat) * calculateFatigueDurationMultiplier(currentFatigue));
+}
+
 function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
     if (!actionType || !durationSeconds) return { playerExp: 0, jobExp: 0 };
+
+    const normalizedActionType = actionType.toUpperCase();
+    if (['REST', 'SLEEP'].includes(normalizedActionType)) {
+        return { playerExp: 0, jobExp: 0 };
+    }
 
     const baseExpPerSecond = {
         EXPLORE: 0.8,
@@ -36,17 +137,18 @@ function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
         MINE:    0.3,
         CHOP:    0.3,
         HUNT:    0.5,
+        DUNGEON: 1.0,
         FORAGE:  0.2,
         CRAFT:   0.4,
         TRADE:   0.3,
         FARM:    0.2,
     };
 
-    const ratePerSecond = baseExpPerSecond[actionType.toUpperCase()] || 0.3;
+    const ratePerSecond = baseExpPerSecond[normalizedActionType] || 0.3;
     const zoneLevelMult = 1 + ((zoneMinLevel || 1) - 1) * 0.05;
     const totalExp = Math.floor(ratePerSecond * durationSeconds * zoneLevelMult);
 
-    const isExploreAction = ['EXPLORE', 'HUNT', 'BATTLE'].includes(actionType.toUpperCase());
+    const isExploreAction = ['EXPLORE', 'HUNT', 'BATTLE', 'DUNGEON'].includes(normalizedActionType);
     const playerExpRatio = isExploreAction ? 0.7 : 0.3;
 
     return {
@@ -122,6 +224,9 @@ async function processClaimedAction(playerId, claimedAction) {
     const actionType     = claimedAction.action_type;
     const durationSeconds = claimedAction.actual_duration_s || claimedAction.base_duration_s;
     const zoneMinLevel   = claimedAction.zone_min_level || 1;
+    const dungeonContext = actionType?.toUpperCase() === 'DUNGEON'
+        ? calculateDungeonScaling(claimedAction.level_gap || zoneMinLevel, [character.player_level], claimedAction.dungeon_mode)
+        : null;
 
     // 1. Tinh EXP
     const expReward = calculateExpReward(actionType, durationSeconds, zoneMinLevel);
@@ -191,6 +296,9 @@ async function processClaimedAction(playerId, claimedAction) {
     }
 
     // 6. Luu exp da tinh vao bang action_queue de audit
+    const resourceResult = await actionQueueRepository.applyClaimResourceChange(playerId, claimedAction);
+
+    // 7. Luu exp da tinh vao bang action_queue de audit
     await actionQueueRepository.updateClaimRewards(
         claimedAction.id, expReward.playerExp, expReward.jobExp
     );
@@ -208,13 +316,23 @@ async function processClaimedAction(playerId, claimedAction) {
         copper_gained:     economyResult.copper_gained || 0,
         sold_items:        economyResult.sold_items || [],
         economy_error:     economyResult.trade_error || null,
+        resource_update:    resourceResult,
+        dungeon_context:    dungeonContext,
         leveled_up:        progressionResult?.leveled_up  || false,
         new_level:         progressionResult?.new_level   || character.player_level
     };
 }
 
 module.exports = {
+    MAX_FATIGUE,
+    FATIGUE_TIRED_THRESHOLD,
+    FATIGUE_EXHAUSTED_THRESHOLD,
+    calculateMaxEnergy,
+    calculateActionResourceCost,
+    calculateFatigueDurationMultiplier,
+    calculateDungeonScaling,
     calculateActualDuration,
+    calculateActualDurationWithFatigue,
     calculateExpReward,
     processClaimedAction
 };

@@ -4,6 +4,12 @@ const { dbPool } = require('./repositories.database');
 const walletRepository = require('./repositories.wallet');
 const combatService = require('../services/services.combat');
 
+function calculateMaxEnergy(vitStat, strStat) {
+    const vit = parseFloat(vitStat) || 0;
+    const str = parseFloat(strStat) || 0;
+    return Math.max(1, Math.floor(100 + vit + (str * 0.2)));
+}
+
 // Tinh stat bonus khi nghe len cap 20 (20 cap * stat_per_lv)
 function calculateStartingJobBonus(jobStats) {
     const startingLevel = 20;
@@ -74,20 +80,24 @@ async function createCharacter(characterData) {
             str: startingJob?.stat_bonus?.str || baseStr,
             playerLevel: 1
         });
+        const maxEnergy = calculateMaxEnergy(
+            startingJob?.stat_bonus?.vit || baseVit,
+            startingJob?.stat_bonus?.str || baseStr
+        );
 
         // Tao nhan vat voi base stats tu 0 + bonus nghe khoi dau
         const playerResult = await client.query(`
             INSERT INTO players
                 (account_id, character_name, player_level, current_exp, skill_points,
                  base_str, base_agi, base_dex, base_vit, base_int, base_chr,
-                 max_hp, current_hp)
-            VALUES ($1, $2, 1, 0, 5, $3, $4, $5, $6, $7, $8, $9, $9)
+                 max_hp, current_hp, max_energy, current_energy, max_fatigue, current_fatigue)
+            VALUES ($1, $2, 1, 0, 5, $3, $4, $5, $6, $7, $8, $9, $9, $10, $10, 400, 0)
             RETURNING *;
         `, [
             characterData.accountId,
             characterData.characterName.trim(),
             baseStr, baseAgi, baseDex, baseVit, baseInt, baseChr,
-            maxHp
+            maxHp, maxEnergy
         ]);
 
         const newPlayer = playerResult.rows[0];
@@ -158,7 +168,8 @@ async function findCharacterByAccount(accountId) {
         const result = await dbPool.query(`
             SELECT p.id, p.character_name, p.player_level, p.current_exp, p.skill_points,
                    p.base_str, p.base_agi, p.base_dex, p.base_vit, p.base_int, p.base_chr,
-                   p.max_hp, p.current_hp, p.infection_pct, p.radiation_pct,
+                   p.max_hp, p.current_hp, p.max_energy, p.current_energy,
+                   p.max_fatigue, p.current_fatigue, p.infection_pct, p.radiation_pct,
                    p.infection_status, p.is_alive, p.created_at,
                    w.copper, w.silver, w.gold
             FROM players p
@@ -186,7 +197,8 @@ async function updateCharacterStats(characterId, statsUpdate) {
     const allowedFields = [
         'player_level', 'current_exp', 'skill_points',
         'base_str', 'base_agi', 'base_dex', 'base_vit', 'base_int', 'base_chr',
-        'max_hp', 'current_hp', 'infection_pct', 'radiation_pct',
+        'max_hp', 'current_hp', 'max_energy', 'current_energy', 'max_fatigue', 'current_fatigue',
+        'infection_pct', 'radiation_pct',
         'infection_status', 'is_alive', 'equipped_title_id'
     ];
 

@@ -21,11 +21,56 @@ zonesRouter.get('/', async (req, res, next) => {
         sqlValues.push(type.toLowerCase());
     }
 
-    sqlQuery += ` ORDER BY min_player_lv ASC;`;
+    sqlQuery += ` ORDER BY level_gap ASC, display_name ASC;`;
 
     try {
         const result = await dbPool.query(sqlQuery, sqlValues);
-        return res.json({ success: true, data: result.rows });
+        const zones = result.rows;
+        const zoneIds = zones.map(zone => zone.id);
+
+        if (zoneIds.length === 0) {
+            return res.json({ success: true, data: [] });
+        }
+
+        const poiResult = await dbPool.query(`
+            SELECT
+                wp.*,
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', pgt.id,
+                            'tag_type', pgt.tag_type,
+                            'action_type', pgt.action_type,
+                            'energy_cost_mult', pgt.energy_cost_mult,
+                            'fatigue_mult', pgt.fatigue_mult,
+                            'loot_focus', pgt.loot_focus,
+                            'monster_profile', pgt.monster_profile,
+                            'dungeon_rank_rewards', pgt.dungeon_rank_rewards
+                        )
+                        ORDER BY pgt.tag_type
+                    ) FILTER (WHERE pgt.id IS NOT NULL),
+                    '[]'::JSON
+                ) AS gameplay_tags
+            FROM world_pois wp
+            LEFT JOIN poi_gameplay_tags pgt ON pgt.poi_id = wp.id
+            WHERE wp.zone_id = ANY($1::UUID[])
+            GROUP BY wp.id
+            ORDER BY wp.display_name ASC;
+        `, [zoneIds]);
+
+        const poisByZone = {};
+        for (const poi of poiResult.rows) {
+            if (!poisByZone[poi.zone_id]) poisByZone[poi.zone_id] = [];
+            poisByZone[poi.zone_id].push(poi);
+        }
+
+        return res.json({
+            success: true,
+            data: zones.map(zone => ({
+                ...zone,
+                pois: poisByZone[zone.id] || [],
+            }))
+        });
     } catch (error) {
         next(error);
     }
@@ -48,7 +93,32 @@ zonesRouter.get('/:code', async (req, res, next) => {
             return res.status(404).json({ success: false, message: `Zone does not exist: ${code}` });
         }
 
-        return res.json({ success: true, data: result.rows[0] });
+        const poiResult = await dbPool.query(`
+            SELECT
+                wp.*,
+                COALESCE(
+                    JSON_AGG(
+                        JSON_BUILD_OBJECT(
+                            'id', pgt.id,
+                            'tag_type', pgt.tag_type,
+                            'action_type', pgt.action_type,
+                            'energy_cost_mult', pgt.energy_cost_mult,
+                            'fatigue_mult', pgt.fatigue_mult,
+                            'loot_focus', pgt.loot_focus,
+                            'monster_profile', pgt.monster_profile,
+                            'dungeon_rank_rewards', pgt.dungeon_rank_rewards
+                        )
+                    ) FILTER (WHERE pgt.id IS NOT NULL),
+                    '[]'::JSON
+                ) AS gameplay_tags
+            FROM world_pois wp
+            LEFT JOIN poi_gameplay_tags pgt ON pgt.poi_id = wp.id
+            WHERE wp.zone_id = $1
+            GROUP BY wp.id
+            ORDER BY wp.display_name ASC;
+        `, [result.rows[0].id]);
+
+        return res.json({ success: true, data: { ...result.rows[0], pois: poiResult.rows } });
     } catch (error) {
         next(error);
     }

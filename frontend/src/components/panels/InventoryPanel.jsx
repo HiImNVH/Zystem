@@ -1,7 +1,7 @@
 ﻿// frontend/src/components/panels/InventoryPanel.jsx
 
 import { useState } from 'react';
-import { equipItem } from '../../api/api.game';
+import { equipItem, useFoodItem } from '../../api/api.game';
 
 const RARITY_COLORS = {
     COMMON:    { ring: 'ring-border', text: 'text-textMuted' },
@@ -18,6 +18,8 @@ const CATEGORY_MARKS = {
     EQUIPMENT: 'EQ',
     TOOL: 'TL',
     BUILDING: 'BD',
+    FOOD: 'FD',
+    Food: 'FD',
 };
 
 const FILTERS = [
@@ -28,6 +30,7 @@ const FILTERS = [
     { value: 'EQUIPMENT', label: 'Gear' },
     { value: 'TOOL', label: 'Tools' },
     { value: 'BUILDING', label: 'Building' },
+    { value: 'FOOD', label: 'Food' },
 ];
 
 const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
@@ -59,7 +62,9 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
 
     const rarity = (item.rarity || 'COMMON').toUpperCase();
     const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
-    const canEquip = EQUIPABLE_CATEGORIES.includes(item.category) && !item.is_equipped;
+    const normalizedCategory = (item.category || '').toUpperCase();
+    const canEquip = EQUIPABLE_CATEGORIES.includes(normalizedCategory) && !item.is_equipped;
+    const canEat = normalizedCategory === 'FOOD';
     const tags = Array.isArray(item.tags) ? item.tags : [];
 
     const itemStats = [1, 2, 3]
@@ -71,6 +76,20 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
         setError('');
         try {
             await equipItem(playerId, item.id);
+            onEquipped();
+            onClose();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    async function handleEat() {
+        setIsLoading(true);
+        setError('');
+        try {
+            await useFoodItem(playerId, item.id);
             onEquipped();
             onClose();
         } catch (err) {
@@ -147,6 +166,12 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
 
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
 
+                {canEat && (
+                    <button onClick={handleEat} disabled={isLoading} className="btn-primary w-full mb-2">
+                        {isLoading ? 'Eating...' : 'Eat'}
+                    </button>
+                )}
+
                 {item.is_equipped ? (
                     <div className="text-center text-sm text-success py-2">Equipped</div>
                 ) : canEquip ? (
@@ -163,7 +188,7 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
     const [filter, setFilter] = useState('ALL');
     const [selected, setSelected] = useState(null);
 
-    const filtered = (items || []).filter(item => filter === 'ALL' || item.category === filter);
+    const filtered = (items || []).filter(item => filter === 'ALL' || (item.category || '').toUpperCase() === filter);
 
     return (
         <div className="h-full flex flex-col">

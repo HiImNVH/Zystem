@@ -12,10 +12,10 @@ const { dbPool } = require('../repositories/repositories.database');
 /**
  * @route   POST /api/action-queue/register
  * @access  Protected
- * @body    { playerId, actionType, zoneCode, durationSeconds }
+ * @body    { playerId, actionType, zoneCode, durationSeconds, poiId, gameplayTag, dungeonMode }
  */
 actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res, next) => {
-    const { playerId, actionType, zoneCode, durationSeconds } = req.body;
+    const { playerId, actionType, zoneCode, durationSeconds, poiId, gameplayTag, dungeonMode } = req.body;
 
     if (!playerId || !actionType || !durationSeconds) {
         return res.status(400).json({
@@ -48,14 +48,62 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
         }
 
         const playerResult = await dbPool.query(
-            `SELECT base_agi FROM players WHERE id = $1;`,
+            `SELECT base_agi, current_fatigue FROM players WHERE id = $1;`,
             [playerId]
         );
         const agiStat = playerResult.rows[0]?.base_agi || 10;
-        const actualDuration = actionQueueService.calculateActualDuration(duration, agiStat);
+        const currentFatigue = playerResult.rows[0]?.current_fatigue || 0;
+
+        const zoneResult = zoneCode
+            ? await dbPool.query(`SELECT id, zone_type FROM zones WHERE code = $1 AND is_active = TRUE;`, [zoneCode])
+            : { rows: [{ zone_type: 'safe' }] };
+        if (zoneCode && zoneResult.rows.length === 0) {
+            return res.status(400).json({ success: false, message: `Zone does not exist or is locked: ${zoneCode}` });
+        }
+
+        const zoneType = zoneResult.rows[0]?.zone_type || 'safe';
+        let tagMultipliers = null;
+        let resolvedActionType = actionType;
+        if (poiId && gameplayTag) {
+            const tagResult = await dbPool.query(`
+                SELECT pgt.action_type, pgt.energy_cost_mult, pgt.fatigue_mult
+                FROM poi_gameplay_tags pgt
+                JOIN world_pois wp ON wp.id = pgt.poi_id
+                WHERE pgt.poi_id = $1
+                  AND pgt.tag_type = $2
+                  AND wp.zone_id = $3;
+            `, [poiId, gameplayTag.toUpperCase(), zoneResult.rows[0].id]);
+
+            if (tagResult.rows.length === 0) {
+                return res.status(400).json({ success: false, message: 'Gameplay tag does not exist for this POI.' });
+            }
+
+            resolvedActionType = tagResult.rows[0].action_type;
+            tagMultipliers = {
+                energyCostMult: tagResult.rows[0].energy_cost_mult,
+                fatigueMult: tagResult.rows[0].fatigue_mult,
+            };
+            if (gameplayTag.toUpperCase() === 'DUNGEON' && dungeonMode?.toUpperCase() === 'HARD') {
+                tagMultipliers.energyCostMult = parseFloat(tagMultipliers.energyCostMult) * 1.25;
+                tagMultipliers.fatigueMult = parseFloat(tagMultipliers.fatigueMult) * 1.25;
+            }
+        }
+
+        const actualDuration = actionQueueService.calculateActualDurationWithFatigue(duration, agiStat, currentFatigue);
+        const resourceCost = actionQueueService.calculateActionResourceCost(resolvedActionType, duration, zoneType, tagMultipliers);
 
         const result = await actionQueueRepository.insertActionSlot(
-            playerId, zoneCode, actionType, duration, actualDuration
+            playerId,
+            zoneCode,
+            resolvedActionType,
+            duration,
+            actualDuration,
+            resourceCost,
+            {
+                poiId,
+                gameplayTag: gameplayTag?.toUpperCase(),
+                dungeonMode: dungeonMode?.toUpperCase() || 'NORMAL',
+            }
         );
 
         if (!result) {
@@ -68,10 +116,11 @@ actionQueueRouter.post('/register', verifyToken, actionLimiter, async (req, res,
 
         return res.status(201).json({
             success: true,
-            message: `Action ${actionType} registered successfully!`,
+            message: `Action ${resolvedActionType} registered successfully!`,
             data: {
                 ...result,
-                note: `AGI=${agiStat}: ${duration}s -> ${actualDuration}s`
+                resource_cost: resourceCost,
+                note: `AGI=${agiStat}, fatigue=${currentFatigue}: ${duration}s -> ${actualDuration}s`
             }
         });
     } catch (error) {

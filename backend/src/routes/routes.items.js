@@ -7,6 +7,28 @@ const { dbPool } = require('../repositories/repositories.database');
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 const craftingService = require('../services/services.crafting');
 
+function calculateFoodRestore(item) {
+    const tags = (item.tags || []).map(tag => String(tag).toLowerCase());
+    const level = parseInt(item.item_level) || 1;
+    let energyRestore = 12 + Math.floor(level * 1.5);
+    let fatigueRestore = 2 + Math.floor(level / 10);
+
+    if (tags.includes('raw')) {
+        energyRestore = Math.max(4, Math.floor(energyRestore * 0.6));
+        fatigueRestore = 0;
+    }
+    if (tags.includes('processed') || tags.includes('dried') || tags.includes('smoked')) {
+        energyRestore += 4;
+        fatigueRestore += 1;
+    }
+    if (tags.includes('canned')) {
+        energyRestore += 8;
+        fatigueRestore += 2;
+    }
+
+    return { energyRestore, fatigueRestore };
+}
+
 function getEquipSlot(item) {
     const tags = (item.tags || []).map(tag => tag.toLowerCase());
 
@@ -223,6 +245,94 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
         });
     } catch (error) {
         next(error);
+    }
+});
+
+/**
+ * @route   POST /api/items/use-food
+ * @body    { playerId, itemId }
+ * @desc    Dung 1 food item de hoi energy va hoi nhe fatigue.
+ */
+itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
+    const { playerId, itemId } = req.body;
+
+    if (!playerId || !itemId) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing parameters: playerId and itemId.'
+        });
+    }
+
+    const client = await dbPool.connect();
+    try {
+        await client.query('BEGIN');
+
+        const ownerCheck = await client.query(
+            `SELECT account_id FROM players WHERE id = $1 FOR UPDATE;`,
+            [playerId]
+        );
+        if (ownerCheck.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ success: false, message: 'Character not found.' });
+        }
+        if (ownerCheck.rows[0].account_id !== req.accountId) {
+            await client.query('ROLLBACK');
+            return res.status(403).json({ success: false, message: 'You do not have permission to use items for this character.' });
+        }
+
+        const itemResult = await client.query(`
+            SELECT i.id, i.quantity, it.display_name, it.category, it.tags, it.item_level
+            FROM items i
+            JOIN item_templates it ON i.template_id = it.id
+            WHERE i.id = $1 AND i.owner_player_id = $2
+            FOR UPDATE;
+        `, [itemId, playerId]);
+
+        if (itemResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ success: false, message: 'Item not found.' });
+        }
+
+        const item = itemResult.rows[0];
+        if ((item.category || '').toUpperCase() !== 'FOOD') {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ success: false, message: 'Only food items can restore energy.' });
+        }
+
+        const restore = calculateFoodRestore(item);
+        const updatedPlayer = await client.query(`
+            UPDATE players
+            SET current_energy = LEAST(max_energy, current_energy + $1),
+                current_fatigue = GREATEST(0, current_fatigue - $2),
+                updated_at = NOW()
+            WHERE id = $3
+            RETURNING current_energy, max_energy, current_fatigue, max_fatigue;
+        `, [restore.energyRestore, restore.fatigueRestore, playerId]);
+
+        if (item.quantity > 1) {
+            await client.query(`UPDATE items SET quantity = quantity - 1 WHERE id = $1;`, [itemId]);
+        } else {
+            await client.query(`DELETE FROM items WHERE id = $1;`, [itemId]);
+        }
+
+        await client.query('COMMIT');
+
+        return res.json({
+            success: true,
+            message: `Ate ${item.display_name}.`,
+            data: {
+                item_id: itemId,
+                item_name: item.display_name,
+                energy_restored: restore.energyRestore,
+                fatigue_restored: restore.fatigueRestore,
+                player_resources: updatedPlayer.rows[0]
+            }
+        });
+    } catch (error) {
+        await client.query('ROLLBACK');
+        next(error);
+    } finally {
+        client.release();
     }
 });
 

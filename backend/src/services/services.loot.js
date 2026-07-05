@@ -11,6 +11,7 @@ const ACTION_DROP_POOL = {
     FORAGE:  ['MATERIAL'],
     EXPLORE: ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
     BATTLE:  ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    DUNGEON: ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
     CRAFT:   ['WEAPON', 'EQUIPMENT', 'TOOL', 'BUILDING'],
     FARM:    ['MATERIAL'],
 };
@@ -27,6 +28,7 @@ function calculateDropCount(actionType, durationSeconds) {
         FORAGE:  1,
         EXPLORE: 2,
         BATTLE:  2,
+        DUNGEON: 3,
         CRAFT:   1,
         FARM:    1,
     };
@@ -38,8 +40,7 @@ function calculateDropCount(actionType, durationSeconds) {
 async function getCandidateTemplates(categories, zoneMinLevel, origins) {
     if (!categories || categories.length === 0) return [];
 
-    const maxLevel = Math.max(1, (zoneMinLevel || 1) + 5);
-    const minLevel = Math.max(1, (zoneMinLevel || 1) - 5);
+    const mapLevel = Math.max(1, zoneMinLevel || 1);
     const allowedOrigins = origins || ['Gatherable', 'Loot-only'];
     const categoryPlaceholders = categories.map((_, index) => `$${index + 1}`).join(', ');
     const originOffset = categories.length;
@@ -50,12 +51,27 @@ async function getCandidateTemplates(categories, zoneMinLevel, origins) {
         FROM item_templates
         WHERE category = ANY(ARRAY[${categoryPlaceholders}])
           AND origin = ANY(ARRAY[${originPlaceholders}])
-          AND item_level BETWEEN $${categories.length + allowedOrigins.length + 1} AND $${categories.length + allowedOrigins.length + 2};
+          AND item_level = $${categories.length + allowedOrigins.length + 1};
     `;
 
     try {
-        const result = await dbPool.query(sqlQuery, [...categories, ...allowedOrigins, minLevel, maxLevel]);
-        return result.rows;
+        const exactResult = await dbPool.query(sqlQuery, [...categories, ...allowedOrigins, mapLevel]);
+        if (exactResult.rows.length > 0) return exactResult.rows;
+
+        const fallbackQuery = `
+            SELECT id, category, item_level, drop_weight_common, drop_weight_uncommon,
+                   drop_weight_rare, drop_weight_epic, drop_weight_legendary
+            FROM item_templates
+            WHERE category = ANY(ARRAY[${categoryPlaceholders}])
+              AND origin = ANY(ARRAY[${originPlaceholders}])
+              AND item_level BETWEEN $${categories.length + allowedOrigins.length + 1} AND $${categories.length + allowedOrigins.length + 2}
+            ORDER BY ABS(item_level - $${categories.length + allowedOrigins.length + 3}) ASC
+            LIMIT 50;
+        `;
+        const minLevel = Math.max(1, mapLevel - 5);
+        const maxLevel = mapLevel + 5;
+        const fallbackResult = await dbPool.query(fallbackQuery, [...categories, ...allowedOrigins, minLevel, maxLevel, mapLevel]);
+        return fallbackResult.rows;
     } catch (error) {
         console.error('[ERROR] Loi khi lay candidate templates:', error.message);
         return [];

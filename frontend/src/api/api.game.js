@@ -34,11 +34,11 @@ export async function getActionQueue(playerId) {
     return handleResponse(res);
 }
 
-export async function registerAction(playerId, actionType, zoneCode, durationSeconds) {
+export async function registerAction(playerId, actionType, zoneCode, durationSeconds, options = {}) {
     const res = await fetch(`${BASE_URL}/api/action-queue/register`, {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify({ playerId, actionType, zoneCode, durationSeconds })
+        body: JSON.stringify({ playerId, actionType, zoneCode, durationSeconds, ...options })
     });
     return handleResponse(res);
 }
@@ -138,6 +138,14 @@ export async function getEquippedItems(playerId) {
 
 export async function equipItem(playerId, itemId) {
     const res = await fetch(`${BASE_URL}/api/items/equip`, {
+        method: 'POST', headers: getHeaders(),
+        body: JSON.stringify({ playerId, itemId })
+    });
+    return handleResponse(res);
+}
+
+export async function useFoodItem(playerId, itemId) {
+    const res = await fetch(`${BASE_URL}/api/items/use-food`, {
         method: 'POST', headers: getHeaders(),
         body: JSON.stringify({ playerId, itemId })
     });
