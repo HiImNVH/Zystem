@@ -56,6 +56,7 @@ function runPureLogicChecks(modulesByPath) {
     const auth = modulesByPath['src/middleware/middleware.auth.js'];
     const loot = modulesByPath['src/services/services.loot.js'];
     const curelPower = modulesByPath['src/services/services.curelPower.js'];
+    const itemLifecycle = modulesByPath['src/services/services.itemLifecycle.js'];
     const designSeed = modulesByPath['src/repositories/repositories.designSeed.js'];
     const itemsSeed = modulesByPath['src/repositories/repositories.itemsSeed.js'];
     const skillsSeed = modulesByPath['src/repositories/repositories.skillsSeed.js'];
@@ -137,6 +138,15 @@ function runPureLogicChecks(modulesByPath) {
         { code: 'fighting', job_level: 30 },
         { code: 'scavenging', job_level: 20 },
     ], 'DUNGEON'), 40);
+
+    assertExportedFunction(itemLifecycle, 'calculateExpiresAt');
+    assert.equal(itemLifecycle.shouldExpire('Duration', 72), true);
+    assert.equal(itemLifecycle.shouldExpire('None', 72), false);
+    assert.equal(
+        itemLifecycle.calculateExpiresAt('Duration', 2, new Date('2026-01-01T00:00:00Z')).toISOString(),
+        '2026-01-01T02:00:00.000Z'
+    );
+    assert.equal(itemLifecycle.isExpired('2026-01-01T00:00:00Z', new Date('2026-01-01T00:00:01Z')), true);
 
     assert.equal(itemsSeed.ITEM_TEMPLATES.length, 391);
     assert.equal(skillsSeed.ALL_SKILLS.length, 196);

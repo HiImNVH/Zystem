@@ -8,6 +8,7 @@ const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware
 const craftingService = require('../services/services.crafting');
 const curelPowerService = require('../services/services.curelPower');
 const itemStatsService = require('../services/services.itemStats');
+const itemLifecycleService = require('../services/services.itemLifecycle');
 
 function calculateFoodRestore(item) {
     const tags = (item.tags || []).map(tag => String(tag).toLowerCase());
@@ -166,7 +167,15 @@ itemsRouter.get('/player/:playerId', verifyToken, verifyPlayerOwnership, async (
 
     let sqlQuery = `
         SELECT i.*, it.display_name, it.category, it.tags, it.description, it.note,
-               it.origin, COALESCE(i.item_level, it.item_level) AS item_level, it.is_stackable
+               it.origin, COALESCE(i.item_level, it.item_level) AS item_level, it.is_stackable,
+               it.lifecycle_model, it.base_duration_hours, it.lifecycle_note,
+               CASE
+                   WHEN i.expires_at IS NULL
+                    AND it.base_duration_hours > 0
+                    AND LOWER(it.lifecycle_model) LIKE '%duration%'
+                   THEN i.created_at + (it.base_duration_hours || ' hours')::INTERVAL
+                   ELSE i.expires_at
+               END AS computed_expires_at
         FROM items i
         JOIN item_templates it ON i.template_id = it.id
         WHERE i.owner_player_id = $1
@@ -183,7 +192,7 @@ itemsRouter.get('/player/:playerId', verifyToken, verifyPlayerOwnership, async (
         const result = await dbPool.query(sqlQuery, sqlValues);
 
         // Tinh Item Power cho tung item
-        const itemsWithPower = result.rows.map(item => ({
+        const itemsWithPower = result.rows.map(item => itemLifecycleService.decorateItemLifecycle({
             ...item,
             item_power: craftingService.calculateItemPower(item.item_level, item.rarity)
         }));
@@ -305,6 +314,7 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
         const recipeResult = await client.query(`
             SELECT r.*, it.item_level AS template_item_level, it.display_name AS output_item_name,
                    it.category AS output_template_category, it.base_durability,
+                   it.lifecycle_model, it.base_duration_hours,
                    js.code AS required_job_code
             FROM recipes r
             JOIN item_templates it ON it.id = r.output_template_id
@@ -390,6 +400,7 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
         const itemPower = craftingService.calculateItemPower(outputLevel, rarity);
         const outputCategory = (recipe.output_category || recipe.output_template_category || '').toUpperCase();
         const rolledStats = itemStatsService.rollItemStats(outputCategory, itemPower, rarity);
+        const expiresAt = itemLifecycleService.calculateExpiresAt(recipe.lifecycle_model, recipe.base_duration_hours);
 
         for (const item of selectedItems) {
             if (parseInt(item.quantity) > item.required_quantity) {
@@ -401,16 +412,17 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
 
         const createdItem = await client.query(`
             INSERT INTO items
-                (template_id, rarity, item_power, item_level, max_durability, current_durability,
+                (template_id, rarity, item_power, item_level, expires_at, max_durability, current_durability,
                  owner_player_id, source, quantity, crafted_by_player_id, crafted_at,
                  stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
-            VALUES ($1,$2,$3,$4,$5,$5,$6,'craft',$7,$6,NOW(),$8,$9,$10,$11,$12,$13)
+            VALUES ($1,$2,$3,$4,$5,$6,$6,$7,'craft',$8,$7,NOW(),$9,$10,$11,$12,$13,$14)
             RETURNING *;
         `, [
             recipe.output_template_id,
             rarity,
             itemPower,
             outputLevel,
+            expiresAt,
             recipe.base_durability || 100,
             playerId,
             recipe.output_qty || 1,
@@ -484,7 +496,15 @@ itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
 
         const itemResult = await client.query(`
             SELECT i.id, i.quantity, it.display_name, it.category, it.tags,
-                   COALESCE(i.item_level, it.item_level) AS item_level
+                   COALESCE(i.item_level, it.item_level) AS item_level,
+                   CASE
+                       WHEN i.expires_at IS NULL
+                        AND it.base_duration_hours > 0
+                        AND LOWER(it.lifecycle_model) LIKE '%duration%'
+                       THEN i.created_at + (it.base_duration_hours || ' hours')::INTERVAL
+                       ELSE i.expires_at
+                   END AS computed_expires_at,
+                   it.lifecycle_model, it.base_duration_hours
             FROM items i
             JOIN item_templates it ON i.template_id = it.id
             WHERE i.id = $1 AND i.owner_player_id = $2
@@ -500,6 +520,10 @@ itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
         if ((item.category || '').toUpperCase() !== 'FOOD') {
             await client.query('ROLLBACK');
             return res.status(400).json({ success: false, message: 'Only food items can restore energy.' });
+        }
+        if (itemLifecycleService.isExpired(item.computed_expires_at)) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({ success: false, message: `${item.display_name} is expired and cannot restore energy.` });
         }
 
         const restore = calculateFoodRestore(item);
@@ -584,14 +608,22 @@ itemsRouter.get('/player/:playerId/equipped', verifyToken, verifyPlayerOwnership
     try {
         const result = await dbPool.query(`
             SELECT i.*, it.display_name, it.category, it.tags,
-                   COALESCE(i.item_level, it.item_level) AS item_level
+                   COALESCE(i.item_level, it.item_level) AS item_level,
+                   it.lifecycle_model, it.base_duration_hours, it.lifecycle_note,
+                   CASE
+                       WHEN i.expires_at IS NULL
+                        AND it.base_duration_hours > 0
+                        AND LOWER(it.lifecycle_model) LIKE '%duration%'
+                       THEN i.created_at + (it.base_duration_hours || ' hours')::INTERVAL
+                       ELSE i.expires_at
+                   END AS computed_expires_at
             FROM items i
             JOIN item_templates it ON i.template_id = it.id
             WHERE i.owner_player_id = $1 AND i.is_equipped = TRUE
             ORDER BY i.equip_slot ASC;
         `, [playerId]);
 
-        const itemsWithPower = result.rows.map(item => ({
+        const itemsWithPower = result.rows.map(item => itemLifecycleService.decorateItemLifecycle({
             ...item,
             item_power: craftingService.calculateItemPower(item.item_level, item.rarity)
         }));

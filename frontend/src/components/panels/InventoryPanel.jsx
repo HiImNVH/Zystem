@@ -36,6 +36,16 @@ const FILTERS = [
 const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
 const STAT_LABELS = { str:'STR', agi:'AGI', dex:'DEX', vit:'VIT', int:'INT', chr:'CHR' };
 
+function formatExpiry(expiresAt) {
+    if (!expiresAt) return null;
+    return new Date(expiresAt).toLocaleString([], {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
 function ItemTile({ item, onSelect }) {
     const rarity = (item.rarity || 'COMMON').toUpperCase();
     const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
@@ -48,6 +58,9 @@ function ItemTile({ item, onSelect }) {
         >
             {item.is_equipped && (
                 <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-success" />
+            )}
+            {item.is_expired && (
+                <span className="absolute top-1 left-1 text-[8px] font-bold text-danger">OLD</span>
             )}
             <span className="text-xs font-bold text-textSecondary">{mark}</span>
             <span className={`text-[10px] font-mono font-semibold ${style.text}`}>{item.item_power}</span>
@@ -66,6 +79,7 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
     const canEquip = EQUIPABLE_CATEGORIES.includes(normalizedCategory) && !item.is_equipped;
     const canEat = normalizedCategory === 'FOOD';
     const tags = Array.isArray(item.tags) ? item.tags : [];
+    const expiryText = formatExpiry(item.expires_at);
 
     const itemStats = [1, 2, 3]
         .map(index => ({ type: item[`stat_${index}_type`], value: item[`stat_${index}_value`] }))
@@ -146,6 +160,14 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                     </div>
                 )}
 
+                {(expiryText || item.is_expired) && (
+                    <div className="card p-3 mb-3">
+                        <p className={`text-xs ${item.is_expired ? 'text-danger' : 'text-textMuted'}`}>
+                            {item.is_expired ? 'Expired' : `Expires: ${expiryText}`}
+                        </p>
+                    </div>
+                )}
+
                 {itemStats.length > 0 && (
                     <div className="card p-3 mb-3">
                         <p className="text-textMuted text-xs mb-2">Bonus stats</p>
@@ -167,8 +189,8 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
 
                 {canEat && (
-                    <button onClick={handleEat} disabled={isLoading} className="btn-primary w-full mb-2">
-                        {isLoading ? 'Eating...' : 'Eat'}
+                    <button onClick={handleEat} disabled={isLoading || item.is_expired} className="btn-primary w-full mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {item.is_expired ? 'Expired' : (isLoading ? 'Eating...' : 'Eat')}
                     </button>
                 )}
 

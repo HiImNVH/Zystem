@@ -4,6 +4,7 @@ const { dbPool } = require('../repositories/repositories.database');
 const craftingService = require('./services.crafting');
 const itemStatsService = require('./services.itemStats');
 const curelPowerService = require('./services.curelPower');
+const itemLifecycleService = require('./services.itemLifecycle');
 
 const ACTION_DROP_POOL = {
     MINE:    ['MATERIAL'],
@@ -47,8 +48,8 @@ async function getCandidateTemplates(categories, zoneMinLevel, origins) {
     const originOffset = categories.length;
     const originPlaceholders = allowedOrigins.map((_, index) => `$${originOffset + index + 1}`).join(', ');
     const sqlQuery = `
-        SELECT id, category, item_level, drop_weight_common, drop_weight_uncommon,
-               drop_weight_rare, drop_weight_epic, drop_weight_legendary
+        SELECT id, category, item_level, lifecycle_model, base_duration_hours,
+               drop_weight_common, drop_weight_uncommon, drop_weight_rare, drop_weight_epic, drop_weight_legendary
         FROM item_templates
         WHERE category = ANY(ARRAY[${categoryPlaceholders}])
           AND origin = ANY(ARRAY[${originPlaceholders}])
@@ -60,8 +61,8 @@ async function getCandidateTemplates(categories, zoneMinLevel, origins) {
         if (exactResult.rows.length > 0) return exactResult.rows;
 
         const fallbackQuery = `
-            SELECT id, category, item_level, drop_weight_common, drop_weight_uncommon,
-                   drop_weight_rare, drop_weight_epic, drop_weight_legendary
+            SELECT id, category, item_level, lifecycle_model, base_duration_hours,
+                   drop_weight_common, drop_weight_uncommon, drop_weight_rare, drop_weight_epic, drop_weight_legendary
             FROM item_templates
             WHERE category = ANY(ARRAY[${categoryPlaceholders}])
               AND origin = ANY(ARRAY[${originPlaceholders}])
@@ -86,12 +87,14 @@ function rollOneItem(candidates, curelPower) {
     const rarity = craftingService.rollCurelRarity(curelPower);
     const itemPower = craftingService.calculateItemPower(template.item_level, rarity);
     const rolledStats = itemStatsService.rollItemStats(template.category, itemPower, rarity);
+    const expiresAt = itemLifecycleService.calculateExpiresAt(template.lifecycle_model, template.base_duration_hours);
 
     return {
         templateId: template.id,
         itemLevel: template.item_level,
         rarity,
         itemPower,
+        expiresAt,
         ...rolledStats
     };
 }
@@ -105,13 +108,13 @@ async function insertDroppedItems(playerId, droppedItems, actionId) {
         try {
             const result = await dbPool.query(`
                 INSERT INTO items
-                    (template_id, rarity, item_power, item_level, owner_player_id, source, quantity,
+                    (template_id, rarity, item_power, item_level, expires_at, owner_player_id, source, quantity,
                      stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
-                VALUES ($1, $2, $3, $4, $5, 'drop', 1, $6, $7, $8, $9, $10, $11)
+                VALUES ($1, $2, $3, $4, $5, $6, 'drop', 1, $7, $8, $9, $10, $11, $12)
                 RETURNING id, template_id, rarity, item_power,
                           stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value;
             `, [
-                item.templateId, item.rarity, item.itemPower, item.itemLevel, playerId,
+                item.templateId, item.rarity, item.itemPower, item.itemLevel, item.expiresAt, playerId,
                 item.stat_1_type || null, item.stat_1_value || 0,
                 item.stat_2_type || null, item.stat_2_value || 0,
                 item.stat_3_type || null, item.stat_3_value || 0

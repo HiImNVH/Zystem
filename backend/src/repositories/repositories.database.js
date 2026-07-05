@@ -438,11 +438,13 @@ async function initializeDatabaseSchema() {
                 quantity INT DEFAULT 1 CHECK (quantity > 0),
                 crafted_by_player_id UUID REFERENCES players(id) ON DELETE SET NULL,
                 crafted_at TIMESTAMPTZ,
+                expires_at TIMESTAMPTZ,
                 source VARCHAR(20) DEFAULT 'drop',
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
         await client.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS item_level SMALLINT;`);
+        await client.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_items_owner ON items(owner_player_id) WHERE owner_player_id IS NOT NULL;`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_items_equipped ON items(owner_player_id, is_equipped) WHERE is_equipped = TRUE;`);
 
