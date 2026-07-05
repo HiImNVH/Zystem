@@ -1,22 +1,36 @@
-﻿// backend/src/repositories/repositories.database.js
+// backend/src/repositories/repositories.database.js
 
 require('dotenv').config();
 const { Pool } = require('pg');
 
-if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASSWORD) {
-    console.error('[ERROR] Thieu cau hinh bat buoc trong file .env: DB_HOST, DB_USER, DB_PASSWORD');
+const hasDatabaseUrl = Boolean(process.env.DATABASE_URL);
+const shouldResetDatabaseOnStart = process.env.RESET_DATABASE_ON_START === 'true';
+
+if (!hasDatabaseUrl && (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASSWORD)) {
+    console.error('[ERROR] Missing database configuration. Set DATABASE_URL or DB_HOST, DB_USER, DB_PASSWORD.');
     process.exit(1);
 }
 
-const poolConfiguration = {
+const sslConfiguration = process.env.DB_SSL === 'false'
+    ? false
+    : (hasDatabaseUrl || process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false);
+
+const poolConfiguration = hasDatabaseUrl ? {
+    connectionString: process.env.DATABASE_URL,
+    ssl: sslConfiguration,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+} : {
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT || '5432'),
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    ssl: sslConfiguration,
     max: 10,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 5000,
 };
 
 const dbPool = new Pool(poolConfiguration);
@@ -35,34 +49,36 @@ async function initializeDatabaseSchema() {
         // Extension UUID
         await client.query(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`);
 
-        // Xoa bang cu theo thu tu danh sach phu thuoc (Foreign Key)
-        await client.query(`
-            DROP TABLE IF EXISTS player_achievements CASCADE;
-            DROP TABLE IF EXISTS achievements CASCADE;
-            DROP TABLE IF EXISTS user_progress_timestamps CASCADE;
-            DROP TABLE IF EXISTS skill_refund_log CASCADE;
-            DROP TABLE IF EXISTS player_skills CASCADE;
-            DROP TABLE IF EXISTS job_skills CASCADE;
-            DROP TABLE IF EXISTS recipe_tag_inputs CASCADE;
-            DROP TABLE IF EXISTS player_recipes CASCADE;
-            DROP TABLE IF EXISTS recipe_ingredients CASCADE;
-            DROP TABLE IF EXISTS recipes CASCADE;
-            DROP TABLE IF EXISTS items CASCADE;
-            DROP TABLE IF EXISTS item_templates CASCADE;
-            DROP TABLE IF EXISTS stat_definitions CASCADE;
-            DROP TABLE IF EXISTS item_type_rules CASCADE;
-            DROP TABLE IF EXISTS curel_rarity_weights CASCADE;
-            DROP TABLE IF EXISTS curel_item_power_matrix CASCADE;
-            DROP TABLE IF EXISTS leveling_rules CASCADE;
-            DROP TABLE IF EXISTS wallet_transactions CASCADE;
-            DROP TABLE IF EXISTS wallets CASCADE;
-            DROP TABLE IF EXISTS action_queue CASCADE;
-            DROP TABLE IF EXISTS player_jobs CASCADE;
-            DROP TABLE IF EXISTS jobs_seed CASCADE;
-            DROP TABLE IF EXISTS zones CASCADE;
-            DROP TABLE IF EXISTS players CASCADE;
-            DROP TABLE IF EXISTS accounts CASCADE;
-        `);
+        if (shouldResetDatabaseOnStart) {
+            console.warn('[WARN] RESET_DATABASE_ON_START=true. Dropping all Zystem tables before boot.');
+            await client.query(`
+                DROP TABLE IF EXISTS player_achievements CASCADE;
+                DROP TABLE IF EXISTS achievements CASCADE;
+                DROP TABLE IF EXISTS user_progress_timestamps CASCADE;
+                DROP TABLE IF EXISTS skill_refund_log CASCADE;
+                DROP TABLE IF EXISTS player_skills CASCADE;
+                DROP TABLE IF EXISTS job_skills CASCADE;
+                DROP TABLE IF EXISTS recipe_tag_inputs CASCADE;
+                DROP TABLE IF EXISTS player_recipes CASCADE;
+                DROP TABLE IF EXISTS recipe_ingredients CASCADE;
+                DROP TABLE IF EXISTS recipes CASCADE;
+                DROP TABLE IF EXISTS items CASCADE;
+                DROP TABLE IF EXISTS item_templates CASCADE;
+                DROP TABLE IF EXISTS stat_definitions CASCADE;
+                DROP TABLE IF EXISTS item_type_rules CASCADE;
+                DROP TABLE IF EXISTS curel_rarity_weights CASCADE;
+                DROP TABLE IF EXISTS curel_item_power_matrix CASCADE;
+                DROP TABLE IF EXISTS leveling_rules CASCADE;
+                DROP TABLE IF EXISTS wallet_transactions CASCADE;
+                DROP TABLE IF EXISTS wallets CASCADE;
+                DROP TABLE IF EXISTS action_queue CASCADE;
+                DROP TABLE IF EXISTS player_jobs CASCADE;
+                DROP TABLE IF EXISTS jobs_seed CASCADE;
+                DROP TABLE IF EXISTS zones CASCADE;
+                DROP TABLE IF EXISTS players CASCADE;
+                DROP TABLE IF EXISTS accounts CASCADE;
+            `);
+        }
 
         console.log('[INFO] Dang khoi tao toan bo he thong bang Zystem...');
 
@@ -70,7 +86,7 @@ async function initializeDatabaseSchema() {
         // BANG 1: ACCOUNTS
         // ============================================================
         await client.query(`
-            CREATE TABLE accounts (
+            CREATE TABLE IF NOT EXISTS accounts (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 username VARCHAR(32) NOT NULL UNIQUE,
                 email VARCHAR(255) NOT NULL UNIQUE,
@@ -86,7 +102,7 @@ async function initializeDatabaseSchema() {
         // BANG 2: PLAYERS
         // ============================================================
         await client.query(`
-            CREATE TABLE players (
+            CREATE TABLE IF NOT EXISTS players (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
                 character_name VARCHAR(50) NOT NULL UNIQUE,
@@ -115,7 +131,7 @@ async function initializeDatabaseSchema() {
         // BANG 3: ZONES
         // ============================================================
         await client.query(`
-            CREATE TABLE zones (
+            CREATE TABLE IF NOT EXISTS zones (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 code VARCHAR(64) NOT NULL UNIQUE,
                 display_name VARCHAR(128) NOT NULL,
@@ -133,7 +149,7 @@ async function initializeDatabaseSchema() {
         // BANG 4: JOBS SEED
         // ============================================================
         await client.query(`
-            CREATE TABLE jobs_seed (
+            CREATE TABLE IF NOT EXISTS jobs_seed (
                 id SMALLSERIAL PRIMARY KEY,
                 code VARCHAR(30) NOT NULL UNIQUE,
                 display_name VARCHAR(100) NOT NULL,
@@ -154,7 +170,7 @@ async function initializeDatabaseSchema() {
         // BANG 5: PLAYER JOBS
         // ============================================================
         await client.query(`
-            CREATE TABLE player_jobs (
+            CREATE TABLE IF NOT EXISTS player_jobs (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
                 job_id SMALLINT NOT NULL REFERENCES jobs_seed(id) ON DELETE CASCADE,
@@ -170,7 +186,7 @@ async function initializeDatabaseSchema() {
         // BANG 6: ACTION QUEUE
         // ============================================================
         await client.query(`
-            CREATE TABLE action_queue (
+            CREATE TABLE IF NOT EXISTS action_queue (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
                 slot_index SMALLINT CHECK (slot_index BETWEEN 1 AND 5),
@@ -193,7 +209,7 @@ async function initializeDatabaseSchema() {
         // BANG 7: WALLETS
         // ============================================================
         await client.query(`
-            CREATE TABLE wallets (
+            CREATE TABLE IF NOT EXISTS wallets (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 player_id UUID NOT NULL UNIQUE REFERENCES players(id) ON DELETE CASCADE,
                 copper BIGINT DEFAULT 0 CHECK (copper >= 0),
@@ -207,7 +223,7 @@ async function initializeDatabaseSchema() {
         // BANG 8: WALLET TRANSACTIONS (audit trail)
         // ============================================================
         await client.query(`
-            CREATE TABLE wallet_transactions (
+            CREATE TABLE IF NOT EXISTS wallet_transactions (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 wallet_id UUID NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
                 currency VARCHAR(10) NOT NULL,
@@ -219,14 +235,14 @@ async function initializeDatabaseSchema() {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
-        await client.query(`CREATE INDEX idx_wallet_tx_wallet ON wallet_transactions(wallet_id);`);
-        await client.query(`CREATE INDEX idx_wallet_tx_created ON wallet_transactions(created_at DESC);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_wallet_tx_wallet ON wallet_transactions(wallet_id);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_wallet_tx_created ON wallet_transactions(created_at DESC);`);
 
         // ============================================================
         // BANG 9: LEVELING RULES
         // ============================================================
         await client.query(`
-            CREATE TABLE leveling_rules (
+            CREATE TABLE IF NOT EXISTS leveling_rules (
                 level SMALLINT PRIMARY KEY,
                 player_exp_required BIGINT NOT NULL,
                 total_player_exp BIGINT NOT NULL,
@@ -241,7 +257,7 @@ async function initializeDatabaseSchema() {
         // BANG 10: CUREL ITEM POWER MATRIX
         // ============================================================
         await client.query(`
-            CREATE TABLE curel_item_power_matrix (
+            CREATE TABLE IF NOT EXISTS curel_item_power_matrix (
                 item_level SMALLINT PRIMARY KEY,
                 base_item_power SMALLINT NOT NULL,
                 common_power SMALLINT NOT NULL,
@@ -256,7 +272,7 @@ async function initializeDatabaseSchema() {
         // BANG 11: CUREL RARITY WEIGHTS
         // ============================================================
         await client.query(`
-            CREATE TABLE curel_rarity_weights (
+            CREATE TABLE IF NOT EXISTS curel_rarity_weights (
                 curel_level SMALLINT PRIMARY KEY,
                 common_weight SMALLINT NOT NULL,
                 uncommon_weight SMALLINT NOT NULL,
@@ -271,7 +287,7 @@ async function initializeDatabaseSchema() {
         // BANG 12: ITEM TYPE RULES
         // ============================================================
         await client.query(`
-            CREATE TABLE item_type_rules (
+            CREATE TABLE IF NOT EXISTS item_type_rules (
                 id SMALLSERIAL PRIMARY KEY,
                 main_tag VARCHAR(40) NOT NULL UNIQUE,
                 sub_tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
@@ -283,7 +299,7 @@ async function initializeDatabaseSchema() {
         // BANG 13: STAT DEFINITIONS
         // ============================================================
         await client.query(`
-            CREATE TABLE stat_definitions (
+            CREATE TABLE IF NOT EXISTS stat_definitions (
                 id SMALLSERIAL PRIMARY KEY,
                 stat_type VARCHAR(30) NOT NULL,
                 code VARCHAR(50) NOT NULL,
@@ -298,7 +314,7 @@ async function initializeDatabaseSchema() {
         // BANG 14: ITEM TEMPLATES
         // ============================================================
         await client.query(`
-            CREATE TABLE item_templates (
+            CREATE TABLE IF NOT EXISTS item_templates (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 code VARCHAR(50) NOT NULL UNIQUE,
                 display_name VARCHAR(100) NOT NULL,
@@ -329,7 +345,7 @@ async function initializeDatabaseSchema() {
         // BANG 15: ITEMS (instances)
         // ============================================================
         await client.query(`
-            CREATE TABLE items (
+            CREATE TABLE IF NOT EXISTS items (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 template_id UUID NOT NULL REFERENCES item_templates(id) ON DELETE CASCADE,
                 rarity VARCHAR(20) NOT NULL DEFAULT 'COMMON',
@@ -352,14 +368,14 @@ async function initializeDatabaseSchema() {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
-        await client.query(`CREATE INDEX idx_items_owner ON items(owner_player_id) WHERE owner_player_id IS NOT NULL;`);
-        await client.query(`CREATE INDEX idx_items_equipped ON items(owner_player_id, is_equipped) WHERE is_equipped = TRUE;`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_items_owner ON items(owner_player_id) WHERE owner_player_id IS NOT NULL;`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_items_equipped ON items(owner_player_id, is_equipped) WHERE is_equipped = TRUE;`);
 
         // ============================================================
         // BANG 16: RECIPES
         // ============================================================
         await client.query(`
-            CREATE TABLE recipes (
+            CREATE TABLE IF NOT EXISTS recipes (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 code VARCHAR(64) UNIQUE,
                 recipe_number SMALLINT UNIQUE,
@@ -390,7 +406,7 @@ async function initializeDatabaseSchema() {
         // BANG 17: RECIPE TAG INPUTS
         // ============================================================
         await client.query(`
-            CREATE TABLE recipe_tag_inputs (
+            CREATE TABLE IF NOT EXISTS recipe_tag_inputs (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
                 slot_index SMALLINT NOT NULL CHECK (slot_index BETWEEN 1 AND 4),
@@ -399,13 +415,13 @@ async function initializeDatabaseSchema() {
                 UNIQUE(recipe_id, slot_index)
             );
         `);
-        await client.query(`CREATE INDEX idx_recipe_tag_inputs_recipe ON recipe_tag_inputs(recipe_id);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_recipe_tag_inputs_recipe ON recipe_tag_inputs(recipe_id);`);
 
         // ============================================================
         // BANG 18: RECIPE INGREDIENTS
         // ============================================================
         await client.query(`
-            CREATE TABLE recipe_ingredients (
+            CREATE TABLE IF NOT EXISTS recipe_ingredients (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
                 material_template_id UUID NOT NULL REFERENCES item_templates(id) ON DELETE CASCADE,
@@ -418,7 +434,7 @@ async function initializeDatabaseSchema() {
         // BANG 19: PLAYER RECIPES (junction)
         // ============================================================
         await client.query(`
-            CREATE TABLE player_recipes (
+            CREATE TABLE IF NOT EXISTS player_recipes (
                 player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
                 recipe_id UUID NOT NULL REFERENCES recipes(id) ON DELETE CASCADE,
                 unlocked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -430,7 +446,7 @@ async function initializeDatabaseSchema() {
         // BANG 20: ACHIEVEMENTS (seed data)
         // ============================================================
         await client.query(`
-            CREATE TABLE achievements (
+            CREATE TABLE IF NOT EXISTS achievements (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 code VARCHAR(64) NOT NULL UNIQUE,
                 display_name VARCHAR(128) NOT NULL,
@@ -455,7 +471,7 @@ async function initializeDatabaseSchema() {
         // BANG 21: PLAYER ACHIEVEMENTS
         // ============================================================
         await client.query(`
-            CREATE TABLE player_achievements (
+            CREATE TABLE IF NOT EXISTS player_achievements (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
                 achievement_id UUID NOT NULL REFERENCES achievements(id),
@@ -467,13 +483,13 @@ async function initializeDatabaseSchema() {
                 UNIQUE (player_id, achievement_id)
             );
         `);
-        await client.query(`CREATE INDEX idx_player_ach ON player_achievements(player_id);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_player_ach ON player_achievements(player_id);`);
 
         // ============================================================
         // BANG 22: USER PROGRESS TIMESTAMPS
         // ============================================================
         await client.query(`
-            CREATE TABLE user_progress_timestamps (
+            CREATE TABLE IF NOT EXISTS user_progress_timestamps (
                 player_id UUID PRIMARY KEY REFERENCES players(id) ON DELETE CASCADE,
                 last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 last_saved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -485,21 +501,28 @@ async function initializeDatabaseSchema() {
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
-        await client.query(`CREATE INDEX idx_user_progress_saved ON user_progress_timestamps(last_saved_at DESC);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_user_progress_saved ON user_progress_timestamps(last_saved_at DESC);`);
 
-        // FK vong cho players.equipped_title_id -> player_achievements
+        // Circular FK for players.equipped_title_id -> player_achievements.
         await client.query(`
-            ALTER TABLE players
-            ADD CONSTRAINT fk_equipped_title
-            FOREIGN KEY (equipped_title_id)
-            REFERENCES player_achievements(id)
-            ON DELETE SET NULL;
+            DO $$
+            BEGIN
+                IF NOT EXISTS (
+                    SELECT 1 FROM pg_constraint WHERE conname = 'fk_equipped_title'
+                ) THEN
+                    ALTER TABLE players
+                    ADD CONSTRAINT fk_equipped_title
+                    FOREIGN KEY (equipped_title_id)
+                    REFERENCES player_achievements(id)
+                    ON DELETE SET NULL;
+                END IF;
+            END $$;
         `);
 
         // Index tong the
-        await client.query(`CREATE INDEX idx_queue_player_status ON action_queue(player_id, status);`);
-        await client.query(`CREATE INDEX idx_queue_completes ON action_queue(completes_at) WHERE status = 'PENDING';`);
-        await client.query(`CREATE INDEX idx_player_jobs_player ON player_jobs(player_id);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_queue_player_status ON action_queue(player_id, status);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_queue_completes ON action_queue(completes_at) WHERE status = 'PENDING';`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_player_jobs_player ON player_jobs(player_id);`);
 
 
         // === BANG KY NANG (SKILL TREE) ===
@@ -564,3 +587,4 @@ module.exports = {
     dbPool,
     initializeDatabaseSchema
 };
+

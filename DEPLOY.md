@@ -49,16 +49,16 @@ Environment variables:
 
 ```text
 NODE_ENV=production
-PORT=5000
-DB_HOST=your-postgres-host
-DB_PORT=5432
-DB_USER=your-postgres-user
-DB_PASSWORD=your-postgres-password
-DB_NAME=your-postgres-database
+DATABASE_URL=postgresql://...
+DB_SSL=true
+CORS_ORIGIN=https://your-frontend-url
 JWT_SECRET=replace_with_a_long_random_secret
 JWT_EXPIRES_IN=7d
 LOG_LEVEL=info
+RESET_DATABASE_ON_START=false
 ```
+
+`PORT` is usually provided automatically by Render. Do not set `RESET_DATABASE_ON_START=true` in public alpha unless you intentionally want to wipe all tester data on every backend boot.
 
 ## Database
 
@@ -67,6 +67,8 @@ Recommended free database:
 - Neon Postgres
 
 Do not expose PostgreSQL directly to the public internet. Only the backend should connect to the database.
+
+Use Neon's pooled or direct connection string as `DATABASE_URL`. Keep SSL enabled with `DB_SSL=true`.
 
 ## Cold Start Note
 

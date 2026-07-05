@@ -26,8 +26,16 @@ const progressRouter     = require('./routes/routes.progress');
 
 const app = express();
 const serverPort = process.env.PORT || 5000;
+const corsOrigins = (process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
 
-app.use(cors());
+if (process.env.NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+}
+
+app.use(cors(corsOrigins.length > 0 ? { origin: corsOrigins } : undefined));
 app.use(express.json());
 // Rate limiting toan cuc cho toan bo API
 app.use(globalLimiter);

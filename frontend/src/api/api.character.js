@@ -1,7 +1,7 @@
 ﻿// frontend/src/api/api.character.js
 // Character API: fetch characters and create a new character with a starting job
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 function getAuthHeader() {
     const token = localStorage.getItem('zystem_token');

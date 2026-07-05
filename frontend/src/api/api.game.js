@@ -1,7 +1,7 @@
 ﻿// frontend/src/api/api.game.js
 // Gameplay API: zones, action queue, inventory, stats
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 function getHeaders() {
     const token = localStorage.getItem('zystem_token');
