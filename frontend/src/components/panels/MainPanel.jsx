@@ -79,6 +79,35 @@ const ZONE_FATIGUE_MULTIPLIER = {
     desert: 1.45,
 };
 
+const GENERIC_INGREDIENT_TOKENS = new Set([
+    'and', 'any', 'the', 'with', 'material', 'materials', 'processed',
+    'recyclable', 'scrap', 'item', 'items', 'ingredient', 'ingredients',
+    'crafting', 'base', 'basic', 'raw', 'resource', 'resources'
+]);
+
+function normalizeIngredientText(value) {
+    return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function getIngredientTokens(tagQuery) {
+    return normalizeIngredientText(tagQuery)
+        .split(/\s+/)
+        .filter(token => token.length >= 3 && !GENERIC_INGREDIENT_TOKENS.has(token));
+}
+
+function itemMatchesIngredient(item, tagQuery) {
+    const tokens = getIngredientTokens(tagQuery);
+    if (tokens.length === 0) return true;
+
+    const itemText = normalizeIngredientText([
+        item?.display_name,
+        item?.category,
+        ...(Array.isArray(item?.tags) ? item.tags : []),
+    ].join(' '));
+
+    return tokens.some(token => itemText.includes(token));
+}
+
 function calculateResourcePreview(actionType, durationSeconds, zoneType, tag) {
     const rule = ACTION_RESOURCE_RULES[actionType] || ACTION_RESOURCE_RULES.EXPLORE;
     const actionUnits = Math.max(1, Math.ceil((durationSeconds || 0) / 1800));
@@ -550,6 +579,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                         const chosenIds = Object.entries(selectedIngredients)
                                             .filter(([slot]) => parseInt(slot) !== parseInt(input.slot_index))
                                             .map(([, itemId]) => itemId);
+                                        const matchingItems = usableInventory.filter(item => itemMatchesIngredient(item, input.tag_query));
                                         return (
                                             <div key={input.slot_index}>
                                                 <p className="text-xs text-textMuted mb-1">
@@ -561,7 +591,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                                     className="input-field"
                                                 >
                                                     <option value="">Choose item</option>
-                                                    {usableInventory.map(item => (
+                                                    {matchingItems.map(item => (
                                                         <option
                                                             key={item.id}
                                                             value={item.id}
@@ -571,6 +601,9 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                                         </option>
                                                     ))}
                                                 </select>
+                                                {matchingItems.length === 0 && (
+                                                    <p className="text-[10px] text-danger mt-1">No matching items in inventory.</p>
+                                                )}
                                             </div>
                                         );
                                     })}

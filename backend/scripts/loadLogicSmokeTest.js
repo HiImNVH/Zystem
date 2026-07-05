@@ -87,6 +87,17 @@ function runPureLogicChecks(modulesByPath) {
         [{ slot_index: 1, rarity: 'EPIC' }, { slot_index: 2, rarity: 'COMMON' }],
         1
     ), 'EPIC');
+    assert.deepEqual(crafting.getIngredientQueryTokens('Recyclable metal scrap or ore, Copper'), ['metal', 'ore', 'copper']);
+    assert.equal(crafting.itemMatchesIngredientQuery({
+        display_name: 'Copper Ore',
+        category: 'MATERIAL',
+        tags: ['Ore', 'Copper'],
+    }, 'Recyclable metal scrap or ore, Copper'), true);
+    assert.equal(crafting.itemMatchesIngredientQuery({
+        display_name: 'Branch',
+        category: 'MATERIAL',
+        tags: ['Wood'],
+    }, 'Processed material, Charcoal'), false);
 
     assertExportedFunction(itemStats, 'calculateBaseStatValue');
     assert.equal(itemStats.calculateBaseStatValue(21), 63);

@@ -60,6 +60,13 @@ const CUREL_RARITY_WEIGHT_BY_LEVEL = [
     { level: 40, common: 160, uncommon: 60, rare: 17, epic: 10, legendary: 9 },
 ];
 
+const GENERIC_INGREDIENT_TOKENS = new Set([
+    'a', 'an', 'and', 'any', 'or', 'of', 'the', 'with',
+    'material', 'materials', 'processed', 'recyclable', 'scrap',
+    'item', 'items', 'ingredient', 'ingredients', 'crafting',
+    'base', 'basic', 'raw', 'resource', 'resources',
+]);
+
 function clampCurelLevel(curelLevel) {
     const normalizedLevel = Math.floor(Number(curelLevel) || 0);
     return Math.min(Math.max(normalizedLevel, 0), 40);
@@ -68,6 +75,32 @@ function clampCurelLevel(curelLevel) {
 function getCurelRarityWeights(curelLevel) {
     const targetLevel = clampCurelLevel(curelLevel);
     return CUREL_RARITY_WEIGHT_BY_LEVEL[targetLevel] || CUREL_RARITY_WEIGHT_BY_LEVEL[0];
+}
+
+function normalizeSearchText(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+}
+
+function getIngredientQueryTokens(tagQuery) {
+    return normalizeSearchText(tagQuery)
+        .split(/\s+/)
+        .filter(token => token.length >= 3 && !GENERIC_INGREDIENT_TOKENS.has(token));
+}
+
+function itemMatchesIngredientQuery(item, tagQuery) {
+    const tokens = getIngredientQueryTokens(tagQuery);
+    if (tokens.length === 0) return true;
+
+    const itemText = normalizeSearchText([
+        item?.display_name,
+        item?.category,
+        ...(Array.isArray(item?.tags) ? item.tags : []),
+    ].join(' '));
+
+    return tokens.some(token => itemText.includes(token));
 }
 
 function calculateOutputItemLevel(craftJobLevel, materialItemLevel) {
@@ -183,6 +216,8 @@ module.exports = {
     calculateOutputItemLevel,
     calculateRecipeOutputItemLevel,
     resolveCraftedRarity,
+    getIngredientQueryTokens,
+    itemMatchesIngredientQuery,
     parseMainMaterialSlots,
     pickHighestRarity,
     clampItemLevel,

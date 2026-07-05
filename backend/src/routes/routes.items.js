@@ -378,6 +378,14 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
 
             const item = itemResult.rows[0];
             const requiredQty = parseInt(input.quantity) || 1;
+            if (!craftingService.itemMatchesIngredientQuery(item, input.tag_query)) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({
+                    success: false,
+                    message: `${item.display_name} does not match slot ${input.slot_index}: ${input.tag_query}.`,
+                });
+            }
+
             if ((parseInt(item.quantity) || 0) < requiredQty) {
                 await client.query('ROLLBACK');
                 return res.status(400).json({
