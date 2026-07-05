@@ -158,6 +158,16 @@ export async function useFoodItem(playerId, itemId) {
     return handleResponse(res);
 }
 
+export async function getRecipes() {
+    const res = await fetch(`${BASE_URL}/api/items/recipes`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function getRecipe(recipeCode) {
+    const res = await fetch(`${BASE_URL}/api/items/recipes/${encodeURIComponent(recipeCode)}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
 export async function craftItem(playerId, recipeCode, ingredients) {
     const res = await fetch(`${BASE_URL}/api/items/craft`, {
         method: 'POST',

@@ -54,7 +54,7 @@ export default function Dashboard({ initialCharacter, onLogout }) {
 
     function renderPanel(tab) {
         if (tab === TAB.MAIN) {
-            return <MainPanel playerId={playerId} character={character} zones={zones} queue={queue} onUpdate={loadAll} />;
+            return <MainPanel playerId={playerId} character={character} zones={zones} queue={queue} inventory={inventory} onUpdate={loadAll} />;
         }
 
         if (tab === TAB.INVENTORY) {

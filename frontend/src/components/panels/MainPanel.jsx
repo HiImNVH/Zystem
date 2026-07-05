@@ -1,7 +1,10 @@
 ﻿// frontend/src/components/panels/MainPanel.jsx
 
 import { useState, useEffect } from 'react';
-import { registerAction, claimAction, cancelAction, getPoiActivities } from '../../api/api.game';
+import {
+    registerAction, claimAction, cancelAction, getPoiActivities,
+    getRecipes, getRecipe, craftItem
+} from '../../api/api.game';
 
 const DESTINATIONS = {
     EXPEDITION: {
@@ -408,6 +411,185 @@ function RegisterActionSheet({
     );
 }
 
+function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
+    const [recipes, setRecipes] = useState([]);
+    const [search, setSearch] = useState('');
+    const [selectedRecipe, setSelectedRecipe] = useState(null);
+    const [selectedIngredients, setSelectedIngredients] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [isCrafting, setIsCrafting] = useState(false);
+    const [error, setError] = useState('');
+
+    const usableInventory = (inventory || []).filter(item => !item.is_equipped && !item.is_expired);
+    const filteredRecipes = recipes
+        .filter(recipe => {
+            const text = `${recipe.output_item_name || ''} ${recipe.code || ''}`.toLowerCase();
+            return text.includes(search.toLowerCase());
+        })
+        .slice(0, 60);
+
+    useEffect(() => {
+        let isMounted = true;
+        async function loadRecipes() {
+            setIsLoading(true);
+            setError('');
+            try {
+                const result = await getRecipes();
+                if (isMounted) setRecipes(result.data || []);
+            } catch (err) {
+                if (isMounted) setError(err.message);
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        }
+        loadRecipes();
+        return () => { isMounted = false; };
+    }, []);
+
+    async function selectRecipe(recipe) {
+        setError('');
+        setSelectedIngredients({});
+        try {
+            const result = await getRecipe(recipe.code);
+            setSelectedRecipe(result.data);
+        } catch (err) {
+            setError(err.message);
+        }
+    }
+
+    function updateIngredient(slotIndex, itemId) {
+        setSelectedIngredients(current => ({
+            ...current,
+            [slotIndex]: itemId,
+        }));
+    }
+
+    async function handleCraft() {
+        if (!selectedRecipe) return;
+
+        const ingredients = (selectedRecipe.inputs || [])
+            .map(input => ({
+                slotIndex: input.slot_index,
+                itemId: selectedIngredients[input.slot_index],
+            }))
+            .filter(input => input.itemId);
+
+        if (ingredients.length !== (selectedRecipe.inputs || []).length) {
+            setError('Choose an item for every ingredient slot.');
+            return;
+        }
+
+        setIsCrafting(true);
+        setError('');
+        try {
+            const result = await craftItem(playerId, selectedRecipe.code, ingredients);
+            onNotify(`Crafted ${result.data.output_item_name}`, 'success');
+            await onUpdate?.();
+            onClose();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsCrafting(false);
+        }
+    }
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
+            <div className="card w-full sm:max-w-3xl max-h-[88vh] overflow-hidden animate-slideup" onClick={event => event.stopPropagation()}>
+                <div className="p-5 border-b border-border flex items-start justify-between gap-4">
+                    <div>
+                        <h3 className="font-semibold">Crafting</h3>
+                        <p className="text-xs text-textMuted mt-1">Choose a recipe, then assign inventory items to each slot.</p>
+                    </div>
+                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(280px,0.9fr)] max-h-[72vh]">
+                    <div className="p-4 border-b md:border-b-0 md:border-r border-border overflow-y-auto">
+                        <input
+                            value={search}
+                            onChange={event => setSearch(event.target.value)}
+                            placeholder="Search recipe"
+                            className="input-field mb-3"
+                        />
+                        {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading recipes...</p>}
+                        {!isLoading && error && !selectedRecipe && <p className="text-sm text-danger mb-3">{error}</p>}
+                        <div className="space-y-2">
+                            {filteredRecipes.map(recipe => (
+                                <button
+                                    key={recipe.id}
+                                    onClick={() => selectRecipe(recipe)}
+                                    className={`w-full card card-hover p-3 text-left ${selectedRecipe?.code === recipe.code ? 'ring-1 ring-accent' : ''}`}
+                                >
+                                    <p className="text-sm font-semibold truncate">{recipe.output_item_name}</p>
+                                    <p className="text-xs text-textMuted mt-1 truncate">
+                                        Lv.{recipe.required_job_level} | {recipe.curel_rule_key || 'No CUREL'}
+                                    </p>
+                                </button>
+                            ))}
+                            {!isLoading && filteredRecipes.length === 0 && (
+                                <p className="text-sm text-textMuted py-6 text-center">No recipes found.</p>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="p-4 overflow-y-auto">
+                        {!selectedRecipe ? (
+                            <p className="text-sm text-textMuted py-8 text-center">Select a recipe to craft.</p>
+                        ) : (
+                            <div>
+                                <div className="card p-3 mb-3">
+                                    <p className="font-semibold">{selectedRecipe.output_item_name}</p>
+                                    <p className="text-xs text-textMuted mt-1">
+                                        {selectedRecipe.output_category} | Skill Lv.{selectedRecipe.required_job_level} | {selectedRecipe.workstation_queue_slot || 'Craft'}
+                                    </p>
+                                </div>
+
+                                <div className="space-y-3 mb-4">
+                                    {(selectedRecipe.inputs || []).map(input => {
+                                        const chosenIds = Object.entries(selectedIngredients)
+                                            .filter(([slot]) => parseInt(slot) !== parseInt(input.slot_index))
+                                            .map(([, itemId]) => itemId);
+                                        return (
+                                            <div key={input.slot_index}>
+                                                <p className="text-xs text-textMuted mb-1">
+                                                    Slot {input.slot_index}: {input.tag_query} x{input.quantity}
+                                                </p>
+                                                <select
+                                                    value={selectedIngredients[input.slot_index] || ''}
+                                                    onChange={event => updateIngredient(input.slot_index, event.target.value)}
+                                                    className="input-field"
+                                                >
+                                                    <option value="">Choose item</option>
+                                                    {usableInventory.map(item => (
+                                                        <option
+                                                            key={item.id}
+                                                            value={item.id}
+                                                            disabled={chosenIds.includes(item.id) || (parseInt(item.quantity) || 0) < (parseInt(input.quantity) || 1)}
+                                                        >
+                                                            {item.display_name} | Lv.{item.item_level} | {item.rarity} | x{item.quantity || 1}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {error && <p className="text-sm text-danger mb-3">{error}</p>}
+
+                                <button onClick={handleCraft} disabled={isCrafting} className="btn-primary w-full">
+                                    {isCrafting ? 'Crafting...' : 'Craft'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onStart }) {
     if (!activityType) return null;
 
@@ -497,10 +679,11 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
     );
 }
 
-export default function MainPanel({ playerId, character, zones, queue, onUpdate }) {
+export default function MainPanel({ playerId, character, zones, queue, inventory, onUpdate }) {
     const [showRegister, setShowRegister] = useState(false);
     const [showActiveActions, setShowActiveActions] = useState(false);
     const [showZonePicker, setShowZonePicker] = useState(false);
+    const [showCrafting, setShowCrafting] = useState(false);
     const [registerDestination, setRegisterDestination] = useState('EXPEDITION');
     const [registerAction, setRegisterAction] = useState(null);
     const [registerZone, setRegisterZone] = useState(null);
@@ -624,7 +807,7 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                                 <p className="text-xs text-textMuted leading-relaxed mt-1">Choose a level-appropriate area and leave camp.</p>
                             </div>
                         </button>
-                        <button onClick={() => openAction('HOME', 'CRAFT', safeZone)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
+                        <button onClick={() => setShowCrafting(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">HM</span>
                             </div>
@@ -771,6 +954,16 @@ export default function MainPanel({ playerId, character, zones, queue, onUpdate 
                     error={activitySheet.error}
                     onClose={() => setActivitySheet(null)}
                     onStart={startPoiActivity}
+                />
+            )}
+
+            {showCrafting && (
+                <CraftingSheet
+                    playerId={playerId}
+                    inventory={inventory}
+                    onClose={() => setShowCrafting(false)}
+                    onUpdate={onUpdate}
+                    onNotify={notify}
                 />
             )}
 
