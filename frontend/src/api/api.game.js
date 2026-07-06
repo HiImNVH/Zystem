@@ -35,6 +35,15 @@ export async function getPoiActivities(poiId, type) {
     return handleResponse(res);
 }
 
+export async function executePoiActivity(playerId, poiId, activityType, targetId, options = {}) {
+    const res = await fetch(`${BASE_URL}/api/zones/pois/${poiId}/execute`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, activityType, targetId, ...options })
+    });
+    return handleResponse(res);
+}
+
 export async function getInventory(playerId) {
     const res = await fetch(`${BASE_URL}/api/items/player/${playerId}`, { headers: getHeaders() });
     return handleResponse(res);

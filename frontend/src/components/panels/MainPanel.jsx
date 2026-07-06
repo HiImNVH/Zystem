@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import {
     getPoiActivities,
+    executePoiActivity,
     getRecipes, getRecipe, craftItem
 } from '../../api/api.game';
 
@@ -350,7 +351,13 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
     );
 }
 
-function ActivityListSheet({ activityType, activityData, isLoading, error, onClose }) {
+function formatActionResult(result) {
+    if (!result) return '';
+    const lootCount = result.items_dropped?.length || 0;
+    return `Energy -${result.energy_cost}, fatigue +${result.fatigue_gained}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
+}
+
+function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onExecute, executingId, result }) {
     if (!activityType) return null;
 
     const titleMap = {
@@ -378,6 +385,12 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
+                {result && (
+                    <div className="mb-3 rounded-lg border border-success/30 bg-success/10 p-3">
+                        <p className="text-sm font-semibold text-success">{result.poi_name}</p>
+                        <p className="text-xs text-textSecondary mt-1">{formatActionResult(result)}</p>
+                    </div>
+                )}
 
                 {!isLoading && activityType !== 'dungeon' && (
                     <div className="space-y-2">
@@ -394,6 +407,14 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                             : `Item Lv.${item.item_level} | ${item.rarity_hint}`}
                                     </p>
                                 </div>
+                                <button
+                                    type="button"
+                                    onClick={() => onExecute?.(item)}
+                                    disabled={Boolean(executingId)}
+                                    className="btn-primary px-3 py-2 text-xs flex-shrink-0"
+                                >
+                                    {executingId === item.id ? 'Doing...' : 'Do'}
+                                </button>
                             </div>
                         ))}
                         {list.length === 0 && (
@@ -412,10 +433,26 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                             <div className="w-full card p-3 text-left">
                                 <p className="text-sm font-semibold">Normal</p>
                                 <p className="text-xs text-textMuted mt-1">Monster Lv.{dungeon.normal.monster_level} | {dungeon.normal.reward_hint}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => onExecute?.(dungeon, { mode: 'normal' })}
+                                    disabled={Boolean(executingId)}
+                                    className="btn-primary mt-3 px-3 py-2 text-xs"
+                                >
+                                    {executingId === `${dungeon.id}:normal` ? 'Running...' : 'Run Normal'}
+                                </button>
                             </div>
                             <div className="w-full card p-3 text-left">
                                 <p className="text-sm font-semibold">Hard</p>
                                 <p className="text-xs text-textMuted mt-1">{dungeon.hard.monster_level_rule} | {dungeon.hard.reward_hint}</p>
+                                <button
+                                    type="button"
+                                    onClick={() => onExecute?.(dungeon, { mode: 'hard' })}
+                                    disabled={Boolean(executingId)}
+                                    className="btn-secondary mt-3 px-3 py-2 text-xs"
+                                >
+                                    {executingId === `${dungeon.id}:hard` ? 'Running...' : 'Run Hard'}
+                                </button>
                             </div>
                         </div>
                     ) : (
@@ -432,6 +469,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     const [showCrafting, setShowCrafting] = useState(false);
     const [currentExpeditionZone, setCurrentExpeditionZone] = useState(null);
     const [activitySheet, setActivitySheet] = useState(null);
+    const [executingActivityId, setExecutingActivityId] = useState('');
     const [notification, setNotification] = useState(null);
 
     function notify(message, type) {
@@ -440,12 +478,39 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     }
 
     async function openPoiActivity(poi, type) {
-        setActivitySheet({ type, poi, data: null, isLoading: true, error: '' });
+        setExecutingActivityId('');
+        setActivitySheet({ type, poi, data: null, isLoading: true, error: '', result: null });
         try {
             const result = await getPoiActivities(poi.id, type);
-            setActivitySheet({ type, poi, data: result.data, isLoading: false, error: '' });
+            setActivitySheet({ type, poi, data: result.data, isLoading: false, error: '', result: null });
         } catch (err) {
-            setActivitySheet({ type, poi, data: null, isLoading: false, error: err.message });
+            setActivitySheet({ type, poi, data: null, isLoading: false, error: err.message, result: null });
+        }
+    }
+
+    async function executeActivity(target, options = {}) {
+        if (!activitySheet?.poi || !activitySheet?.type) return;
+        const executionId = activitySheet.type === 'dungeon'
+            ? `${target.id}:${options.mode || 'normal'}`
+            : target.id;
+        setExecutingActivityId(executionId);
+        setActivitySheet(current => current ? { ...current, error: '' } : current);
+        try {
+            const result = await executePoiActivity(
+                playerId,
+                activitySheet.poi.id,
+                activitySheet.type,
+                target.id,
+                options
+            );
+            setActivitySheet(current => current ? { ...current, result: result.data, error: '' } : current);
+            notify(formatActionResult(result.data), 'success');
+            await onUpdate?.();
+        } catch (err) {
+            setActivitySheet(current => current ? { ...current, error: err.message } : current);
+            notify(err.message, 'error');
+        } finally {
+            setExecutingActivityId('');
         }
     }
 
@@ -649,6 +714,9 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     activityData={activitySheet.data}
                     isLoading={activitySheet.isLoading}
                     error={activitySheet.error}
+                    result={activitySheet.result}
+                    executingId={executingActivityId}
+                    onExecute={executeActivity}
                     onClose={() => setActivitySheet(null)}
                 />
             )}

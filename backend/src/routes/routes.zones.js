@@ -4,6 +4,43 @@
 const express = require('express');
 const zonesRouter = express.Router();
 const { dbPool } = require('../repositories/repositories.database');
+const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
+const lootService = require('../services/services.loot');
+const progressionService = require('../services/services.progression');
+const playerEventsService = require('../services/services.playerEvents');
+
+const ACTION_RESOURCE_RULES = {
+    EXPLORE: { energyPerUnit: 8, fatiguePerUnit: 10 },
+    BATTLE:  { energyPerUnit: 10, fatiguePerUnit: 12 },
+    DUNGEON: { energyPerUnit: 14, fatiguePerUnit: 18 },
+    MINE:    { energyPerUnit: 7, fatiguePerUnit: 9 },
+    CHOP:    { energyPerUnit: 6, fatiguePerUnit: 8 },
+    HUNT:    { energyPerUnit: 9, fatiguePerUnit: 11 },
+    FORAGE:  { energyPerUnit: 4, fatiguePerUnit: 6 },
+};
+
+const ZONE_FATIGUE_MULTIPLIER = {
+    safe: 0.75,
+    urban: 1.05,
+    rural: 0.95,
+    coast: 1.1,
+    forest: 1,
+    mine: 1.1,
+    ruins: 1.2,
+    dungeon: 1.25,
+    hazard: 1.35,
+    desert: 1.45,
+};
+
+const ACTION_JOB_CODE = {
+    BATTLE: 'fighting',
+    HUNT: 'fighting',
+    DUNGEON: 'fighting',
+    EXPLORE: 'scavenging',
+    FORAGE: 'gathering',
+    MINE: 'gathering',
+    CHOP: 'gathering',
+};
 
 const BIOME_ENEMY_LIST = {
     urban: ['Infected scavenger', 'Barricade raider', 'Basement stalker'],
@@ -25,6 +62,51 @@ const BIOME_GATHER_LIST = {
 
 function pickActivityTag(poi, tagTypes) {
     return (poi.gameplay_tags || []).find(tag => tagTypes.includes(tag.tag_type));
+}
+
+function normalizeActivityType(activityType) {
+    const value = String(activityType || '').toLowerCase();
+    if (value === 'enemy') return { tagTypes: ['BATTLE', 'SKIRMISH'], label: 'Enemy', fallbackAction: 'BATTLE' };
+    if (value === 'gather') return { tagTypes: ['EXPLORATION'], label: 'Gather', fallbackAction: 'EXPLORE' };
+    if (value === 'dungeon') return { tagTypes: ['DUNGEON'], label: 'Dungeon', fallbackAction: 'DUNGEON' };
+    return null;
+}
+
+function calculateActionResourceCost(actionType, durationSeconds, zoneType, tag) {
+    const rule = ACTION_RESOURCE_RULES[actionType] || ACTION_RESOURCE_RULES.EXPLORE;
+    const actionUnits = Math.max(1, Math.ceil((parseInt(durationSeconds) || 0) / 1800));
+    const zoneMultiplier = ZONE_FATIGUE_MULTIPLIER[zoneType] || 1;
+    const energyMultiplier = parseFloat(tag?.energy_cost_mult) || 1;
+    const tagFatigueMultiplier = parseFloat(tag?.fatigue_mult) || 1;
+
+    return {
+        energyCost: Math.max(0, Math.ceil(rule.energyPerUnit * actionUnits * energyMultiplier)),
+        fatigueChange: Math.max(1, Math.ceil(rule.fatiguePerUnit * actionUnits * zoneMultiplier * tagFatigueMultiplier)),
+    };
+}
+
+function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
+    const baseRates = {
+        EXPLORE: { player: 0.56, job: 0.24 },
+        FORAGE: { player: 0.48, job: 0.32 },
+        MINE: { player: 0.50, job: 0.35 },
+        CHOP: { player: 0.46, job: 0.34 },
+        HUNT: { player: 0.70, job: 0.34 },
+        BATTLE: { player: 0.80, job: 0.36 },
+        DUNGEON: { player: 1.05, job: 0.48 },
+    };
+    const rate = baseRates[actionType] || baseRates.EXPLORE;
+    const levelMult = 1 + Math.max(0, (parseInt(zoneMinLevel) || 1) - 1) * 0.035;
+    return {
+        playerExp: Math.max(1, Math.floor(rate.player * durationSeconds * levelMult)),
+        jobExp: Math.max(1, Math.floor(rate.job * durationSeconds * levelMult)),
+    };
+}
+
+async function findJobIdByCode(jobCode) {
+    if (!jobCode) return null;
+    const result = await dbPool.query(`SELECT id FROM jobs_seed WHERE code = $1;`, [jobCode]);
+    return result.rows[0]?.id || null;
 }
 
 function buildEnemyList(zone, poi, tag) {
@@ -230,6 +312,182 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
         return res.json({ success: true, data: payload });
     } catch (error) {
         next(error);
+    }
+});
+
+/**
+ * @route   POST /api/zones/pois/:poiId/execute
+ * @desc    Thuc hien truc tiep mot hoat dong POI, khong qua action queue.
+ * @body    { playerId, activityType: enemy|gather|dungeon, targetId, mode? }
+ */
+zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
+    const { poiId } = req.params;
+    const { playerId, activityType, targetId, mode } = req.body;
+    const activity = normalizeActivityType(activityType);
+
+    if (!playerId || !activity) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing or invalid parameters: playerId and activityType are required.'
+        });
+    }
+
+    const client = await dbPool.connect();
+    let executionSummary = null;
+
+    try {
+        await client.query('BEGIN');
+
+        const playerResult = await client.query(`
+            SELECT id, account_id, player_level, current_energy, max_energy,
+                   current_fatigue, max_fatigue, infection_pct, radiation_pct
+            FROM players
+            WHERE id = $1
+            FOR UPDATE;
+        `, [playerId]);
+
+        if (playerResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ success: false, message: 'Character not found.' });
+        }
+
+        const player = playerResult.rows[0];
+        if (player.account_id && player.account_id !== req.accountId) {
+            await client.query('ROLLBACK');
+            return res.status(403).json({ success: false, message: 'You do not have permission to use this character.' });
+        }
+
+        const poiResult = await client.query(`
+            SELECT wp.id AS poi_id, wp.code AS poi_code, wp.display_name AS poi_name,
+                   wp.poi_type, wp.is_dungeon,
+                   z.id AS zone_id, z.code AS zone_code, z.display_name AS zone_name,
+                   z.zone_type, z.biome, z.level_gap, z.min_player_lv,
+                   z.base_duration_s, z.infection_risk, z.radiation_risk,
+                   pgt.id AS tag_id, pgt.tag_type, pgt.action_type,
+                   pgt.energy_cost_mult, pgt.fatigue_mult, pgt.loot_focus,
+                   pgt.monster_profile, pgt.dungeon_rank_rewards
+            FROM world_pois wp
+            JOIN zones z ON z.id = wp.zone_id
+            JOIN poi_gameplay_tags pgt ON pgt.poi_id = wp.id
+            WHERE wp.id = $1 AND pgt.tag_type = ANY($2::VARCHAR[])
+            ORDER BY
+                CASE pgt.tag_type
+                    WHEN 'DUNGEON' THEN 1
+                    WHEN 'BATTLE' THEN 2
+                    WHEN 'SKIRMISH' THEN 3
+                    WHEN 'EXPLORATION' THEN 4
+                    ELSE 5
+                END
+            LIMIT 1;
+        `, [poiId, activity.tagTypes]);
+
+        if (poiResult.rows.length === 0) {
+            await client.query('ROLLBACK');
+            return res.status(404).json({ success: false, message: 'This POI does not support that activity.' });
+        }
+
+        const poi = poiResult.rows[0];
+        const mapLevel = parseInt(poi.level_gap || poi.min_player_lv || 1);
+        const actionType = poi.action_type || activity.fallbackAction;
+        const baseDuration = Math.max(30, parseInt(poi.base_duration_s) || 60);
+        const durationSeconds = mode === 'hard' && actionType === 'DUNGEON'
+            ? Math.ceil(baseDuration * 1.5)
+            : baseDuration;
+        const tag = {
+            energy_cost_mult: poi.energy_cost_mult,
+            fatigue_mult: poi.fatigue_mult,
+        };
+        const cost = calculateActionResourceCost(actionType, durationSeconds, poi.biome || poi.zone_type, tag);
+        const currentEnergy = parseInt(player.current_energy) || 0;
+        const currentFatigue = parseInt(player.current_fatigue) || 0;
+        const maxFatigue = parseInt(player.max_fatigue) || 400;
+
+        if (currentEnergy < cost.energyCost) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({
+                success: false,
+                message: `Not enough energy. Need ${cost.energyCost}, current ${currentEnergy}.`
+            });
+        }
+
+        if (currentFatigue + cost.fatigueChange > maxFatigue) {
+            await client.query('ROLLBACK');
+            return res.status(400).json({
+                success: false,
+                message: `Too fatigued. Rest before doing this activity.`
+            });
+        }
+
+        const hazard = {
+            infectionGain: Number(((parseFloat(poi.infection_risk) || 0) * (durationSeconds / 1800)).toFixed(2)),
+            radiationGain: Number(((parseFloat(poi.radiation_risk) || 0) * (durationSeconds / 1800)).toFixed(2)),
+        };
+
+        const updatedPlayer = await client.query(`
+            UPDATE players
+            SET current_energy = current_energy - $1,
+                current_fatigue = LEAST(max_fatigue, current_fatigue + $2),
+                infection_pct = LEAST(100, infection_pct + $3),
+                radiation_pct = LEAST(100, radiation_pct + $4),
+                updated_at = NOW()
+            WHERE id = $5
+            RETURNING current_energy, max_energy, current_fatigue, max_fatigue, infection_pct, radiation_pct;
+        `, [cost.energyCost, cost.fatigueChange, hazard.infectionGain, hazard.radiationGain, playerId]);
+
+        await client.query('COMMIT');
+
+        const expReward = calculateExpReward(actionType, durationSeconds, mapLevel);
+        const playerExpResult = await progressionService.processPlayerExpGain(playerId, expReward.playerExp);
+        const jobId = await findJobIdByCode(ACTION_JOB_CODE[actionType]);
+        const jobExpResult = jobId
+            ? await progressionService.processJobExpGain(playerId, jobId, expReward.jobExp)
+            : null;
+        const lootResult = await lootService.processLootDrop(playerId, {
+            action_type: actionType,
+            actual_duration_s: durationSeconds,
+            zone_min_level: mapLevel,
+        });
+
+        executionSummary = {
+            poi_id: poi.poi_id,
+            poi_name: poi.poi_name,
+            zone_code: poi.zone_code,
+            zone_name: poi.zone_name,
+            activity_type: activityType,
+            target_id: targetId || null,
+            mode: mode || 'normal',
+            action_type: actionType,
+            duration_seconds: durationSeconds,
+            energy_cost: cost.energyCost,
+            fatigue_gained: cost.fatigueChange,
+            infection_gained: hazard.infectionGain,
+            radiation_gained: hazard.radiationGain,
+            player_exp: expReward.playerExp,
+            job_exp: expReward.jobExp,
+            player_exp_result: playerExpResult,
+            job_exp_result: jobExpResult,
+            items_dropped: lootResult.items_dropped || [],
+            player_resources: updatedPlayer.rows[0],
+        };
+
+        await playerEventsService.logPlayerEvent(playerId, {
+            eventType: 'POI_ACTIVITY',
+            source: 'Zystem',
+            title: `${activity.label} Completed`,
+            message: `${activity.label} at ${poi.poi_name}. Energy -${cost.energyCost}, fatigue +${cost.fatigueChange}.`,
+            payload: executionSummary,
+        });
+
+        return res.json({
+            success: true,
+            message: `${activity.label} completed at ${poi.poi_name}.`,
+            data: executionSummary,
+        });
+    } catch (error) {
+        await client.query('ROLLBACK').catch(() => {});
+        next(error);
+    } finally {
+        client.release();
     }
 });
 
