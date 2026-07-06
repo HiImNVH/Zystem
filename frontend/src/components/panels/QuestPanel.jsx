@@ -57,6 +57,11 @@ function normalizeSkillChainName(name) {
         .toLowerCase();
 }
 
+function getSheetRowKey(skillName) {
+    const baseName = normalizeSkillChainName(skillName);
+    return baseName.split(':')[0].trim();
+}
+
 function inferPrerequisiteSkill(skill, branchSkills) {
     if (skill.prerequisite_skill_code) {
         return branchSkills.find(item => item.skill_code === skill.prerequisite_skill_code) || null;
@@ -83,28 +88,10 @@ function buildAlignedSkillColumns(branchSkills, levelGaps) {
         a.tier - b.tier ||
         a.skill_name.localeCompare(b.skill_name)
     );
-    const parentByCode = {};
-    sortedSkills.forEach(skill => {
-        parentByCode[skill.skill_code] = skill.skill_code;
-    });
-
-    function findRoot(skillCode) {
-        if (parentByCode[skillCode] !== skillCode) {
-            parentByCode[skillCode] = findRoot(parentByCode[skillCode]);
-        }
-        return parentByCode[skillCode];
-    }
-
-    sortedSkills.forEach(skill => {
-        const prerequisite = inferPrerequisiteSkill(skill, branchSkills);
-        if (prerequisite) {
-            parentByCode[findRoot(skill.skill_code)] = findRoot(prerequisite.skill_code);
-        }
-    });
 
     const componentsByRoot = {};
     sortedSkills.forEach(skill => {
-        const root = findRoot(skill.skill_code);
+        const root = getSheetRowKey(skill.skill_name);
         if (!componentsByRoot[root]) componentsByRoot[root] = [];
         componentsByRoot[root].push(skill);
     });
