@@ -59,7 +59,7 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
                 <div className={`w-8 h-px ${isUnlocked ? 'bg-accent/60' : 'bg-border'}`} />
             )}
             <button
-                onClick={() => onSelect(skill)}
+                onClick={event => onSelect(skill, event.currentTarget.getBoundingClientRect())}
                 className={`w-[118px] min-h-[118px] rounded-lg border p-3 flex flex-col items-center text-center transition-colors ${
                 isUnlocked
                     ? 'border-accent bg-accent/10'
@@ -82,7 +82,7 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
     );
 }
 
-function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerId, refundsLeft, onAction, onClose }) {
+function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerId, refundsLeft, onAction, onClose, position }) {
     const [isLoading, setIsLoading] = useState(false);
     if (!skill) return null;
 
@@ -98,6 +98,7 @@ function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerI
         try {
             const result = await unlockSkill(playerId, skill.skill_code);
             onAction(result.message, 'success');
+            onClose();
         } catch (err) {
             onAction(err.message, 'error');
         } finally {
@@ -110,6 +111,7 @@ function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerI
         try {
             const result = await refundSkill(playerId, skill.skill_code);
             onAction(result.message, 'success');
+            onClose();
         } catch (err) {
             onAction(err.message, 'error');
         } finally {
@@ -118,7 +120,15 @@ function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerI
     }
 
     return (
-        <div className="card p-4 mt-3 animate-slideup">
+        <div
+            className="card p-4 animate-slideup fixed z-50 max-h-[46vh] overflow-y-auto shadow-xl"
+            style={{
+                top: position?.top || 120,
+                left: position?.left || 16,
+                width: position?.width || 320,
+            }}
+            onClick={event => event.stopPropagation()}
+        >
             <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="min-w-0">
                     <p className="font-semibold">{skill.skill_name}</p>
@@ -206,6 +216,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const [selectedJobCode, setSelectedJobCode] = useState(null);
     const [selectedBranch, setSelectedBranch] = useState(null);
     const [selectedSkillCode, setSelectedSkillCode] = useState(null);
+    const [skillPopoverPosition, setSkillPopoverPosition] = useState(null);
     const [notification, setNotification] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -214,6 +225,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
             setSelectedJobCode(null);
             setSelectedBranch(null);
             setSelectedSkillCode(null);
+            setSkillPopoverPosition(null);
         }
     }, [jobs, selectedJobCode]);
 
@@ -238,6 +250,19 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         setNotification({ message, type });
         setTimeout(() => setNotification(null), 3500);
         loadSkills();
+    }
+
+    function openSkillPopover(skill, rect) {
+        const width = Math.min(320, window.innerWidth - 24);
+        const left = Math.max(12, Math.min(rect.left + (rect.width / 2) - (width / 2), window.innerWidth - width - 12));
+        const top = Math.min(rect.bottom + 8, window.innerHeight - 180);
+        setSelectedSkillCode(skill.skill_code);
+        setSkillPopoverPosition({ top, left, width });
+    }
+
+    function closeSkillPopover() {
+        setSelectedSkillCode(null);
+        setSkillPopoverPosition(null);
     }
 
     function canUnlock(skill) {
@@ -284,9 +309,11 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                     if (selectedBranch) {
                                         setSelectedBranch(null);
                                         setSelectedSkillCode(null);
+                                        setSkillPopoverPosition(null);
                                     } else {
                                         setSelectedJobCode(null);
                                         setSelectedSkillCode(null);
+                                        setSkillPopoverPosition(null);
                                     }
                                 }}
                                 className="text-xs text-textMuted hover:text-textPrimary mb-1"
@@ -339,6 +366,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                     setSelectedJobCode(job.code);
                                     setSelectedBranch(null);
                                     setSelectedSkillCode(null);
+                                    setSkillPopoverPosition(null);
                                 }}
                             />
                         ))}
@@ -357,6 +385,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                     onClick={() => {
                                         setSelectedBranch(branch);
                                         setSelectedSkillCode(null);
+                                        setSkillPopoverPosition(null);
                                     }}
                                 />
                             );
@@ -386,7 +415,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                                     isFirst={true}
                                                     showLevel={false}
                                                     isSelected={selectedSkillCode === skill.skill_code}
-                                                    onSelect={item => setSelectedSkillCode(item.skill_code)}
+                                                    onSelect={openSkillPopover}
                                                 />
                                                 ))}
                                             </div>
@@ -398,6 +427,12 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                         {branchLevelGroups.length === 0 && (
                             <p className="text-sm text-textMuted">No skill nodes available.</p>
                         )}
+                    </div>
+                )}
+            </div>
+
+            {selectedSkill && (
+                <div className="fixed inset-0 z-40" onClick={closeSkillPopover}>
                         <SkillDetailCard
                             skill={selectedSkill}
                             jobLevel={currentJob?.job_level || 0}
@@ -406,11 +441,11 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                             playerId={playerId}
                             refundsLeft={refundStatus?.remaining_today ?? 0}
                             onAction={handleAction}
-                            onClose={() => setSelectedSkillCode(null)}
+                            onClose={closeSkillPopover}
+                            position={skillPopoverPosition}
                         />
-                    </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 }
