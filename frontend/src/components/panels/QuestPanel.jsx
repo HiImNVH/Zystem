@@ -65,12 +65,12 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
                     onSelect(skill, event.currentTarget.getBoundingClientRect());
                 }}
                 className={`w-[118px] min-h-[96px] px-2 py-1 flex flex-col items-center text-center transition-opacity ${
-                    isUnlocked || isReady ? '' : 'opacity-60'
+                    isUnlocked || isReady ? '' : 'opacity-75'
                 } ${isSelected ? 'text-cyan' : ''}`}
                 type="button"
             >
                 <div className={`relative w-16 h-16 flex items-center justify-center text-xs font-bold ${
-                    isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
+                    isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textPrimary')
                 } ${isSelected ? 'ring-2 ring-cyan ring-offset-2 ring-offset-base' : ''}`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
                     <span>{isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}</span>
                     <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-bold text-base/80">
@@ -78,7 +78,9 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
                     </span>
                 </div>
                 {showLevel && <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>}
-                <p className="mt-2 text-xs font-semibold leading-snug min-h-[30px] line-clamp-2">{skill.skill_name}</p>
+                <p className="mt-2 text-xs font-semibold leading-snug min-h-[42px] max-w-[96px] whitespace-normal break-words text-textPrimary">
+                    {skill.skill_name}
+                </p>
             </button>
         </div>
     );
@@ -420,8 +422,8 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                             </div>
                                             <div className="space-y-3">
                                                 {group.skills.length === 0 ? (
-                                                    <div className="w-[118px] min-h-[96px] flex items-center justify-center">
-                                                        <span className="w-2 h-2 rounded-full bg-border/70" />
+                                                    <div className="w-[118px] min-h-[96px] flex items-start justify-center pt-8">
+                                                        <span className="block w-full h-px bg-border/80" />
                                                     </div>
                                                 ) : group.skills.map((skill, index) => (
                                                     <SkillNode
