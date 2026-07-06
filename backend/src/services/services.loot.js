@@ -99,7 +99,7 @@ function rollOneItem(candidates, curelPower) {
     };
 }
 
-async function insertDroppedItems(playerId, droppedItems, actionId) {
+async function insertDroppedItems(playerId, droppedItems) {
     if (!droppedItems || droppedItems.length === 0) return [];
 
     const insertedItems = [];
@@ -124,13 +124,6 @@ async function insertDroppedItems(playerId, droppedItems, actionId) {
         } catch (error) {
             console.error('[ERROR] Loi khi insert dropped item:', error.message);
         }
-    }
-
-    if (insertedItems.length > 0) {
-        await dbPool.query(
-            `UPDATE action_queue SET loot_snapshot = $1 WHERE id = $2;`,
-            [JSON.stringify(insertedItems), actionId]
-        ).catch(error => console.error('[WARN] Loi khi luu loot_snapshot:', error.message));
     }
 
     return insertedItems;
@@ -161,7 +154,7 @@ async function processLootDrop(playerId, claimedAction) {
         if (item) droppedItems.push(item);
     }
 
-    const savedItems = await insertDroppedItems(playerId, droppedItems, claimedAction.id);
+    const savedItems = await insertDroppedItems(playerId, droppedItems);
 
     if (savedItems.length > 0) {
         console.log(`[SUCCESS] Drop ${savedItems.length} item cho player ${playerId} tu action ${actionType}`);

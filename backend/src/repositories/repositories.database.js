@@ -233,34 +233,6 @@ async function initializeDatabaseSchema() {
         `);
 
         // ============================================================
-        // BANG 6: ACTION QUEUE
-        // ============================================================
-        await client.query(`
-            CREATE TABLE IF NOT EXISTS action_queue (
-                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
-                slot_index SMALLINT CHECK (slot_index BETWEEN 1 AND 5),
-                action_type VARCHAR(30) NOT NULL,
-                target_zone_id UUID REFERENCES zones(id) ON DELETE SET NULL,
-                target_poi_id UUID REFERENCES world_pois(id) ON DELETE SET NULL,
-                gameplay_tag VARCHAR(30),
-                dungeon_mode VARCHAR(20) NOT NULL DEFAULT 'NORMAL',
-                status VARCHAR(20) DEFAULT 'PENDING',
-                started_at TIMESTAMPTZ DEFAULT NOW(),
-                base_duration_s INT NOT NULL DEFAULT 30,
-                actual_duration_s INT NOT NULL DEFAULT 30,
-                completes_at TIMESTAMPTZ NOT NULL,
-                claimed_at TIMESTAMPTZ,
-                energy_cost INT NOT NULL DEFAULT 0,
-                fatigue_change INT NOT NULL DEFAULT 0,
-                exp_earned INT,
-                job_exp_earned INT,
-                loot_snapshot JSONB,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-            );
-        `);
-
-        // ============================================================
         // BANG 7: WALLETS
         // ============================================================
         await client.query(`
@@ -312,11 +284,6 @@ async function initializeDatabaseSchema() {
         await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS current_energy INT DEFAULT 100 CHECK (current_energy >= 0);`);
         await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS max_fatigue INT DEFAULT 400 CHECK (max_fatigue > 0);`);
         await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS current_fatigue INT DEFAULT 0 CHECK (current_fatigue BETWEEN 0 AND 400);`);
-        await client.query(`ALTER TABLE action_queue ADD COLUMN IF NOT EXISTS energy_cost INT NOT NULL DEFAULT 0;`);
-        await client.query(`ALTER TABLE action_queue ADD COLUMN IF NOT EXISTS fatigue_change INT NOT NULL DEFAULT 0;`);
-        await client.query(`ALTER TABLE action_queue ADD COLUMN IF NOT EXISTS target_poi_id UUID REFERENCES world_pois(id) ON DELETE SET NULL;`);
-        await client.query(`ALTER TABLE action_queue ADD COLUMN IF NOT EXISTS gameplay_tag VARCHAR(30);`);
-        await client.query(`ALTER TABLE action_queue ADD COLUMN IF NOT EXISTS dungeon_mode VARCHAR(20) NOT NULL DEFAULT 'NORMAL';`);
         await client.query(`
             UPDATE players
             SET max_energy = GREATEST(1, FLOOR(100 + COALESCE(base_vit, 0) + COALESCE(base_str, 0) * 0.2))::INT,
@@ -599,8 +566,6 @@ async function initializeDatabaseSchema() {
         `);
 
         // Index tong the
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_queue_player_status ON action_queue(player_id, status);`);
-        await client.query(`CREATE INDEX IF NOT EXISTS idx_queue_completes ON action_queue(completes_at) WHERE status = 'PENDING';`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_player_jobs_player ON player_jobs(player_id);`);
 
 

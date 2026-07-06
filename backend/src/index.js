@@ -16,7 +16,6 @@ const { globalLimiter } = require('./middleware/middleware.rateLimit');
 const accountRouter      = require('./routes/routes.account');
 const characterRouter    = require('./routes/routes.character');
 const walletRouter       = require('./routes/routes.wallet');
-const actionQueueRouter  = require('./routes/routes.actionQueue');
 const zonesRouter        = require('./routes/routes.zones');
 const achievementsRouter = require('./routes/routes.achievements');
 const jobsRouter         = require('./routes/routes.jobs');
@@ -83,7 +82,6 @@ app.get('/', (req, res) => {
 app.use('/api/accounts',     accountRouter);      // POST /register, /login; GET /me
 app.use('/api/characters',   characterRouter);    // Protected
 app.use('/api/wallets',      walletRouter);       // Protected
-app.use('/api/action-queue', actionQueueRouter);  // Protected
 app.use('/api/zones',        zonesRouter);        // Protected
 app.use('/api/achievements', achievementsRouter); // Protected
 app.use('/api/jobs',         jobsRouter);         // Protected
@@ -120,8 +118,6 @@ async function bootUpWebApplication() {
         console.log('  [PROTECTED] POST /api/characters        | GET /api/characters/:id | GET /api/characters/:id/stats');
         console.log('  [PROTECTED] GET  /api/characters/account/me');
         console.log('  [PROTECTED] GET  /api/wallets/:id       | GET /api/wallets/:id/history | POST /api/wallets/modify');
-        console.log('  [PROTECTED] POST /api/action-queue/register | POST /claim | POST /cancel');
-        console.log('  [PROTECTED] GET  /api/action-queue/:id  | GET /api/action-queue/:id/history');
         console.log('  [PROTECTED] GET  /api/zones             | GET /api/zones/:code');
         console.log('  [PROTECTED] GET  /api/achievements      | POST /claim-sp | POST /equip-title');
         console.log('  [PROTECTED] GET  /api/jobs              | POST /unlock   | POST /forget');

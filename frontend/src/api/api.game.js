@@ -1,5 +1,5 @@
 ﻿// frontend/src/api/api.game.js
-// Gameplay API: zones, action queue, inventory, stats
+// Gameplay API: zones, inventory, stats
 
 const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
@@ -32,38 +32,6 @@ export async function getZones() {
 export async function getPoiActivities(poiId, type) {
     const query = type ? `?type=${encodeURIComponent(type)}` : '';
     const res = await fetch(`${BASE_URL}/api/zones/pois/${poiId}/activities${query}`, { headers: getHeaders() });
-    return handleResponse(res);
-}
-
-export async function getActionQueue(playerId) {
-    const res = await fetch(`${BASE_URL}/api/action-queue/${playerId}`, { headers: getHeaders() });
-    return handleResponse(res);
-}
-
-export async function registerAction(playerId, actionType, zoneCode, durationSeconds, options = {}) {
-    const res = await fetch(`${BASE_URL}/api/action-queue/register`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ playerId, actionType, zoneCode, durationSeconds, ...options })
-    });
-    return handleResponse(res);
-}
-
-export async function claimAction(playerId, actionId) {
-    const res = await fetch(`${BASE_URL}/api/action-queue/claim`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ playerId, actionId })
-    });
-    return handleResponse(res);
-}
-
-export async function cancelAction(playerId, actionId) {
-    const res = await fetch(`${BASE_URL}/api/action-queue/cancel`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ playerId, actionId })
-    });
     return handleResponse(res);
 }
 
