@@ -35,11 +35,22 @@ const BRANCH_LABELS = {
     housing: 'Housing',
 };
 
-function SkillRow({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction }) {
+function getSkillInitials(skillName) {
+    return String(skillName || 'SK')
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map(part => part[0])
+        .join('')
+        .toUpperCase();
+}
+
+function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction, isFirst }) {
     const [isLoading, setIsLoading] = useState(false);
     const isUnlocked = skill.is_unlocked;
     const meetsLevel = jobLevel >= skill.lv_required;
     const isFree = skill.sp_cost === 0;
+    const isReady = !isUnlocked && meetsLevel && canUnlock;
 
     async function handleUnlock() {
         setIsLoading(true);
@@ -66,35 +77,46 @@ function SkillRow({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction 
     }
 
     return (
-        <div className={`card p-3 flex items-center gap-3 ${!meetsLevel ? 'opacity-40' : ''}`}>
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-[9px] font-mono flex-shrink-0 ${
-                isUnlocked ? 'bg-accent/15 text-accent' : 'bg-elevated text-textMuted'
+        <div className="relative flex items-center flex-shrink-0">
+            {!isFirst && (
+                <div className={`w-8 h-px ${isUnlocked ? 'bg-accent/60' : 'bg-border'}`} />
+            )}
+            <div className={`w-[118px] min-h-[150px] rounded-lg border p-3 flex flex-col items-center text-center ${
+                isUnlocked
+                    ? 'border-accent bg-accent/10'
+                    : (isReady ? 'border-cyan bg-cyan/10' : 'border-border bg-surface opacity-70')
             }`}>
-                {isUnlocked ? '✓' : `Lv${skill.lv_required}`}
-            </div>
-            <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{skill.skill_name}</p>
-                {skill.description && <p className="text-xs text-textMuted truncate">{skill.description}</p>}
-            </div>
-            <div className="flex-shrink-0">
-                {isUnlocked && !isFree && (
-                    <button onClick={handleRefund} disabled={isLoading || refundsLeft <= 0} className="btn-ghost text-xs">
-                        {isLoading ? '...' : 'Refund'}
-                    </button>
+                <div className={`w-14 h-14 flex items-center justify-center text-xs font-bold mb-2 ${
+                    isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
+                }`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
+                    {isUnlocked ? 'OK' : getSkillInitials(skill.skill_name)}
+                </div>
+                <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>
+                <p className="text-xs font-semibold leading-snug min-h-[32px] line-clamp-2">{skill.skill_name}</p>
+                {skill.description && (
+                    <p className="text-[10px] text-textMuted leading-snug mt-1 line-clamp-2">{skill.description}</p>
                 )}
-                {!isUnlocked && !isFree && meetsLevel && canUnlock && (
-                    <button onClick={handleUnlock} disabled={isLoading} className="btn-primary text-xs py-1.5 px-3">
-                        {isLoading ? '...' : `${skill.sp_cost} SP`}
-                    </button>
-                )}
-                {!isUnlocked && isFree && meetsLevel && canUnlock && (
-                    <button onClick={handleUnlock} disabled={isLoading} className="btn-secondary text-xs py-1.5 px-3">
-                        {isLoading ? '...' : 'Free'}
-                    </button>
-                )}
-                {!isUnlocked && (!meetsLevel || !canUnlock) && (
-                    <span className="text-xs text-textMuted">Locked</span>
-                )}
+                <div className="mt-auto pt-3 w-full">
+                    {isUnlocked && !isFree && (
+                        <button onClick={handleRefund} disabled={isLoading || refundsLeft <= 0} className="btn-ghost text-[10px] w-full py-1.5">
+                            {isLoading ? '...' : 'Refund'}
+                        </button>
+                    )}
+                    {!isUnlocked && meetsLevel && canUnlock && (
+                        <button
+                            onClick={handleUnlock}
+                            disabled={isLoading}
+                            className={`${isFree ? 'btn-secondary' : 'btn-primary'} text-[10px] w-full py-1.5`}
+                        >
+                            {isLoading ? '...' : (isFree ? 'Free' : `${skill.sp_cost} SP`)}
+                        </button>
+                    )}
+                    {!isUnlocked && (!meetsLevel || !canUnlock) && (
+                        <span className="block text-[10px] text-textMuted py-1.5">
+                            {!meetsLevel ? `Need Lv.${skill.lv_required}` : 'Prereq'}
+                        </span>
+                    )}
+                </div>
             </div>
         </div>
     );
@@ -153,8 +175,18 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         <div className="h-full flex flex-col">
             <div className="p-4 border-b border-border flex-shrink-0">
                 <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-semibold">Skill Tree</h2>
-                    <span className="text-xs font-mono text-accent">{skillPoints} SP</span>
+                    <div>
+                        <h2 className="text-sm font-semibold">Skill Tree</h2>
+                        {currentJob && (
+                            <p className="text-xs text-textMuted mt-0.5">
+                                {JOB_LABELS[currentJob.code] || currentJob.display_name || currentJob.code} Lv.{currentJob.job_level}
+                            </p>
+                        )}
+                    </div>
+                    <div className="text-right">
+                        <span className="block text-xs font-mono text-accent">{skillPoints} SP</span>
+                        <span className="block text-[10px] text-textMuted">{refundStatus?.remaining_today ?? 0} refunds</span>
+                    </div>
                 </div>
                 {unlockedJobs.length > 0 && (
                     <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -195,27 +227,40 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-5">
+                    <div className="space-y-4">
                         {branchOrder.map(branch => {
-                            const branchSkills = jobSkills.filter(skill => (skill.branch || 'general') === branch);
+                            const branchSkills = jobSkills
+                                .filter(skill => (skill.branch || 'general') === branch)
+                                .sort((a, b) => a.lv_required - b.lv_required || a.tier - b.tier || a.skill_name.localeCompare(b.skill_name));
                             if (!branchSkills.length) return null;
+                            const unlockedCount = branchSkills.filter(skill => skill.is_unlocked).length;
                             return (
-                                <div key={branch}>
-                                    <p className="text-xs font-semibold text-textMuted mb-2">
-                                        {(BRANCH_LABELS[branch] || branch).toUpperCase()}
-                                    </p>
-                                    <div className="space-y-2">
-                                        {branchSkills.map(skill => (
-                                            <SkillRow
-                                                key={skill.skill_code}
-                                                skill={skill}
-                                                jobLevel={currentJob?.job_level || 0}
-                                                canUnlock={canUnlock(skill)}
-                                                playerId={playerId}
-                                                refundsLeft={refundStatus?.remaining_today ?? 0}
-                                                onAction={handleAction}
-                                            />
-                                        ))}
+                                <div key={branch} className="card p-3 overflow-hidden">
+                                    <div className="flex items-center justify-between gap-3 mb-3">
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold truncate">{BRANCH_LABELS[branch] || branch}</p>
+                                            <p className="text-[10px] text-textMuted">{unlockedCount}/{branchSkills.length} unlocked</p>
+                                        </div>
+                                        <span className="text-[10px] font-semibold text-accent bg-elevated rounded px-2 py-1">
+                                            Lv.{branchSkills[0]?.lv_required}-{branchSkills[branchSkills.length - 1]?.lv_required}
+                                        </span>
+                                    </div>
+
+                                    <div className="overflow-x-auto pb-2">
+                                        <div className="flex items-stretch min-w-max pr-2">
+                                            {branchSkills.map((skill, index) => (
+                                                <SkillNode
+                                                    key={skill.skill_code}
+                                                    skill={skill}
+                                                    jobLevel={currentJob?.job_level || 0}
+                                                    canUnlock={canUnlock(skill)}
+                                                    playerId={playerId}
+                                                    refundsLeft={refundStatus?.remaining_today ?? 0}
+                                                    onAction={handleAction}
+                                                    isFirst={index === 0}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             );
