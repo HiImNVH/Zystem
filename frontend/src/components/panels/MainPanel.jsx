@@ -508,17 +508,47 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                             </div>
                             <div className="space-y-2">
                                 {expeditionZones.map(zone => (
-                                    <button
+                                    <div
                                         key={zone.id}
-                                        onClick={() => {
-                                            setCurrentExpeditionZone(zone);
-                                            setShowZonePicker(false);
-                                        }}
-                                        className="card card-hover p-3 text-left"
+                                        className="card p-3"
                                     >
-                                        <p className="text-sm font-medium truncate mb-1">{zone.display_name}</p>
-                                        <p className="text-xs text-textMuted">Lv.{zone.level_gap || zone.min_player_lv} | {zone.biome || zone.zone_type} | {zone.pois?.length || 0} POIs</p>
-                                    </button>
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium truncate mb-1">{zone.display_name}</p>
+                                                <p className="text-xs text-textMuted">
+                                                    Lv.{zone.level_gap || zone.min_player_lv} | {zone.biome || zone.zone_type} | {zone.pois?.length || 0} POIs
+                                                </p>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setCurrentExpeditionZone(zone);
+                                                    setShowZonePicker(false);
+                                                }}
+                                                className="btn-secondary text-xs px-3 py-1.5 flex-shrink-0"
+                                                type="button"
+                                            >
+                                                Explore
+                                            </button>
+                                        </div>
+                                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {(zone.pois || []).map(poi => (
+                                                <div key={poi.id} className="rounded-lg border border-border/70 bg-elevated/40 p-2">
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <p className="text-xs font-semibold truncate">{poi.display_name}</p>
+                                                        <span className="text-[9px] font-bold text-accent flex-shrink-0">
+                                                            {poi.is_dungeon ? 'DG' : 'POI'}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[10px] text-textMuted mt-1 truncate">
+                                                        {poi.poi_type} | {(poi.gameplay_tags || []).map(tag => tag.tag_type).join(', ') || 'No tags'}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                            {(zone.pois || []).length === 0 && (
+                                                <p className="text-xs text-textMuted sm:col-span-2">No POIs mapped here yet.</p>
+                                            )}
+                                        </div>
+                                    </div>
                                 ))}
                                 {expeditionZones.length === 0 && (
                                     <p className="text-sm text-textMuted">No areas match your current level.</p>
@@ -582,24 +612,6 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                         </div>
                     </div>
                 </div>
-            )}
-
-            {!isExploring && !showZonePicker && (
-            <div className="px-4 pb-4">
-                <h2 className="text-sm font-semibold mb-3">Exploration Areas</h2>
-                <div className="space-y-2">
-                    {expeditionZones.map(zone => (
-                        <button
-                            key={zone.id}
-                            onClick={() => setCurrentExpeditionZone(zone)}
-                            className="card card-hover p-3 text-left"
-                        >
-                            <p className="text-xs font-medium truncate mb-0.5">{zone.display_name}</p>
-                            <p className="text-[10px] text-textMuted">Lv.{zone.level_gap || zone.min_player_lv} | {zone.biome || zone.zone_type} | {zone.pois?.length || 0} POIs</p>
-                        </button>
-                    ))}
-                </div>
-            </div>
             )}
 
             {activitySheet && (
