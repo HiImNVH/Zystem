@@ -120,7 +120,8 @@ async function insertDroppedItems(playerId, droppedItems) {
                 item.stat_3_type || null, item.stat_3_value || 0
             ]);
 
-            insertedItems.push(result.rows[0]);
+            const { item_power, ...visibleItem } = result.rows[0];
+            insertedItems.push(visibleItem);
         } catch (error) {
             console.error('[ERROR] Loi khi insert dropped item:', error.message);
         }

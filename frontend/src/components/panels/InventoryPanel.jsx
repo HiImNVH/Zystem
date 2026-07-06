@@ -62,7 +62,7 @@ function ItemTile({ item, onSelect }) {
             {item.is_expired && (
                 <span className="absolute top-1 left-1 text-[8px] font-bold text-danger">OLD</span>
             )}
-            <span className="text-xs font-bold text-textSecondary">{mark}</span>
+            <span className="w-9 h-9 rounded bg-elevated flex items-center justify-center text-xs font-bold text-textSecondary">{mark}</span>
             <span className={`text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</span>
         </button>
     );
@@ -116,28 +116,21 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4" onClick={onClose}>
             <div className="card w-full sm:max-w-sm p-5 animate-slideup" onClick={event => event.stopPropagation()}>
-                <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-12 h-12 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent flex-shrink-0">
-                            {CATEGORY_MARKS[item.category] || 'IT'}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-start gap-3 min-w-0">
+                        <div className="flex-shrink-0 text-center">
+                            <div className="w-14 h-14 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">
+                                {CATEGORY_MARKS[item.category] || 'IT'}
+                            </div>
+                            <p className={`mt-1 text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</p>
                         </div>
                         <div className="min-w-0">
                             <p className="font-semibold text-textPrimary truncate">{item.display_name || item.category}</p>
                             <p className={`text-xs font-medium ${style.text}`}>{rarity}</p>
+                            {normalizedCategory && <p className="text-[10px] text-textMuted mt-1">{normalizedCategory}</p>}
                         </div>
                     </div>
                     <button onClick={onClose} className="text-textMuted hover:text-textPrimary">×</button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm mb-3">
-                    <div className="card p-3">
-                        <p className="text-textMuted text-xs mb-1">Item Level</p>
-                        <p className="font-mono font-semibold text-accent">{item.item_level || 1}</p>
-                    </div>
-                    <div className="card p-3">
-                        <p className="text-textMuted text-xs mb-1">Category</p>
-                        <p className="font-mono font-semibold">{normalizedCategory || 'ITEM'}</p>
-                    </div>
                 </div>
 
                 {tags.length > 0 && (

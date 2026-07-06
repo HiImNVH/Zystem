@@ -104,6 +104,7 @@ itemsRouter.get('/recipes', verifyToken, async (req, res, next) => {
                 r.workstation_queue_slot, r.curel_rule_key, r.design_notes,
                 r.main_material_slots, r.curel_mechanic, r.required_use_case_tags,
                 it.display_name AS output_item_name,
+                it.item_level AS output_item_level,
                 it.tags AS output_item_tags,
                 js.code AS required_job_code,
                 js.display_name AS required_job_name
@@ -125,6 +126,7 @@ itemsRouter.get('/recipes/:code', verifyToken, async (req, res, next) => {
             SELECT
                 r.*,
                 it.display_name AS output_item_name,
+                it.item_level AS output_item_level,
                 it.tags AS output_item_tags,
                 js.code AS required_job_code,
                 js.display_name AS required_job_name
@@ -192,13 +194,12 @@ itemsRouter.get('/player/:playerId', verifyToken, verifyPlayerOwnership, async (
     try {
         const result = await dbPool.query(sqlQuery, sqlValues);
 
-        // Tinh Item Power cho tung item
-        const itemsWithPower = result.rows.map(item => itemLifecycleService.decorateItemLifecycle({
-            ...item,
-            item_power: craftingService.calculateItemPower(item.item_level, item.rarity)
-        }));
+        const inventoryItems = result.rows.map(item => {
+            const { item_power, ...visibleItem } = item;
+            return itemLifecycleService.decorateItemLifecycle(visibleItem);
+        });
 
-        return res.json({ success: true, data: itemsWithPower });
+        return res.json({ success: true, data: inventoryItems });
     } catch (error) {
         next(error);
     }
@@ -461,7 +462,6 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
                 item_name: recipe.output_item_name,
                 output_level: outputLevel,
                 rarity,
-                item_power: itemPower,
                 consumed_items: selectedItems.map(item => ({
                     id: item.id,
                     name: item.display_name,
@@ -479,8 +479,6 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
                 output_item_name: recipe.output_item_name,
                 output_level: outputLevel,
                 rarity,
-                item_power: itemPower,
-                crafting_power: craftingPower,
                 consumed_items: selectedItems.map(item => ({
                     id: item.id,
                     name: item.display_name,
@@ -678,14 +676,14 @@ itemsRouter.get('/player/:playerId/equipped', verifyToken, verifyPlayerOwnership
             ORDER BY i.equip_slot ASC;
         `, [playerId]);
 
-        const itemsWithPower = result.rows.map(item => itemLifecycleService.decorateItemLifecycle({
-            ...item,
-            item_power: craftingService.calculateItemPower(item.item_level, item.rarity)
-        }));
+        const visibleItems = result.rows.map(item => {
+            const { item_power, ...visibleItem } = item;
+            return itemLifecycleService.decorateItemLifecycle(visibleItem);
+        });
 
         // Gom theo slot de frontend de render paper-doll
         const bySlot = {};
-        itemsWithPower.forEach(item => { bySlot[item.equip_slot] = item; });
+        visibleItems.forEach(item => { bySlot[item.equip_slot] = item; });
 
         return res.json({ success: true, data: bySlot });
     } catch (error) {

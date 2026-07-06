@@ -99,6 +99,24 @@ const ZONE_FATIGUE_MULTIPLIER = {
     desert: 1.45,
 };
 
+const ITEM_CATEGORY_MARKS = {
+    RUBBISH: 'RB',
+    MATERIAL: 'MT',
+    WEAPON: 'WP',
+    EQUIPMENT: 'EQ',
+    TOOL: 'TL',
+    BUILDING: 'BD',
+    FOOD: 'FD',
+};
+
+const ITEM_RARITY_TEXT = {
+    COMMON: 'text-textMuted',
+    UNCOMMON: 'text-success',
+    RARE: 'text-cyan',
+    EPIC: 'text-purple-400',
+    LEGENDARY: 'text-accent',
+};
+
 const GENERIC_INGREDIENT_TOKENS = new Set([
     'and', 'any', 'the', 'with', 'material', 'materials', 'processed',
     'recyclable', 'scrap', 'item', 'items', 'ingredient', 'ingredients',
@@ -126,6 +144,10 @@ function itemMatchesIngredient(item, tagQuery) {
     ].join(' '));
 
     return tokens.some(token => itemText.includes(token));
+}
+
+function getItemMark(category) {
+    return ITEM_CATEGORY_MARKS[String(category || '').toUpperCase()] || 'IT';
 }
 
 function calculateResourcePreview(actionType, durationSeconds, zoneType, tag) {
@@ -221,6 +243,10 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
         }));
     }
 
+    function getSelectedItem(slotIndex) {
+        return usableInventory.find(item => item.id === selectedIngredients[slotIndex]);
+    }
+
     async function handleCraft() {
         if (!selectedRecipe) return;
 
@@ -261,7 +287,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                     <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(280px,0.9fr)] max-h-[72vh]">
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(300px,0.9fr)] max-h-[72vh]">
                     <div className="p-4 border-b md:border-b-0 md:border-r border-border overflow-y-auto">
                         <input
                             value={search}
@@ -276,12 +302,20 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                 <button
                                     key={recipe.id}
                                     onClick={() => selectRecipe(recipe)}
-                                    className={`w-full card card-hover p-3 text-left ${selectedRecipe?.code === recipe.code ? 'ring-1 ring-accent' : ''}`}
+                                    className={`w-full card card-hover p-3 text-left flex items-center gap-3 ${selectedRecipe?.code === recipe.code ? 'ring-1 ring-accent' : ''}`}
                                 >
-                                    <p className="text-sm font-semibold truncate">{recipe.output_item_name}</p>
-                                    <p className="text-xs text-textMuted mt-1 truncate">
-                                        Lv.{recipe.required_job_level} | {recipe.curel_rule_key || 'No CUREL'}
-                                    </p>
+                                    <div className="flex-shrink-0 text-center">
+                                        <div className="w-10 h-10 rounded bg-elevated flex items-center justify-center text-[10px] font-bold text-accent">
+                                            {getItemMark(recipe.output_category)}
+                                        </div>
+                                        <p className="mt-0.5 text-[9px] font-mono text-textMuted">Lv.{recipe.output_item_level || 1}</p>
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-semibold truncate">{recipe.output_item_name}</p>
+                                        <p className="text-xs text-textMuted mt-1 truncate">
+                                            Skill Lv.{recipe.required_job_level} | {recipe.curel_rule_key || 'No CUREL'}
+                                        </p>
+                                    </div>
                                 </button>
                             ))}
                             {!isLoading && filteredRecipes.length === 0 && (
@@ -295,11 +329,26 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                             <p className="text-sm text-textMuted py-8 text-center">Select a recipe to craft.</p>
                         ) : (
                             <div>
-                                <div className="card p-3 mb-3">
-                                    <p className="font-semibold">{selectedRecipe.output_item_name}</p>
-                                    <p className="text-xs text-textMuted mt-1">
-                                        {selectedRecipe.output_category} | Skill Lv.{selectedRecipe.required_job_level} | {selectedRecipe.workstation_queue_slot || 'Craft'}
-                                    </p>
+                                <div className="card p-3 mb-3 flex items-start gap-3">
+                                    <div className="flex-shrink-0 text-center">
+                                        <div className="w-16 h-16 rounded-lg bg-elevated flex items-center justify-center text-sm font-bold text-accent">
+                                            {getItemMark(selectedRecipe.output_category)}
+                                        </div>
+                                        <p className="mt-1 text-[10px] font-mono text-accent">Lv.{selectedRecipe.output_item_level || 1}</p>
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="font-semibold truncate">{selectedRecipe.output_item_name}</p>
+                                        <p className="text-xs text-textMuted mt-1">
+                                            {selectedRecipe.output_category} | Skill Lv.{selectedRecipe.required_job_level}
+                                        </p>
+                                        <div className="flex flex-wrap gap-1.5 mt-2">
+                                            {(selectedRecipe.output_item_tags || []).slice(0, 4).map(tag => (
+                                                <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-elevated text-textSecondary">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-3 mb-4">
@@ -308,27 +357,49 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                             .filter(([slot]) => parseInt(slot) !== parseInt(input.slot_index))
                                             .map(([, itemId]) => itemId);
                                         const matchingItems = usableInventory.filter(item => itemMatchesIngredient(item, input.tag_query));
+                                        const selectedItem = getSelectedItem(input.slot_index);
                                         return (
                                             <div key={input.slot_index}>
-                                                <p className="text-xs text-textMuted mb-1">
+                                                <p className="text-xs text-textMuted mb-2">
                                                     Slot {input.slot_index}: {input.tag_query} x{input.quantity}
                                                 </p>
-                                                <select
-                                                    value={selectedIngredients[input.slot_index] || ''}
-                                                    onChange={event => updateIngredient(input.slot_index, event.target.value)}
-                                                    className="input-field"
-                                                >
-                                                    <option value="">Choose item</option>
-                                                    {matchingItems.map(item => (
-                                                        <option
-                                                            key={item.id}
-                                                            value={item.id}
-                                                            disabled={chosenIds.includes(item.id) || (parseInt(item.quantity) || 0) < (parseInt(input.quantity) || 1)}
-                                                        >
-                                                            {item.display_name} | Lv.{item.item_level} | {item.rarity} | x{item.quantity || 1}
-                                                        </option>
-                                                    ))}
-                                                </select>
+                                                {selectedItem && (
+                                                    <div className="mb-2 rounded-lg border border-accent/40 bg-accent/10 p-2 flex items-center gap-2">
+                                                        <div className="text-center flex-shrink-0">
+                                                            <div className="w-9 h-9 rounded bg-elevated flex items-center justify-center text-[10px] font-bold text-accent">
+                                                                {getItemMark(selectedItem.category)}
+                                                            </div>
+                                                            <p className="mt-0.5 text-[9px] font-mono text-accent">Lv.{selectedItem.item_level || 1}</p>
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <p className="text-xs font-semibold truncate">{selectedItem.display_name}</p>
+                                                            <p className="text-[10px] text-textMuted">{selectedItem.rarity} | x{selectedItem.quantity || 1}</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div className="grid grid-cols-3 gap-2 max-h-36 overflow-y-auto pr-1">
+                                                    {matchingItems.map(item => {
+                                                        const isDisabled = chosenIds.includes(item.id) || (parseInt(item.quantity) || 0) < (parseInt(input.quantity) || 1);
+                                                        const isSelected = selectedIngredients[input.slot_index] === item.id;
+                                                        const rarityClass = ITEM_RARITY_TEXT[String(item.rarity || 'COMMON').toUpperCase()] || ITEM_RARITY_TEXT.COMMON;
+                                                        return (
+                                                            <button
+                                                                key={item.id}
+                                                                type="button"
+                                                                onClick={() => !isDisabled && updateIngredient(input.slot_index, item.id)}
+                                                                disabled={isDisabled}
+                                                                className={`rounded-lg border bg-surface p-2 text-center transition-colors ${
+                                                                    isSelected ? 'border-accent' : 'border-border hover:border-accent/50'
+                                                                } ${isDisabled ? 'opacity-35 cursor-not-allowed' : ''}`}
+                                                            >
+                                                                <div className="mx-auto w-9 h-9 rounded bg-elevated flex items-center justify-center text-[10px] font-bold text-textSecondary">
+                                                                    {getItemMark(item.category)}
+                                                                </div>
+                                                                <p className={`mt-1 text-[9px] font-mono ${rarityClass}`}>Lv.{item.item_level || 1}</p>
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
                                                 {matchingItems.length === 0 && (
                                                     <p className="text-[10px] text-danger mt-1">No matching items in inventory.</p>
                                                 )}
