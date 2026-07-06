@@ -52,6 +52,25 @@ const ZONE_BANNERS = {
     safe:    { gradient: 'from-cyan-900/30 to-base', mark: 'HM' },
 };
 
+const EXPLORATION_RINGS = [
+    {
+        id: 'near_city',
+        title: 'Near City Ring',
+        range: 'Lv.5-20',
+        minLevel: 5,
+        maxLevel: 20,
+        helper: 'Suburbs, market streets, industrial edges, greenbelt, farms, and the nearest coast.',
+    },
+    {
+        id: 'far_routes',
+        title: 'Far Routes',
+        range: 'Lv.25-40',
+        minLevel: 25,
+        maxLevel: 40,
+        helper: 'Quarries, warehouses, downtown ruins, deep wild zones, wastelands, and high-risk endgame sites.',
+    },
+];
+
 const ACTION_RESOURCE_RULES = {
     EXPLORE: { energyPerUnit: 8, fatiguePerUnit: 10 },
     BATTLE:  { energyPerUnit: 10, fatiguePerUnit: 12 },
@@ -121,6 +140,10 @@ function calculateResourcePreview(actionType, durationSeconds, zoneType, tag) {
         energyCost: Math.max(0, Math.ceil(rule.energyPerUnit * actionUnits * energyMultiplier)),
         fatigueChange: isRecovery ? Math.floor(fatigueValue) : Math.ceil(fatigueValue),
     };
+}
+
+function getZoneLevel(zone) {
+    return parseInt(zone?.level_gap || zone?.min_player_lv || 1);
 }
 
 function ResourceMeter({ label, current, max, tone }) {
@@ -428,12 +451,21 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
 
     const safeZone = zones.find(zone => zone.zone_type === 'safe') || zones[0];
     const isExploring = Boolean(currentExpeditionZone);
+    const isChoosingRoute = showZonePicker && !isExploring;
     const currentZone = currentExpeditionZone || safeZone;
-    const banner = ZONE_BANNERS[currentZone?.zone_type] || ZONE_BANNERS.safe;
+    const banner = isChoosingRoute ? ZONE_BANNERS.urban : (ZONE_BANNERS[currentZone?.zone_type] || ZONE_BANNERS.safe);
     const playerLevel = character?.player_level || 1;
     const accessibleLevel = Math.max(5, playerLevel);
     const expeditionZones = zones
-        .filter(zone => zone.zone_type !== 'safe' && (zone.min_player_lv || 1) <= accessibleLevel);
+        .filter(zone => zone.zone_type !== 'safe' && (zone.min_player_lv || 1) <= accessibleLevel)
+        .sort((a, b) => getZoneLevel(a) - getZoneLevel(b) || a.display_name.localeCompare(b.display_name));
+    const explorationGroups = EXPLORATION_RINGS.map(ring => ({
+        ...ring,
+        zones: expeditionZones.filter(zone => {
+            const level = getZoneLevel(zone);
+            return level >= ring.minLevel && level <= ring.maxLevel;
+        }),
+    }));
     const currentPois = currentExpeditionZone?.pois || [];
 
     return (
@@ -442,13 +474,17 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 <span className="absolute top-4 right-4 text-3xl font-bold opacity-20">{banner.mark}</span>
                 <div>
                     <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">
-                        {isExploring ? 'EXPLORING' : 'REFUGEE CAMP'}
+                        {isExploring ? 'EXPLORING' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP')}
                     </span>
-                    <h1 className="text-xl font-bold">{isExploring ? currentZone.display_name : (character?.character_name || 'Survivor')}</h1>
+                    <h1 className="text-xl font-bold">
+                        {isExploring ? currentZone.display_name : (isChoosingRoute ? 'Exploration Routes' : (character?.character_name || 'Survivor'))}
+                    </h1>
                     <p className="text-sm text-textSecondary mt-1">
                         {isExploring
                             ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${currentZone.biome || currentZone.zone_type} | ${currentZone.pois?.length || 0} POIs`
-                            : 'Manage your base, meet NPCs, then choose an area to explore.'}
+                            : (isChoosingRoute
+                                ? 'Move outward from the camp edge toward distant high-risk zones.'
+                                : 'Manage your base, meet NPCs, then choose an area to explore.')}
                     </p>
                 </div>
             </div>
@@ -468,7 +504,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 </div>
             </div>
 
-            {!isExploring ? (
+            {!isExploring && !showZonePicker ? (
                 <div className="p-4 space-y-4">
                     <div className="space-y-3">
                         <button onClick={() => setShowZonePicker(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
@@ -500,17 +536,32 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                         </button>
                     </div>
 
-                    {showZonePicker && (
-                        <div>
-                            <div className="flex items-center justify-between mb-3">
-                                <h2 className="text-sm font-semibold">Choose Exploration Area</h2>
-                                <button onClick={() => setShowZonePicker(false)} className="text-xs text-textMuted hover:text-textPrimary">Close</button>
+                </div>
+            ) : isChoosingRoute ? (
+                <div className="p-4 space-y-4">
+                    <button
+                        onClick={() => setShowZonePicker(false)}
+                        className="w-full btn-secondary text-left"
+                    >
+                        Back to Refugee Camp
+                    </button>
+
+                    {explorationGroups.map(group => (
+                        <section key={group.id}>
+                            <div className="mb-3">
+                                <div className="flex items-center justify-between gap-3">
+                                    <h2 className="text-sm font-semibold">{group.title}</h2>
+                                    <span className="text-[10px] text-textMuted">{group.range}</span>
+                                </div>
+                                <p className="text-xs text-textMuted mt-1">{group.helper}</p>
                             </div>
                             <div className="space-y-2">
-                                {expeditionZones.map(zone => (
-                                    <div
+                                {group.zones.map(zone => (
+                                    <button
                                         key={zone.id}
-                                        className="card p-3"
+                                        onClick={() => setCurrentExpeditionZone(zone)}
+                                        className="w-full card card-hover p-3 text-left"
+                                        type="button"
                                     >
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="min-w-0">
@@ -519,51 +570,29 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                                     Lv.{zone.level_gap || zone.min_player_lv} | {zone.biome || zone.zone_type} | {zone.pois?.length || 0} POIs
                                                 </p>
                                             </div>
-                                            <button
-                                                onClick={() => {
-                                                    setCurrentExpeditionZone(zone);
-                                                    setShowZonePicker(false);
-                                                }}
-                                                className="btn-secondary text-xs px-3 py-1.5 flex-shrink-0"
-                                                type="button"
-                                            >
-                                                Explore
-                                            </button>
+                                            <span className="text-[10px] font-bold text-accent flex-shrink-0">
+                                                {ZONE_BANNERS[zone.biome || zone.zone_type]?.mark || 'EX'}
+                                            </span>
                                         </div>
-                                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            {(zone.pois || []).map(poi => (
-                                                <div key={poi.id} className="rounded-lg border border-border/70 bg-elevated/40 p-2">
-                                                    <div className="flex items-center justify-between gap-2">
-                                                        <p className="text-xs font-semibold truncate">{poi.display_name}</p>
-                                                        <span className="text-[9px] font-bold text-accent flex-shrink-0">
-                                                            {poi.is_dungeon ? 'DG' : 'POI'}
-                                                        </span>
-                                                    </div>
-                                                    <p className="text-[10px] text-textMuted mt-1 truncate">
-                                                        {poi.poi_type} | {(poi.gameplay_tags || []).map(tag => tag.tag_type).join(', ') || 'No tags'}
-                                                    </p>
-                                                </div>
-                                            ))}
-                                            {(zone.pois || []).length === 0 && (
-                                                <p className="text-xs text-textMuted sm:col-span-2">No POIs mapped here yet.</p>
-                                            )}
-                                        </div>
-                                    </div>
+                                    </button>
                                 ))}
-                                {expeditionZones.length === 0 && (
-                                    <p className="text-sm text-textMuted">No areas match your current level.</p>
+                                {group.zones.length === 0 && (
+                                    <p className="text-sm text-textMuted">No available areas in this route yet.</p>
                                 )}
                             </div>
-                        </div>
-                    )}
+                        </section>
+                    ))}
                 </div>
             ) : (
                 <div className="p-4 space-y-4">
                     <button
-                        onClick={() => setCurrentExpeditionZone(null)}
+                        onClick={() => {
+                            setCurrentExpeditionZone(null);
+                            setShowZonePicker(true);
+                        }}
                         className="w-full btn-secondary text-left"
                     >
-                        Return to Refugee Camp
+                        Back to Exploration Routes
                     </button>
 
                     <div>
