@@ -75,20 +75,21 @@ function inferPrerequisiteSkill(skill, branchSkills) {
     ) || null;
 }
 
-function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect, hasPrerequisite }) {
+function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect, onMeasure }) {
+    const nodeRef = useRef(null);
     const isUnlocked = skill.is_unlocked;
     const meetsLevel = jobLevel >= skill.lv_required;
     const isFree = skill.sp_cost === 0;
     const isReady = !isUnlocked && meetsLevel && canUnlock;
 
+    useEffect(() => {
+        if (nodeRef.current) onMeasure?.(skill.skill_code, nodeRef.current);
+    });
+
     return (
         <div className="relative flex items-center flex-shrink-0">
-            {hasPrerequisite && (
-                <div className="absolute top-8 -left-6 w-7 h-px bg-border">
-                    <span className="absolute -right-1 -top-[3px] w-0 h-0 border-y-[4px] border-y-transparent border-l-[6px] border-l-border" />
-                </div>
-            )}
             <button
+                ref={nodeRef}
                 onClick={event => {
                     event.stopPropagation();
                     onSelect(skill, event.currentTarget.getBoundingClientRect());
@@ -202,6 +203,35 @@ function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerI
     );
 }
 
+function SkillConnectorOverlay({ connectors, width, height }) {
+    if (!connectors.length || width <= 0 || height <= 0) return null;
+
+    return (
+        <svg
+            className="absolute left-0 top-0 z-0 pointer-events-none"
+            width={width}
+            height={height}
+            viewBox={`0 0 ${width} ${height}`}
+        >
+            <defs>
+                <marker id="skill-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#2a2d37" />
+                </marker>
+            </defs>
+            {connectors.map(connector => (
+                <path
+                    key={`${connector.from}-${connector.to}`}
+                    d={`M ${connector.x1} ${connector.y1} L ${connector.x2} ${connector.y2}`}
+                    stroke="#2a2d37"
+                    strokeWidth="1"
+                    fill="none"
+                    markerEnd="url(#skill-arrow)"
+                />
+            ))}
+        </svg>
+    );
+}
+
 function JobSkillCard({ job, isSelected, onClick }) {
     const name = JOB_LABELS[job.code] || job.display_name || job.code;
     return (
@@ -250,9 +280,12 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const [selectedBranch, setSelectedBranch] = useState(null);
     const [selectedSkillCode, setSelectedSkillCode] = useState(null);
     const [skillPopoverPosition, setSkillPopoverPosition] = useState(null);
+    const [nodeRects, setNodeRects] = useState({});
+    const [treeCanvasSize, setTreeCanvasSize] = useState({ width: 0, height: 0 });
     const [notification, setNotification] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const skillTreeRef = useRef(null);
+    const skillScrollRef = useRef(null);
 
     useEffect(() => {
         if (selectedJobCode && !(jobs || []).some(job => job.code === selectedJobCode)) {
@@ -262,6 +295,12 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
             setSkillPopoverPosition(null);
         }
     }, [jobs, selectedJobCode]);
+
+    useEffect(() => {
+        setNodeRects({});
+        setTreeCanvasSize({ width: 0, height: 0 });
+        requestAnimationFrame(updateTreeCanvasSize);
+    }, [selectedJobCode, selectedBranch, skills]);
 
     async function loadSkills() {
         if (!playerId) return;
@@ -302,6 +341,46 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         setSkillPopoverPosition(null);
     }
 
+    function measureSkillNode(skillCode, element) {
+        const scrollElement = skillScrollRef.current;
+        if (!scrollElement || !element) return;
+
+        const scrollRect = scrollElement.getBoundingClientRect();
+        const rect = element.getBoundingClientRect();
+        const nextRect = {
+            left: rect.left - scrollRect.left + scrollElement.scrollLeft,
+            top: rect.top - scrollRect.top + scrollElement.scrollTop,
+            width: rect.width,
+            height: rect.height,
+        };
+
+        setNodeRects(current => {
+            const previous = current[skillCode];
+            if (
+                previous &&
+                Math.abs(previous.left - nextRect.left) < 0.5 &&
+                Math.abs(previous.top - nextRect.top) < 0.5 &&
+                Math.abs(previous.width - nextRect.width) < 0.5 &&
+                Math.abs(previous.height - nextRect.height) < 0.5
+            ) {
+                return current;
+            }
+            return { ...current, [skillCode]: nextRect };
+        });
+    }
+
+    function updateTreeCanvasSize() {
+        const element = skillScrollRef.current;
+        if (!element) return;
+        const nextSize = {
+            width: element.scrollWidth,
+            height: element.scrollHeight,
+        };
+        setTreeCanvasSize(current => (
+            current.width === nextSize.width && current.height === nextSize.height ? current : nextSize
+        ));
+    }
+
     function canUnlock(skill) {
         const sameBranchSkills = skills.filter(item => item.job_code === skill.job_code && (item.branch || 'general') === (skill.branch || 'general'));
         const prerequisite = inferPrerequisiteSkill(skill, sameBranchSkills);
@@ -335,6 +414,22 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const selectedSkillHasUnlockedChild = selectedSkill
         ? currentBranchSkills.some(skill => inferPrerequisiteSkill(skill, currentBranchSkills)?.skill_code === selectedSkill.skill_code && skill.is_unlocked)
         : false;
+    const skillConnectors = currentBranchSkills
+        .map(skill => ({ skill, prerequisite: inferPrerequisiteSkill(skill, currentBranchSkills) }))
+        .filter(({ skill, prerequisite }) => prerequisite && nodeRects[skill.skill_code] && nodeRects[prerequisite.skill_code])
+        .map(({ skill, prerequisite }) => {
+            const from = nodeRects[prerequisite.skill_code];
+            const to = nodeRects[skill.skill_code];
+            const gap = 10;
+            return {
+                from: prerequisite.skill_code,
+                to: skill.skill_code,
+                x1: from.left + from.width + gap,
+                y1: from.top + 32,
+                x2: to.left - gap,
+                y2: to.top + 32,
+            };
+        });
     const viewTitle = selectedBranch
         ? (BRANCH_LABELS[selectedBranch] || selectedBranch)
         : (currentJob ? (JOB_LABELS[currentJob.code] || currentJob.display_name || currentJob.code) : 'Skills');
@@ -441,8 +536,18 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                         onClick={closeSkillPopover}
                         ref={skillTreeRef}
                     >
-                        <div className="overflow-x-auto pb-2" onClick={closeSkillPopover}>
-                            <div className="flex items-start min-w-max pr-2">
+                        <div
+                            ref={skillScrollRef}
+                            className="overflow-x-auto pb-2 relative"
+                            onClick={closeSkillPopover}
+                            onScroll={updateTreeCanvasSize}
+                        >
+                            <SkillConnectorOverlay
+                                connectors={skillConnectors}
+                                width={treeCanvasSize.width}
+                                height={treeCanvasSize.height}
+                            />
+                            <div className="relative z-10 flex items-start min-w-max pr-2">
                                 {levelColumns.map((group, groupIndex) => (
                                     <div key={group.level} className="flex items-stretch">
                                         {groupIndex > 0 && <div className="w-8 flex-shrink-0" />}
@@ -463,7 +568,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                                         showLevel={false}
                                                         isSelected={selectedSkillCode === skill.skill_code}
                                                         onSelect={openSkillPopover}
-                                                        hasPrerequisite={Boolean(prerequisite)}
+                                                        onMeasure={measureSkillNode}
                                                     />
                                                     );
                                                 })}
