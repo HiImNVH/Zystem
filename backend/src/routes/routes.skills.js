@@ -4,7 +4,12 @@
 const express = require('express');
 const skillsRouter = express.Router();
 const { dbPool } = require('../repositories/repositories.database');
-const { getRefundCountToday, MAX_REFUNDS_PER_DAY } = require('../repositories/repositories.skillsSeed');
+const {
+    ensurePlayerDefaultJobs,
+    autoUnlockFreeSkills,
+    getRefundCountToday,
+    MAX_REFUNDS_PER_DAY
+} = require('../repositories/repositories.skillsSeed');
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 
 /**
@@ -33,12 +38,16 @@ skillsRouter.get('/job/:jobCode', verifyToken, async (req, res, next) => {
 skillsRouter.get('/player/:playerId', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
     const { playerId } = req.params;
     try {
+        await ensurePlayerDefaultJobs(playerId);
+        await autoUnlockFreeSkills(playerId);
+
         const result = await dbPool.query(`
             SELECT
                 js.id, js.job_code, js.branch, js.skill_code, js.skill_name,
                 js.lv_required, js.sp_cost, js.tier,
                 js.effect_type, js.effect_val, js.description,
                 js.prerequisite_skill_code,
+                pj.job_level,
                 COALESCE(ps.is_unlocked, FALSE) AS is_unlocked,
                 ps.unlocked_at
             FROM job_skills js
@@ -81,7 +90,13 @@ skillsRouter.post('/unlock', verifyToken, async (req, res, next) => {
         }
         const skill = skillResult.rows[0];
 
+        if (parseInt(skill.sp_cost) === 0) {
+            throw new Error('AUTO skills are learned automatically when the job reaches the required level.');
+        }
+
         // Kiem tra player co nghe do khong
+        await ensurePlayerDefaultJobs(playerId, client);
+        await autoUnlockFreeSkills(playerId, client);
         const jobResult = await client.query(`
             SELECT pj.job_level FROM player_jobs pj
             JOIN jobs_seed js ON pj.job_id = js.id

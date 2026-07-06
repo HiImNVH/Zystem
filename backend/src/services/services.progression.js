@@ -4,6 +4,7 @@
 const { dbPool } = require('../repositories/repositories.database');
 const characterRepository = require('../repositories/repositories.character');
 const playerEventsService = require('./services.playerEvents');
+const { autoUnlockFreeSkills } = require('../repositories/repositories.skillsSeed');
 
 // Cong thuc EXP can de len cap theo Balance Sheet: 0.7L^3 + 20L^2 + 100L + 50
 function calculateExpRequired(targetLevel) {
@@ -137,7 +138,7 @@ async function processJobExpGain(playerId, jobId, expAmount) {
         if (!currentJob) {
             const insertedJob = await dbPool.query(
                 `INSERT INTO player_jobs (player_id, job_id, job_level, current_exp)
-                 VALUES ($1, $2, 0, 0)
+                 VALUES ($1, $2, 1, 0)
                  ON CONFLICT (player_id, job_id) DO UPDATE SET current_exp = player_jobs.current_exp
                  RETURNING *;`,
                 [playerId, jobId]
@@ -179,6 +180,8 @@ async function processJobExpGain(playerId, jobId, expAmount) {
              WHERE player_id = $3 AND job_id = $4;`,
             [newJobLevel, remainingExp.toString(), playerId, jobId]
         );
+
+        await autoUnlockFreeSkills(playerId);
 
         return { job_level: newJobLevel, exp_gained: expAmount };
     } catch (error) {

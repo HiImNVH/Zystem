@@ -6,6 +6,7 @@ const jobsRouter = express.Router();
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 const { dbPool } = require('../repositories/repositories.database');
 const playerEventsService = require('../services/services.playerEvents');
+const { ensurePlayerDefaultJobs, autoUnlockFreeSkills } = require('../repositories/repositories.skillsSeed');
 
 /**
  * @route   GET /api/jobs
@@ -30,22 +31,25 @@ jobsRouter.get('/player/:playerId', verifyToken, verifyPlayerOwnership, async (r
     const { playerId } = req.params;
 
     try {
+        await ensurePlayerDefaultJobs(playerId);
+        await autoUnlockFreeSkills(playerId);
+
         const result = await dbPool.query(`
             SELECT
                 js.id, js.code, js.display_name, js.category,
                 js.str_per_lv, js.agi_per_lv, js.dex_per_lv,
                 js.vit_per_lv, js.int_per_lv, js.chr_per_lv,
-                COALESCE(pj.job_level, 0) AS job_level,
+                COALESCE(pj.job_level, 1) AS job_level,
                 COALESCE(pj.current_exp, 0) AS current_exp,
                 COALESCE(pj.sp_invested, 0) AS sp_invested,
                 pj.unlocked_at,
                 -- Tinh tong stat da nhan tu nghe nay
-                ROUND(COALESCE(pj.job_level, 0) * js.str_per_lv, 2) AS total_str_bonus,
-                ROUND(COALESCE(pj.job_level, 0) * js.agi_per_lv, 2) AS total_agi_bonus,
-                ROUND(COALESCE(pj.job_level, 0) * js.dex_per_lv, 2) AS total_dex_bonus,
-                ROUND(COALESCE(pj.job_level, 0) * js.vit_per_lv, 2) AS total_vit_bonus,
-                ROUND(COALESCE(pj.job_level, 0) * js.int_per_lv, 2) AS total_int_bonus,
-                ROUND(COALESCE(pj.job_level, 0) * js.chr_per_lv, 2) AS total_chr_bonus
+                ROUND(COALESCE(pj.job_level, 1) * js.str_per_lv, 2) AS total_str_bonus,
+                ROUND(COALESCE(pj.job_level, 1) * js.agi_per_lv, 2) AS total_agi_bonus,
+                ROUND(COALESCE(pj.job_level, 1) * js.dex_per_lv, 2) AS total_dex_bonus,
+                ROUND(COALESCE(pj.job_level, 1) * js.vit_per_lv, 2) AS total_vit_bonus,
+                ROUND(COALESCE(pj.job_level, 1) * js.int_per_lv, 2) AS total_int_bonus,
+                ROUND(COALESCE(pj.job_level, 1) * js.chr_per_lv, 2) AS total_chr_bonus
             FROM jobs_seed js
             LEFT JOIN player_jobs pj
                 ON pj.job_id = js.id AND pj.player_id = $1
@@ -122,7 +126,7 @@ jobsRouter.post('/unlock', verifyToken, async (req, res, next) => {
 
         const newJobRecord = await client.query(`
             INSERT INTO player_jobs (player_id, job_id, job_level, current_exp, sp_invested)
-            VALUES ($1, $2, 0, 0, $3)
+            VALUES ($1, $2, 1, 0, $3)
             RETURNING *;
         `, [playerId, job.id, spCost]);
 
@@ -252,6 +256,9 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
 
         const player = playerResult.rows[0];
 
+        await ensurePlayerDefaultJobs(playerId, client);
+        await autoUnlockFreeSkills(playerId, client);
+
         // Kiem tra quyen so huu
         const ownerResult = await client.query(
             `SELECT account_id FROM players WHERE id = $1;`, [playerId]
@@ -313,6 +320,8 @@ jobsRouter.post('/invest-sp', verifyToken, async (req, res, next) => {
              WHERE id = $3;`,
             [newJobLevel, actualSpSpent, playerJob.id]
         );
+
+        await autoUnlockFreeSkills(playerId, client);
 
         await client.query('COMMIT');
 

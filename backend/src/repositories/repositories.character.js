@@ -3,6 +3,7 @@
 const { dbPool } = require('./repositories.database');
 const walletRepository = require('./repositories.wallet');
 const combatService = require('../services/services.combat');
+const { ensurePlayerDefaultJobs, autoUnlockFreeSkills } = require('./repositories.skillsSeed');
 
 function calculateMaxEnergy(vitStat, strStat) {
     const vit = parseFloat(vitStat) || 0;
@@ -102,6 +103,8 @@ async function createCharacter(characterData) {
 
         const newPlayer = playerResult.rows[0];
 
+        await ensurePlayerDefaultJobs(newPlayer.id, client);
+
         // Gan nghe khoi dau o cap 20 vao player_jobs
         if (startingJob) {
             // EXP tuong duong de dat cap 20 (dung ham don gian)
@@ -109,11 +112,16 @@ async function createCharacter(characterData) {
 
             await client.query(`
                 INSERT INTO player_jobs (player_id, job_id, job_level, current_exp, sp_invested, unlocked_at)
-                VALUES ($1, $2, 20, $3, 0, NOW());
+                VALUES ($1, $2, 20, $3, 0, NOW())
+                ON CONFLICT (player_id, job_id) DO UPDATE
+                SET job_level = 20,
+                    current_exp = EXCLUDED.current_exp;
             `, [newPlayer.id, startingJob.id, expForLevel20]);
 
             console.log(`[INFO] Gan nghe khoi dau "${startingJob.display_name}" cap 20 cho nhan vat ${newPlayer.character_name}`);
         }
+
+        await autoUnlockFreeSkills(newPlayer.id, client);
 
         // Tao vi tien
         await walletRepository.initializeWallet(newPlayer.id);

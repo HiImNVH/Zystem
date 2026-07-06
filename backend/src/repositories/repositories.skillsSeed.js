@@ -1967,6 +1967,37 @@ const ALL_SKILLS = [
 
 const MAX_REFUNDS_PER_DAY = 3;
 
+async function ensurePlayerDefaultJobs(playerId, queryable = dbPool) {
+    if (!playerId) return;
+
+    await queryable.query(`
+        INSERT INTO player_jobs (player_id, job_id, job_level, current_exp, sp_invested, unlocked_at)
+        SELECT $1, js.id, 1, 0, 0, NOW()
+        FROM jobs_seed js
+        WHERE js.is_available = TRUE
+        ON CONFLICT (player_id, job_id) DO UPDATE
+        SET job_level = GREATEST(player_jobs.job_level, 1);
+    `, [playerId]);
+}
+
+async function autoUnlockFreeSkills(playerId, queryable = dbPool) {
+    if (!playerId) return;
+
+    await ensurePlayerDefaultJobs(playerId, queryable);
+    await queryable.query(`
+        INSERT INTO player_skills (player_id, skill_id, is_unlocked, unlocked_at)
+        SELECT $1, js.id, TRUE, NOW()
+        FROM job_skills js
+        JOIN jobs_seed seed ON seed.code = js.job_code
+        JOIN player_jobs pj ON pj.job_id = seed.id AND pj.player_id = $1
+        WHERE js.sp_cost = 0
+          AND pj.job_level >= js.lv_required
+        ON CONFLICT (player_id, skill_id) DO UPDATE
+        SET is_unlocked = TRUE,
+            unlocked_at = COALESCE(player_skills.unlocked_at, NOW());
+    `, [playerId]);
+}
+
 async function seedSkillTree() {
     try {
         const count = await dbPool.query('SELECT COUNT(*) FROM job_skills;');
@@ -2029,6 +2060,8 @@ async function getRefundCountToday(playerId) {
 
 module.exports = {
     seedSkillTree,
+    ensurePlayerDefaultJobs,
+    autoUnlockFreeSkills,
     getRefundCountToday,
     MAX_REFUNDS_PER_DAY,
     ALL_SKILLS,

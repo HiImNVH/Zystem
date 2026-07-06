@@ -45,7 +45,9 @@ function getSkillInitials(skillName) {
         .toUpperCase();
 }
 
-function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction, isFirst }) {
+const JOB_ORDER = ['fighting', 'scavenging', 'cooking', 'gathering', 'crafting', 'building'];
+
+function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction, isFirst, showLevel = true }) {
     const [isLoading, setIsLoading] = useState(false);
     const isUnlocked = skill.is_unlocked;
     const meetsLevel = jobLevel >= skill.lv_required;
@@ -81,7 +83,7 @@ function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction
             {!isFirst && (
                 <div className={`w-8 h-px ${isUnlocked ? 'bg-accent/60' : 'bg-border'}`} />
             )}
-            <div className={`w-[118px] min-h-[150px] rounded-lg border p-3 flex flex-col items-center text-center ${
+            <div className={`w-[118px] min-h-[142px] rounded-lg border p-3 flex flex-col items-center text-center ${
                 isUnlocked
                     ? 'border-accent bg-accent/10'
                     : (isReady ? 'border-cyan bg-cyan/10' : 'border-border bg-surface opacity-70')
@@ -89,29 +91,34 @@ function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction
                 <div className={`w-14 h-14 flex items-center justify-center text-xs font-bold mb-2 ${
                     isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
                 }`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
-                    {isUnlocked ? 'OK' : getSkillInitials(skill.skill_name)}
+                    {isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}
                 </div>
-                <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>
+                {showLevel && <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>}
                 <p className="text-xs font-semibold leading-snug min-h-[32px] line-clamp-2">{skill.skill_name}</p>
                 {skill.description && (
                     <p className="text-[10px] text-textMuted leading-snug mt-1 line-clamp-2">{skill.description}</p>
                 )}
                 <div className="mt-auto pt-3 w-full">
+                    {isFree && (
+                        <span className={`block text-[10px] py-1.5 ${isUnlocked ? 'text-accent' : 'text-textMuted'}`}>
+                            {isUnlocked ? 'AUTO' : `Auto Lv.${skill.lv_required}`}
+                        </span>
+                    )}
                     {isUnlocked && !isFree && (
                         <button onClick={handleRefund} disabled={isLoading || refundsLeft <= 0} className="btn-ghost text-[10px] w-full py-1.5">
                             {isLoading ? '...' : 'Refund'}
                         </button>
                     )}
-                    {!isUnlocked && meetsLevel && canUnlock && (
+                    {!isFree && !isUnlocked && meetsLevel && canUnlock && (
                         <button
                             onClick={handleUnlock}
                             disabled={isLoading}
-                            className={`${isFree ? 'btn-secondary' : 'btn-primary'} text-[10px] w-full py-1.5`}
+                            className="btn-primary text-[10px] w-full py-1.5"
                         >
-                            {isLoading ? '...' : (isFree ? 'Free' : `${skill.sp_cost} SP`)}
+                            {isLoading ? '...' : `${skill.sp_cost} SP`}
                         </button>
                     )}
-                    {!isUnlocked && (!meetsLevel || !canUnlock) && (
+                    {!isFree && !isUnlocked && (!meetsLevel || !canUnlock) && (
                         <span className="block text-[10px] text-textMuted py-1.5">
                             {!meetsLevel ? `Need Lv.${skill.lv_required}` : 'Prereq'}
                         </span>
@@ -122,20 +129,61 @@ function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction
     );
 }
 
+function JobSkillCard({ job, isSelected, onClick }) {
+    const name = JOB_LABELS[job.code] || job.display_name || job.code;
+    return (
+        <button
+            onClick={onClick}
+            className={`w-full card card-hover p-4 text-left ${isSelected ? 'border-accent bg-accent/5' : ''}`}
+            type="button"
+        >
+            <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent flex-shrink-0">
+                    {job.code?.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                    <p className="font-semibold truncate">{name}</p>
+                    <p className="text-xs text-textMuted mt-0.5">Lv.{job.job_level || 1} | {job.category}</p>
+                </div>
+                <span className="text-xs text-textMuted">Open</span>
+            </div>
+        </button>
+    );
+}
+
+function BranchCard({ branch, skills, onClick }) {
+    const unlockedCount = skills.filter(skill => skill.is_unlocked).length;
+    const levels = [...new Set(skills.map(skill => skill.lv_required))].sort((a, b) => a - b);
+
+    return (
+        <button onClick={onClick} className="w-full card card-hover p-4 text-left" type="button">
+            <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <p className="font-semibold truncate">{BRANCH_LABELS[branch] || branch}</p>
+                    <p className="text-xs text-textMuted mt-1">{unlockedCount}/{skills.length} learned</p>
+                </div>
+                <span className="text-[10px] font-semibold text-accent bg-elevated rounded px-2 py-1 flex-shrink-0">
+                    Lv.{levels[0]}-{levels[levels.length - 1]}
+                </span>
+            </div>
+        </button>
+    );
+}
+
 export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const [skills, setSkills] = useState([]);
     const [refundStatus, setRefundStatus] = useState(null);
     const [selectedJobCode, setSelectedJobCode] = useState(null);
+    const [selectedBranch, setSelectedBranch] = useState(null);
     const [notification, setNotification] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const unlockedJobs = (jobs || []).filter(job => job.job_level > 0);
-
     useEffect(() => {
-        if (unlockedJobs.length > 0 && !selectedJobCode) {
-            setSelectedJobCode(unlockedJobs[0].code);
+        if (selectedJobCode && !(jobs || []).some(job => job.code === selectedJobCode)) {
+            setSelectedJobCode(null);
+            setSelectedBranch(null);
         }
-    }, [jobs, selectedJobCode, unlockedJobs]);
+    }, [jobs, selectedJobCode]);
 
     async function loadSkills() {
         if (!playerId) return;
@@ -166,41 +214,58 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         return prerequisite?.is_unlocked === true;
     }
 
-    const currentJob = (jobs || []).find(job => job.code === selectedJobCode);
+    const allJobs = [...(jobs || [])].sort((a, b) => {
+        const aIndex = JOB_ORDER.indexOf(a.code);
+        const bIndex = JOB_ORDER.indexOf(b.code);
+        return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex);
+    });
+    const currentJob = allJobs.find(job => job.code === selectedJobCode);
     const jobSkills = skills.filter(skill => skill.job_code === selectedJobCode);
-    const branchOrder = [...new Set(jobSkills.map(skill => skill.branch || 'general'))];
-    const hasAnyJobLeveled = (jobs || []).some(job => job.job_level > 0);
+    const branchOrder = [...new Set(jobSkills.map(skill => skill.branch || 'general'))].sort((a, b) => {
+        return (BRANCH_LABELS[a] || a).localeCompare(BRANCH_LABELS[b] || b);
+    });
+    const currentBranchSkills = jobSkills
+        .filter(skill => (skill.branch || 'general') === selectedBranch)
+        .sort((a, b) => a.lv_required - b.lv_required || a.tier - b.tier || a.skill_name.localeCompare(b.skill_name));
+    const branchLevelGroups = [...new Set(currentBranchSkills.map(skill => skill.lv_required))]
+        .sort((a, b) => a - b)
+        .map(level => ({
+            level,
+            skills: currentBranchSkills.filter(skill => skill.lv_required === level),
+        }));
+    const viewTitle = selectedBranch
+        ? (BRANCH_LABELS[selectedBranch] || selectedBranch)
+        : (currentJob ? (JOB_LABELS[currentJob.code] || currentJob.display_name || currentJob.code) : 'Skills');
 
     return (
         <div className="h-full flex flex-col">
             <div className="p-4 border-b border-border flex-shrink-0">
                 <div className="flex items-center justify-between mb-3">
                     <div>
-                        <h2 className="text-sm font-semibold">Skill Tree</h2>
-                        {currentJob && (
-                            <p className="text-xs text-textMuted mt-0.5">
-                                {JOB_LABELS[currentJob.code] || currentJob.display_name || currentJob.code} Lv.{currentJob.job_level}
-                            </p>
+                        {(selectedJobCode || selectedBranch) && (
+                            <button
+                                onClick={() => {
+                                    if (selectedBranch) setSelectedBranch(null);
+                                    else setSelectedJobCode(null);
+                                }}
+                                className="text-xs text-textMuted hover:text-textPrimary mb-1"
+                                type="button"
+                            >
+                                Back
+                            </button>
                         )}
+                        <h2 className="text-sm font-semibold">{viewTitle}</h2>
+                        <p className="text-xs text-textMuted mt-0.5">
+                            {selectedBranch
+                                ? `${JOB_LABELS[currentJob?.code] || currentJob?.display_name || currentJob?.code} Lv.${currentJob?.job_level || 1}`
+                                : (currentJob ? 'Choose a branch' : 'Choose a skill')}
+                        </p>
                     </div>
                     <div className="text-right">
                         <span className="block text-xs font-mono text-accent">{skillPoints} SP</span>
                         <span className="block text-[10px] text-textMuted">{refundStatus?.remaining_today ?? 0} refunds</span>
                     </div>
                 </div>
-                {unlockedJobs.length > 0 && (
-                    <div className="flex gap-1.5 overflow-x-auto pb-1">
-                        {unlockedJobs.map(job => (
-                            <button
-                                key={job.code}
-                                onClick={() => setSelectedJobCode(job.code)}
-                                className={`tab-pill flex-shrink-0 ${selectedJobCode === job.code ? 'tab-pill-active' : 'tab-pill-inactive'}`}
-                            >
-                                {JOB_LABELS[job.code] || job.display_name || job.code}
-                            </button>
-                        ))}
-                    </div>
-                )}
             </div>
 
             {notification && (
@@ -214,41 +279,60 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
             <div className="flex-1 overflow-y-auto p-4">
                 {isLoading ? (
                     <p className="text-sm text-textMuted">Loading...</p>
-                ) : unlockedJobs.length === 0 ? (
+                ) : allJobs.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
                         <div className="text-center max-w-[240px]">
                             <div className="text-3xl mb-3 opacity-20">SP</div>
-                            <p className="text-sm text-textSecondary mb-1">
-                                {hasAnyJobLeveled ? 'No skill tree yet' : 'No skills unlocked'}
-                            </p>
-                            <p className="text-xs text-textMuted">
-                                Complete AFK actions to level up and unlock skill branches.
-                            </p>
+                            <p className="text-sm text-textSecondary mb-1">No skills available</p>
+                            <p className="text-xs text-textMuted">The skill catalog has not loaded yet.</p>
                         </div>
                     </div>
-                ) : (
-                    <div className="space-y-4">
+                ) : !selectedJobCode ? (
+                    <div className="space-y-2">
+                        {allJobs.map(job => (
+                            <JobSkillCard
+                                key={job.code}
+                                job={job}
+                                isSelected={selectedJobCode === job.code}
+                                onClick={() => {
+                                    setSelectedJobCode(job.code);
+                                    setSelectedBranch(null);
+                                }}
+                            />
+                        ))}
+                    </div>
+                ) : !selectedBranch ? (
+                    <div className="space-y-2">
                         {branchOrder.map(branch => {
                             const branchSkills = jobSkills
                                 .filter(skill => (skill.branch || 'general') === branch)
                                 .sort((a, b) => a.lv_required - b.lv_required || a.tier - b.tier || a.skill_name.localeCompare(b.skill_name));
-                            if (!branchSkills.length) return null;
-                            const unlockedCount = branchSkills.filter(skill => skill.is_unlocked).length;
                             return (
-                                <div key={branch} className="card p-3 overflow-hidden">
-                                    <div className="flex items-center justify-between gap-3 mb-3">
-                                        <div className="min-w-0">
-                                            <p className="text-sm font-semibold truncate">{BRANCH_LABELS[branch] || branch}</p>
-                                            <p className="text-[10px] text-textMuted">{unlockedCount}/{branchSkills.length} unlocked</p>
-                                        </div>
-                                        <span className="text-[10px] font-semibold text-accent bg-elevated rounded px-2 py-1">
-                                            Lv.{branchSkills[0]?.lv_required}-{branchSkills[branchSkills.length - 1]?.lv_required}
-                                        </span>
-                                    </div>
-
-                                    <div className="overflow-x-auto pb-2">
-                                        <div className="flex items-stretch min-w-max pr-2">
-                                            {branchSkills.map((skill, index) => (
+                                <BranchCard
+                                    key={branch}
+                                    branch={branch}
+                                    skills={branchSkills}
+                                    onClick={() => setSelectedBranch(branch)}
+                                />
+                            );
+                        })}
+                        {branchOrder.length === 0 && (
+                            <p className="text-sm text-textMuted">No branches available for this skill.</p>
+                        )}
+                    </div>
+                ) : (
+                    <div className="card p-3 overflow-hidden">
+                        <div className="overflow-x-auto pb-2">
+                            <div className="flex items-start min-w-max pr-2">
+                                {branchLevelGroups.map((group, groupIndex) => (
+                                    <div key={group.level} className="flex items-stretch">
+                                        {groupIndex > 0 && <div className="w-8 h-px bg-border mt-[84px]" />}
+                                        <div className="w-[132px] flex-shrink-0">
+                                            <div className="h-8 flex items-center justify-center border-b border-border mb-3">
+                                                <span className="text-xs font-semibold text-accent">Lv.{group.level}</span>
+                                            </div>
+                                            <div className="space-y-3">
+                                                {group.skills.map((skill, index) => (
                                                 <SkillNode
                                                     key={skill.skill_code}
                                                     skill={skill}
@@ -257,14 +341,19 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                                     playerId={playerId}
                                                     refundsLeft={refundStatus?.remaining_today ?? 0}
                                                     onAction={handleAction}
-                                                    isFirst={index === 0}
+                                                    isFirst={true}
+                                                    showLevel={false}
                                                 />
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                ))}
+                            </div>
+                        </div>
+                        {branchLevelGroups.length === 0 && (
+                            <p className="text-sm text-textMuted">No skill nodes available.</p>
+                        )}
                     </div>
                 )}
             </div>
