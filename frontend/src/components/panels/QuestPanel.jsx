@@ -1,6 +1,6 @@
 ﻿// frontend/src/components/panels/QuestPanel.jsx
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getPlayerSkills, getRefundStatus, unlockSkill, refundSkill } from '../../api/api.game';
 
 const JOB_LABELS = {
@@ -59,24 +59,25 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
                 <div className={`w-8 h-px ${isUnlocked ? 'bg-accent/60' : 'bg-border'}`} />
             )}
             <button
-                onClick={event => onSelect(skill, event.currentTarget.getBoundingClientRect())}
-                className={`w-[118px] min-h-[118px] rounded-lg border p-3 flex flex-col items-center text-center transition-colors ${
-                isUnlocked
-                    ? 'border-accent bg-accent/10'
-                    : (isReady ? 'border-cyan bg-cyan/10' : 'border-border bg-surface opacity-70')
-                } ${isSelected ? 'ring-1 ring-cyan' : ''}`}
+                onClick={event => {
+                    event.stopPropagation();
+                    onSelect(skill, event.currentTarget.getBoundingClientRect());
+                }}
+                className={`w-[118px] min-h-[96px] px-2 py-1 flex flex-col items-center text-center transition-opacity ${
+                    isUnlocked || isReady ? '' : 'opacity-60'
+                } ${isSelected ? 'text-cyan' : ''}`}
                 type="button"
             >
-                <div className={`w-14 h-14 flex items-center justify-center text-xs font-bold mb-2 ${
+                <div className={`relative w-16 h-16 flex items-center justify-center text-xs font-bold ${
                     isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
-                }`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
-                    {isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}
+                } ${isSelected ? 'ring-2 ring-cyan ring-offset-2 ring-offset-base' : ''}`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
+                    <span>{isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}</span>
+                    <span className="absolute right-0 bottom-1 translate-x-1/4 rounded bg-base px-1 text-[9px] font-bold text-accent border border-border">
+                        {isFree ? 'AUTO' : (isUnlocked ? 'OK' : `${skill.sp_cost}SP`)}
+                    </span>
                 </div>
                 {showLevel && <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>}
-                <p className="text-xs font-semibold leading-snug min-h-[32px] line-clamp-2">{skill.skill_name}</p>
-                <span className={`mt-auto pt-2 text-[10px] ${isUnlocked || isReady ? 'text-accent' : 'text-textMuted'}`}>
-                    {isFree ? 'AUTO' : (isUnlocked ? 'LEARNED' : (isReady ? `${skill.sp_cost} SP` : 'LOCKED'))}
-                </span>
+                <p className="mt-2 text-xs font-semibold leading-snug min-h-[30px] line-clamp-2">{skill.skill_name}</p>
             </button>
         </div>
     );
@@ -121,7 +122,7 @@ function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerI
 
     return (
         <div
-            className="card p-4 animate-slideup fixed z-50 max-h-[46vh] overflow-y-auto shadow-xl"
+            className="card p-4 animate-slideup absolute z-30 max-h-[46vh] overflow-y-auto shadow-xl pointer-events-auto"
             style={{
                 top: position?.top || 120,
                 left: position?.left || 16,
@@ -219,6 +220,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const [skillPopoverPosition, setSkillPopoverPosition] = useState(null);
     const [notification, setNotification] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const skillTreeRef = useRef(null);
 
     useEffect(() => {
         if (selectedJobCode && !(jobs || []).some(job => job.code === selectedJobCode)) {
@@ -253,9 +255,12 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     }
 
     function openSkillPopover(skill, rect) {
-        const width = Math.min(320, window.innerWidth - 24);
-        const left = Math.max(12, Math.min(rect.left + (rect.width / 2) - (width / 2), window.innerWidth - width - 12));
-        const top = Math.min(rect.bottom + 8, window.innerHeight - 180);
+        const bounds = skillTreeRef.current?.getBoundingClientRect();
+        const width = Math.min(320, (bounds?.width || window.innerWidth) - 24);
+        const relativeLeft = bounds ? rect.left - bounds.left : rect.left;
+        const relativeTop = bounds ? rect.top - bounds.top : rect.top;
+        const left = Math.max(12, Math.min(relativeLeft + (rect.width / 2) - (width / 2), (bounds?.width || window.innerWidth) - width - 12));
+        const top = relativeTop + rect.height + 8;
         setSelectedSkillCode(skill.skill_code);
         setSkillPopoverPosition({ top, left, width });
     }
@@ -395,8 +400,12 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                         )}
                     </div>
                 ) : (
-                    <div className="card p-3 overflow-hidden">
-                        <div className="overflow-x-auto pb-2">
+                    <div
+                        className="card p-3 overflow-visible relative z-30"
+                        onClick={closeSkillPopover}
+                        ref={skillTreeRef}
+                    >
+                        <div className="overflow-x-auto pb-2" onClick={closeSkillPopover}>
                             <div className="flex items-start min-w-max pr-2">
                                 {branchLevelGroups.map((group, groupIndex) => (
                                     <div key={group.level} className="flex items-stretch">
@@ -427,12 +436,8 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                         {branchLevelGroups.length === 0 && (
                             <p className="text-sm text-textMuted">No skill nodes available.</p>
                         )}
-                    </div>
-                )}
-            </div>
-
-            {selectedSkill && (
-                <div className="fixed inset-0 z-40" onClick={closeSkillPopover}>
+                        {selectedSkill && (
+                            <div className="absolute inset-0 z-20 pointer-events-none">
                         <SkillDetailCard
                             skill={selectedSkill}
                             jobLevel={currentJob?.job_level || 0}
@@ -444,7 +449,14 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                             onClose={closeSkillPopover}
                             position={skillPopoverPosition}
                         />
-                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {selectedSkill && (
+                <div className="fixed inset-0 z-20" onClick={closeSkillPopover} />
             )}
         </div>
     );
