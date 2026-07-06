@@ -48,6 +48,7 @@ function getSkillInitials(skillName) {
 const JOB_ORDER = ['fighting', 'scavenging', 'cooking', 'gathering', 'crafting', 'building'];
 const SKILL_LEVEL_GAPS = [1, 5, 10, 15, 20, 25, 30, 35, 40];
 const ROMAN_CHAIN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+const SKILL_NODE_ROW_HEIGHT = 124;
 
 function normalizeSkillChainName(name) {
     return String(name || '')
@@ -73,6 +74,42 @@ function inferPrerequisiteSkill(skill, branchSkills) {
         normalizeSkillChainName(item.skill_name) === expectedName &&
         new RegExp(`\\s${previousRoman}$`, 'i').test(item.skill_name || '')
     ) || null;
+}
+
+function buildAlignedSkillColumns(branchSkills, levelGaps) {
+    const occupiedRowsByLevel = {};
+    const rowBySkillCode = {};
+    const sortedSkills = [...branchSkills].sort((a, b) =>
+        a.lv_required - b.lv_required ||
+        a.tier - b.tier ||
+        a.skill_name.localeCompare(b.skill_name)
+    );
+
+    function reserveRow(level, preferredRow) {
+        if (!occupiedRowsByLevel[level]) occupiedRowsByLevel[level] = new Set();
+        const occupiedRows = occupiedRowsByLevel[level];
+        let row = Number.isInteger(preferredRow) ? preferredRow : 0;
+        while (occupiedRows.has(row)) row++;
+        occupiedRows.add(row);
+        return row;
+    }
+
+    sortedSkills.forEach(skill => {
+        const prerequisite = inferPrerequisiteSkill(skill, branchSkills);
+        const preferredRow = prerequisite ? rowBySkillCode[prerequisite.skill_code] : undefined;
+        rowBySkillCode[skill.skill_code] = reserveRow(skill.lv_required, preferredRow);
+    });
+
+    const maxRow = Math.max(0, ...Object.values(rowBySkillCode));
+    return levelGaps.map(level => {
+        const rows = Array.from({ length: maxRow + 1 }, () => null);
+        sortedSkills
+            .filter(skill => skill.lv_required === level)
+            .forEach(skill => {
+                rows[rowBySkillCode[skill.skill_code]] = skill;
+            });
+        return { level, rows };
+    });
 }
 
 function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect, onMeasure }) {
@@ -461,11 +498,8 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const firstBranchLevel = usedBranchLevels[0] || 1;
     const lastBranchLevel = usedBranchLevels[usedBranchLevels.length - 1] || 40;
     const levelColumns = SKILL_LEVEL_GAPS
-        .filter(level => level >= firstBranchLevel && level <= lastBranchLevel)
-        .map(level => ({
-            level,
-            skills: currentBranchSkills.filter(skill => skill.lv_required === level),
-        }));
+        .filter(level => level >= firstBranchLevel && level <= lastBranchLevel);
+    const alignedLevelColumns = buildAlignedSkillColumns(currentBranchSkills, levelColumns);
     const selectedSkill = currentBranchSkills.find(skill => skill.skill_code === selectedSkillCode) || null;
     const selectedSkillHasUnlockedChild = selectedSkill
         ? currentBranchSkills.some(skill => inferPrerequisiteSkill(skill, currentBranchSkills)?.skill_code === selectedSkill.skill_code && skill.is_unlocked)
@@ -609,30 +643,36 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                 height={treeCanvasSize.height}
                             />
                             <div className="relative z-10 flex items-start min-w-max pr-2">
-                                {levelColumns.map((group, groupIndex) => (
+                                {alignedLevelColumns.map((group, groupIndex) => (
                                     <div key={group.level} className="flex items-stretch">
                                         {groupIndex > 0 && <div className="w-8 flex-shrink-0" />}
                                         <div className="w-[132px] flex-shrink-0">
                                             <div className="h-8 flex items-center justify-center border-b border-border mb-3">
                                                 <span className="text-xs font-semibold text-accent">Lv.{group.level}</span>
                                             </div>
-                                            <div className="space-y-3">
-                                                {group.skills.map((skill, index) => {
-                                                    const prerequisite = inferPrerequisiteSkill(skill, currentBranchSkills);
-                                                    return (
-                                                    <SkillNode
-                                                        key={skill.skill_code}
-                                                        skill={skill}
-                                                        jobLevel={currentJob?.job_level || 0}
-                                                        canUnlock={canUnlock(skill)}
-                                                        isFirst={true}
-                                                        showLevel={false}
-                                                        isSelected={selectedSkillCode === skill.skill_code}
-                                                        onSelect={openSkillPopover}
-                                                        onMeasure={measureSkillNode}
-                                                    />
-                                                    );
-                                                })}
+                                            <div>
+                                                {group.rows.map((skill, rowIndex) => (
+                                                    <div
+                                                        key={skill?.skill_code || `${group.level}-placeholder-${rowIndex}`}
+                                                        className="flex items-start justify-center"
+                                                        style={{ height: SKILL_NODE_ROW_HEIGHT }}
+                                                    >
+                                                        {skill ? (
+                                                            <SkillNode
+                                                                skill={skill}
+                                                                jobLevel={currentJob?.job_level || 0}
+                                                                canUnlock={canUnlock(skill)}
+                                                                isFirst={true}
+                                                                showLevel={false}
+                                                                isSelected={selectedSkillCode === skill.skill_code}
+                                                                onSelect={openSkillPopover}
+                                                                onMeasure={measureSkillNode}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-[118px] min-h-[96px] opacity-0 pointer-events-none" aria-hidden="true" />
+                                                        )}
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
