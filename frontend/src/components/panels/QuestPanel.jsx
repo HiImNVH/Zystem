@@ -73,13 +73,8 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
                     isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
                 } ${isSelected ? 'ring-2 ring-cyan ring-offset-2 ring-offset-base' : ''}`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
                     <span>{isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}</span>
-                    <span
-                        className="absolute right-2 bottom-2 w-5 h-5 bg-base text-[8px] font-bold text-accent border border-border flex items-center justify-center"
-                        style={{ transform: 'rotate(45deg)' }}
-                    >
-                        <span style={{ transform: 'rotate(-45deg)' }}>
-                            {isFree ? 'A' : (isUnlocked ? 'OK' : skill.sp_cost)}
-                        </span>
+                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[8px] font-bold text-base/80">
+                        {isFree ? 'AUTO' : (isUnlocked ? 'OK' : `${skill.sp_cost}SP`)}
                     </span>
                 </div>
                 {showLevel && <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>}
