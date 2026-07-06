@@ -282,10 +282,13 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const [skillPopoverPosition, setSkillPopoverPosition] = useState(null);
     const [nodeRects, setNodeRects] = useState({});
     const [treeCanvasSize, setTreeCanvasSize] = useState({ width: 0, height: 0 });
+    const [isPanningTree, setIsPanningTree] = useState(false);
     const [notification, setNotification] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const skillTreeRef = useRef(null);
     const skillScrollRef = useRef(null);
+    const panStateRef = useRef(null);
+    const suppressNodeClickRef = useRef(false);
 
     useEffect(() => {
         if (selectedJobCode && !(jobs || []).some(job => job.code === selectedJobCode)) {
@@ -326,6 +329,8 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     }
 
     function openSkillPopover(skill, rect) {
+        if (suppressNodeClickRef.current) return;
+
         const bounds = skillTreeRef.current?.getBoundingClientRect();
         const width = Math.min(320, (bounds?.width || window.innerWidth) - 24);
         const relativeLeft = bounds ? rect.left - bounds.left : rect.left;
@@ -339,6 +344,57 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     function closeSkillPopover() {
         setSelectedSkillCode(null);
         setSkillPopoverPosition(null);
+    }
+
+    function startTreePan(event) {
+        if (event.button !== undefined && event.button !== 0) return;
+        const element = skillScrollRef.current;
+        if (!element) return;
+
+        panStateRef.current = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startY: event.clientY,
+            scrollLeft: element.scrollLeft,
+            scrollTop: element.scrollTop,
+            moved: false,
+        };
+        element.setPointerCapture?.(event.pointerId);
+    }
+
+    function moveTreePan(event) {
+        const state = panStateRef.current;
+        const element = skillScrollRef.current;
+        if (!state || !element || state.pointerId !== event.pointerId) return;
+
+        const deltaX = event.clientX - state.startX;
+        const deltaY = event.clientY - state.startY;
+        if (!state.moved && Math.hypot(deltaX, deltaY) > 5) {
+            state.moved = true;
+            setIsPanningTree(true);
+            closeSkillPopover();
+        }
+
+        if (state.moved) {
+            event.preventDefault();
+            element.scrollLeft = state.scrollLeft - deltaX;
+            element.scrollTop = state.scrollTop - deltaY;
+            updateTreeCanvasSize();
+        }
+    }
+
+    function endTreePan(event) {
+        const state = panStateRef.current;
+        const element = skillScrollRef.current;
+        if (!state || state.pointerId !== event.pointerId) return;
+
+        element?.releasePointerCapture?.(event.pointerId);
+        suppressNodeClickRef.current = state.moved;
+        panStateRef.current = null;
+        setTimeout(() => {
+            suppressNodeClickRef.current = false;
+            setIsPanningTree(false);
+        }, 0);
     }
 
     function measureSkillNode(skillCode, element) {
@@ -538,8 +594,13 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                     >
                         <div
                             ref={skillScrollRef}
-                            className="overflow-x-auto pb-2 relative"
+                            className={`overflow-auto pb-2 relative touch-none select-none ${isPanningTree ? 'cursor-grabbing' : 'cursor-grab'}`}
                             onClick={closeSkillPopover}
+                            onPointerDown={startTreePan}
+                            onPointerMove={moveTreePan}
+                            onPointerUp={endTreePan}
+                            onPointerCancel={endTreePan}
+                            onPointerLeave={endTreePan}
                             onScroll={updateTreeCanvasSize}
                         >
                             <SkillConnectorOverlay
