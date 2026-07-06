@@ -46,6 +46,7 @@ function getSkillInitials(skillName) {
 }
 
 const JOB_ORDER = ['fighting', 'scavenging', 'cooking', 'gathering', 'crafting', 'building'];
+const SKILL_LEVEL_GAPS = [1, 5, 10, 15, 20, 25, 30, 35, 40];
 
 function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect }) {
     const isUnlocked = skill.is_unlocked;
@@ -72,8 +73,13 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
                     isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
                 } ${isSelected ? 'ring-2 ring-cyan ring-offset-2 ring-offset-base' : ''}`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
                     <span>{isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}</span>
-                    <span className="absolute right-0 bottom-1 translate-x-1/4 rounded bg-base px-1 text-[9px] font-bold text-accent border border-border">
-                        {isFree ? 'AUTO' : (isUnlocked ? 'OK' : `${skill.sp_cost}SP`)}
+                    <span
+                        className="absolute right-2 bottom-2 w-5 h-5 bg-base text-[8px] font-bold text-accent border border-border flex items-center justify-center"
+                        style={{ transform: 'rotate(45deg)' }}
+                    >
+                        <span style={{ transform: 'rotate(-45deg)' }}>
+                            {isFree ? 'A' : (isUnlocked ? 'OK' : skill.sp_cost)}
+                        </span>
                     </span>
                 </div>
                 {showLevel && <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>}
@@ -289,8 +295,11 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const currentBranchSkills = jobSkills
         .filter(skill => (skill.branch || 'general') === selectedBranch)
         .sort((a, b) => a.lv_required - b.lv_required || a.tier - b.tier || a.skill_name.localeCompare(b.skill_name));
-    const branchLevelGroups = [...new Set(currentBranchSkills.map(skill => skill.lv_required))]
-        .sort((a, b) => a - b)
+    const usedBranchLevels = [...new Set(currentBranchSkills.map(skill => skill.lv_required))].sort((a, b) => a - b);
+    const firstBranchLevel = usedBranchLevels[0] || 1;
+    const lastBranchLevel = usedBranchLevels[usedBranchLevels.length - 1] || 40;
+    const levelColumns = SKILL_LEVEL_GAPS
+        .filter(level => level >= firstBranchLevel && level <= lastBranchLevel)
         .map(level => ({
             level,
             skills: currentBranchSkills.filter(skill => skill.lv_required === level),
@@ -407,7 +416,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                     >
                         <div className="overflow-x-auto pb-2" onClick={closeSkillPopover}>
                             <div className="flex items-start min-w-max pr-2">
-                                {branchLevelGroups.map((group, groupIndex) => (
+                                {levelColumns.map((group, groupIndex) => (
                                     <div key={group.level} className="flex items-stretch">
                                         {groupIndex > 0 && <div className="w-8 h-px bg-border mt-[84px]" />}
                                         <div className="w-[132px] flex-shrink-0">
@@ -415,17 +424,21 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                                 <span className="text-xs font-semibold text-accent">Lv.{group.level}</span>
                                             </div>
                                             <div className="space-y-3">
-                                                {group.skills.map((skill, index) => (
-                                                <SkillNode
-                                                    key={skill.skill_code}
-                                                    skill={skill}
-                                                    jobLevel={currentJob?.job_level || 0}
-                                                    canUnlock={canUnlock(skill)}
-                                                    isFirst={true}
-                                                    showLevel={false}
-                                                    isSelected={selectedSkillCode === skill.skill_code}
-                                                    onSelect={openSkillPopover}
-                                                />
+                                                {group.skills.length === 0 ? (
+                                                    <div className="w-[118px] min-h-[96px] flex items-center justify-center">
+                                                        <span className="w-2 h-2 rounded-full bg-border/70" />
+                                                    </div>
+                                                ) : group.skills.map((skill, index) => (
+                                                    <SkillNode
+                                                        key={skill.skill_code}
+                                                        skill={skill}
+                                                        jobLevel={currentJob?.job_level || 0}
+                                                        canUnlock={canUnlock(skill)}
+                                                        isFirst={true}
+                                                        showLevel={false}
+                                                        isSelected={selectedSkillCode === skill.skill_code}
+                                                        onSelect={openSkillPopover}
+                                                    />
                                                 ))}
                                             </div>
                                         </div>
@@ -433,7 +446,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                 ))}
                             </div>
                         </div>
-                        {branchLevelGroups.length === 0 && (
+                        {levelColumns.length === 0 && (
                             <p className="text-sm text-textMuted">No skill nodes available.</p>
                         )}
                         {selectedSkill && (
