@@ -20,6 +20,97 @@ const SIDE_TABS = [
 ];
 const RIGHT_TABS = ['Chat', 'Gang', 'Mail', 'Noti.'];
 
+// Ham thuan render panel theo tab, tach ra module-level de khong bi tao lai
+// moi lan Dashboard re-render (tranh unmount/remount lam mat state cua panel con)
+function renderPanel(tab, ctx) {
+    const { playerId, character, zones, inventory, jobs, stats, loadAll, onLogout } = ctx;
+
+    if (tab === TAB.MAIN) {
+        return <MainPanel playerId={playerId} character={character} zones={zones} inventory={inventory} onUpdate={loadAll} />;
+    }
+
+    if (tab === TAB.INVENTORY) {
+        return <InventoryPanel items={inventory} playerId={playerId} onUpdate={loadAll} />;
+    }
+
+    if (tab === TAB.QUEST) {
+        return <QuestPanel playerId={playerId} jobs={jobs} skillPoints={character?.skill_points || 0} />;
+    }
+
+    if (tab === TAB.PROFILE) {
+        return <ProfilePanel character={character} stats={stats} jobs={jobs} playerId={playerId} onUpdate={loadAll} onLogout={onLogout} />;
+    }
+
+    return <ChatPanel character={character} />;
+}
+
+// Cac Viewport duoc khai bao O NGOAI Dashboard (module-level) de giu nguyen
+// component reference giua cac lan render. Neu khai bao ben trong than ham
+// Dashboard, moi lan Dashboard re-render (vi du moi 30s do loadAll) React se
+// coi day la component MOI va unmount/remount toan bo panel con ben trong,
+// gay ra hien tuong giat/reload lien tuc (mat scroll, mat channel chat dang chon,
+// goi lai API va nhap nhay "Loading...").
+function SideTabs({ items, activeTab, onChangeTab }) {
+    return (
+        <div className="workspace-tabs">
+            {items.map(item => (
+                <button
+                    key={item.key}
+                    onClick={() => onChangeTab(item.key)}
+                    className={`workspace-tab ${activeTab === item.key ? 'workspace-tab-active' : ''}`}
+                >
+                    {item.label}
+                </button>
+            ))}
+        </div>
+    );
+}
+
+function LeftViewport({ leftTab, onChangeLeftTab, ctx }) {
+    return (
+        <section className="workspace-pane workspace-pane-left">
+            <SideTabs items={SIDE_TABS} activeTab={leftTab} onChangeTab={onChangeLeftTab} />
+            <div className="workspace-pane-body">
+                {renderPanel(leftTab, ctx)}
+            </div>
+        </section>
+    );
+}
+
+function CenterViewport({ centerTab, onChangeCenterTab, ctx }) {
+    return (
+        <section className="workspace-pane workspace-pane-center">
+            <div className="workspace-pane-body">
+                {renderPanel(centerTab, ctx)}
+            </div>
+            <BottomNav activeTab={centerTab} onChangeTab={onChangeCenterTab} />
+        </section>
+    );
+}
+
+function RightViewport({ rightTab, onChangeRightTab, character }) {
+    return (
+        <section className="workspace-pane workspace-pane-right">
+            <div className="workspace-tabs workspace-tabs-right">
+                {RIGHT_TABS.map(label => (
+                    <button
+                        key={label}
+                        onClick={() => onChangeRightTab(label)}
+                        className={`workspace-tab ${rightTab === label ? 'workspace-tab-active' : ''}`}
+                        type="button"
+                    >
+                        {label}
+                        {label === 'Mail' && <span className="mail-badge">1</span>}
+                    </button>
+                ))}
+            </div>
+            <div className="workspace-pane-body">
+                <ChatPanel character={character} initialChannel={rightTab === 'Noti.' ? 'NOTI' : 'GLOBAL'} />
+            </div>
+        </section>
+    );
+}
+
 export default function Dashboard({ initialCharacter, onLogout }) {
     const [character, setCharacter] = useState(initialCharacter);
     const [stats, setStats]         = useState(null);
@@ -51,93 +142,14 @@ export default function Dashboard({ initialCharacter, onLogout }) {
         return () => clearInterval(id);
     }, [loadAll]);
 
-    function renderPanel(tab) {
-        if (tab === TAB.MAIN) {
-            return <MainPanel playerId={playerId} character={character} zones={zones} inventory={inventory} onUpdate={loadAll} />;
-        }
-
-        if (tab === TAB.INVENTORY) {
-            return <InventoryPanel items={inventory} playerId={playerId} onUpdate={loadAll} />;
-        }
-
-        if (tab === TAB.QUEST) {
-            return <QuestPanel playerId={playerId} jobs={jobs} skillPoints={character?.skill_points || 0} />;
-        }
-
-        if (tab === TAB.PROFILE) {
-            return <ProfilePanel character={character} stats={stats} jobs={jobs} playerId={playerId} onUpdate={loadAll} onLogout={onLogout} />;
-        }
-
-        return <ChatPanel character={character} />;
-    }
-
-    function SideTabs({ items, activeTab, onChangeTab }) {
-        return (
-            <div className="workspace-tabs">
-                {items.map(item => (
-                    <button
-                        key={item.key}
-                        onClick={() => onChangeTab(item.key)}
-                        className={`workspace-tab ${activeTab === item.key ? 'workspace-tab-active' : ''}`}
-                    >
-                        {item.label}
-                    </button>
-                ))}
-            </div>
-        );
-    }
-
-    function LeftViewport() {
-        return (
-            <section className="workspace-pane workspace-pane-left">
-                <SideTabs items={SIDE_TABS} activeTab={leftTab} onChangeTab={setLeftTab} />
-                <div className="workspace-pane-body">
-                    {renderPanel(leftTab)}
-                </div>
-            </section>
-        );
-    }
-
-    function CenterViewport() {
-        return (
-            <section className="workspace-pane workspace-pane-center">
-                <div className="workspace-pane-body">
-                    {renderPanel(centerTab)}
-                </div>
-                <BottomNav activeTab={centerTab} onChangeTab={setCenterTab} />
-            </section>
-        );
-    }
-
-    function RightViewport() {
-        return (
-            <section className="workspace-pane workspace-pane-right">
-                <div className="workspace-tabs workspace-tabs-right">
-                    {RIGHT_TABS.map((label, index) => (
-                        <button
-                            key={label}
-                            onClick={() => setRightTab(label)}
-                            className={`workspace-tab ${rightTab === label ? 'workspace-tab-active' : ''}`}
-                            type="button"
-                        >
-                            {label}
-                            {label === 'Mail' && <span className="mail-badge">1</span>}
-                        </button>
-                    ))}
-                </div>
-                <div className="workspace-pane-body">
-                    <ChatPanel character={character} initialChannel={rightTab === 'Noti.' ? 'NOTI' : 'GLOBAL'} />
-                </div>
-            </section>
-        );
-    }
+    const ctx = { playerId, character, zones, inventory, jobs, stats, loadAll, onLogout };
 
     return (
         <div className="h-screen bg-base text-textPrimary overflow-hidden">
             <div className="workspace-shell">
-                <LeftViewport />
-                <CenterViewport />
-                <RightViewport />
+                <LeftViewport leftTab={leftTab} onChangeLeftTab={setLeftTab} ctx={ctx} />
+                <CenterViewport centerTab={centerTab} onChangeCenterTab={setCenterTab} ctx={ctx} />
+                <RightViewport rightTab={rightTab} onChangeRightTab={setRightTab} character={character} />
             </div>
         </div>
     );

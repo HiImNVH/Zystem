@@ -1,0 +1,368 @@
+TOM TAT DU AN ZYSTEM
+
+1. Tong quan
+
+Zystem la mot du an game web dang theo huong MMORPG / survival RPG, duoc to chuc theo mo hinh monorepo gom hai ung dung rieng:
+
+- frontend: giao dien nguoi choi chay bang React va Vite.
+- backend: API server chay bang Node.js, Express va PostgreSQL.
+
+Du an tap trung vao cac he thong cot loi cua game: tai khoan, nhan vat, chi so, nghe nghiep, skill tree, ban do/zone, POI, hanh dong kham pha, loot, item, trang bi, crafting, vi tien, thanh tuu, su kien nguoi choi va chat.
+
+
+2. Stack cong nghe
+
+Frontend:
+
+- React 19
+- React DOM 19
+- Vite 8
+- Tailwind CSS 3
+- PostCSS va Autoprefixer
+- Oxlint dung de lint
+- Goi API bang fetch truc tiep
+- Token dang nhap luu trong localStorage
+- Bien moi truong chinh: VITE_API_URL
+
+Backend:
+
+- Node.js
+- Express 5
+- PostgreSQL thong qua thu vien pg
+- dotenv de doc bien moi truong
+- bcryptjs de hash mat khau
+- jsonwebtoken de tao va xac thuc JWT
+- cors de cau hinh truy cap tu frontend
+- express-rate-limit de gioi han request
+- nodemon cho che do phat trien
+
+Database:
+
+- PostgreSQL
+- Ho tro ket noi bang DATABASE_URL hoac bo bien DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+- Co tuy chon DB_SSL cho moi truong production
+- Co tuy chon RESET_DATABASE_ON_START de reset schema khi khoi dong, chi nen dung khi phat trien
+
+Deploy de xuat:
+
+- Frontend: Vercel hoac Cloudflare Pages
+- Backend: Render Web Service
+- Database: Neon Postgres
+
+
+3. Cau truc thu muc
+
+Thu muc goc:
+
+- backend/: ma nguon API va logic server
+- frontend/: ma nguon giao dien nguoi choi
+- outputs/: thu muc dau ra/phu tro
+- DEPLOY.md: huong dan deploy monorepo
+- Agent.txt: quy chuan coding cua du an
+- Zystem_Data_design.xlsx: file thiet ke du lieu/game design
+
+Backend:
+
+- backend/src/index.js: diem khoi dong server, cau hinh CORS, rate limit, health check, dang ky route va seed du lieu.
+- backend/src/routes/: cac API route theo tung mien chuc nang.
+- backend/src/repositories/: lop truy cap du lieu, khoi tao schema va seed du lieu.
+- backend/src/services/: logic gameplay va tinh toan nghiep vu.
+- backend/src/middleware/: xac thuc, rate limit va xu ly loi.
+- backend/scripts/loadLogicSmokeTest.js: smoke test logic.
+
+Frontend:
+
+- frontend/src/App.jsx: dieu huong trang dang nhap, tao nhan vat va dashboard.
+- frontend/src/api/: cac ham goi API.
+- frontend/src/components/: component chinh cua ung dung.
+- frontend/src/components/panels/: cac panel gameplay nhu main, inventory, quest, chat, profile.
+- frontend/src/index.css va App.css: style chinh.
+- frontend/tailwind.config.js: bang mau, font va animation.
+
+
+4. Chuc nang chinh
+
+Tai khoan va xac thuc:
+
+- Dang ky tai khoan.
+- Dang nhap bang username va password.
+- Mat khau duoc hash bang bcrypt.
+- Backend tra JWT, frontend luu token trong localStorage.
+- API protected dung header Authorization: Bearer <token>.
+- Co endpoint lay thong tin tai khoan hien tai.
+
+Nhan vat:
+
+- Kiem tra tai khoan da co nhan vat hay chua.
+- Tao nhan vat voi ten nhan vat va nghe khoi dau.
+- Luu level, kinh nghiem, skill points, chi so co ban, HP, energy, fatigue, infection, radiation va title dang trang bi.
+- Tinh tong chi so dua tren chi so goc va trang bi.
+
+Nghe nghiep:
+
+- He thong jobs_seed gom nhieu nghe, co category va bonus chi so theo level.
+- Co player_jobs de luu level nghe, exp nghe va SP da dau tu.
+- Cac nghe trong UI duoc nhom theo combat, survival va production.
+- Co API lay danh sach nghe, nghe cua nguoi choi, mo khoa nghe, quen nghe va dau tu SP.
+
+Skill tree:
+
+- Moi nghe co skill tree rieng, chia theo branch.
+- Skill co yeu cau level nghe, tier, SP cost, prerequisite va effect.
+- Skill mien phi co the auto unlock khi du dieu kien.
+- Nguoi choi co the unlock skill bang SP.
+- Co chuc nang refund skill, gioi han so lan moi ngay va co log refund.
+- Frontend hien thi cay skill co node, branch, popover chi tiet va duong noi prerequisite.
+
+Ban do, zone va POI:
+
+- He thong zones luu code, ten hien thi, loai zone, biome, level gap, stage, min level, thoi luong co ban, nguy co infection va radiation.
+- World POI luu cac diem tren ban do.
+- POI gameplay tags xac dinh hanh dong co the lam: exploration, battle, dungeon...
+- API lay danh sach zone, chi tiet zone, hoat dong trong POI va thuc thi hoat dong POI.
+
+Gameplay hanh dong:
+
+- Nguoi choi co the chon activity trong POI nhu enemy, gather hoac dungeon.
+- Khi thuc thi hanh dong, server tinh energy cost, fatigue gain, infection/radiation gain, exp nhan vat, exp nghe va loot.
+- Co kiem tra du energy va fatigue truoc khi cho thuc hien.
+- Ket qua duoc ghi vao player_events.
+
+Leveling va progression:
+
+- Co cong thuc tinh exp can thiet cho player level va skill/job level.
+- Player len level nhan them skill points.
+- Job nhan exp theo loai hanh dong.
+- Co bang leveling_rules de luu quy tac level.
+
+Item, loot va inventory:
+
+- Item template luu thong tin vat pham goc: code, ten, category, tags, level, lifecycle, drop weight, stack, durability...
+- Items la instance that cua vat pham trong inventory nguoi choi.
+- Loot duoc roll theo action, zone level, CUREL power, rarity weight va item template phu hop.
+- Inventory co filter theo category va xem chi tiet item.
+- Food item co the duoc dung de hoi energy va giam fatigue nhe.
+
+Trang bi:
+
+- Co API equip va unequip item.
+- Slot trang bi duoc suy ra tu category va tag: weapon, tool, backpack, accessory, head, hands, feet, lower_body, armor, upper_body...
+- Co kiem tra Player Level phai lon hon hoac bang Item Level de trang bi.
+- Trang bi anh huong den chi so tong thong qua service itemStats.
+
+Crafting:
+
+- Recipes luu cong thuc che tao, vat pham dau ra, yeu cau nghe, level nghe, workstation, tool, craft time, CUREL rule va design notes.
+- Recipe tag inputs cho phep nguyen lieu dua tren tag query thay vi chi dinh cung mot item.
+- Khi craft, server kiem tra quyen so huu nhan vat, level nghe, nguyen lieu, so luong va tag phu hop.
+- Crafting tinh output item level, rarity, item power, stat roll va lifecycle.
+- Nguyen lieu bi tru so luong hoac xoa khi da dung het.
+
+CUREL power:
+
+- He thong CUREL dung de tinh suc manh/ti le trong loot va crafting.
+- Lay theo player level, job level va bonus passive skill.
+- Anh huong den rarity, item power va ket qua che tao/loot.
+
+Vi tien:
+
+- Moi nhan vat co wallet gom copper, silver va gold.
+- Co lich su wallet_transactions de audit thay doi so du.
+- API ho tro lay vi, lich su giao dich va thay doi so du.
+
+Thanh tuu va title:
+
+- Achievements co dieu kien hoan thanh, SP bonus va bonus chi so cua title.
+- Player achievements luu tien do, trang thai hoan thanh va trang thai da nhan SP.
+- Co chuc nang claim SP va equip title.
+
+Su kien va thong bao:
+
+- player_events luu log cac hanh dong quan trong cua nguoi choi.
+- Co API lay event va danh dau da doc.
+- Cac hanh dong nhu equip item, craft item, dung food, hoan thanh POI activity deu ghi event.
+
+Chat:
+
+- Bang chat_messages luu tin nhan theo channel.
+- API lay tin nhan va gui tin nhan.
+- Frontend co ChatPanel va cac tab lien quan nhu Chat, Gang, Mail, Noti.
+
+
+5. Giao dien nguoi dung
+
+Luon chinh cua frontend:
+
+1. Khi mo app, App.jsx kiem tra token va thong tin account trong localStorage.
+2. Neu chua dang nhap, hien AuthForm.
+3. Neu da dang nhap nhung chua co nhan vat, hien CreateCharacter.
+4. Neu da co nhan vat, vao Dashboard.
+
+Dashboard:
+
+- Chia bo cuc thanh ba vung: trai, giua, phai.
+- Vung trai co Inventory va Chat.
+- Vung giua co Main, Quest, Profile thong qua BottomNav.
+- Vung phai co Chat, Gang, Mail, Noti.
+- Du lieu nhan vat, stats, zones, inventory va jobs duoc reload dinh ky moi 30 giay.
+
+Panel chinh:
+
+- MainPanel: kham pha zone/POI, xem activity, thuc thi hanh dong, crafting va hien thi resource.
+- InventoryPanel: xem kho do, loc item, trang bi item, dung food.
+- QuestPanel: xem job, branch va skill tree, unlock/refund skill.
+- ProfilePanel: xem stats, jobs, trang bi va logout.
+- ChatPanel: xem/gui tin nhan va thong bao.
+
+Phong cach UI:
+
+- Theme toi, mau nen base/panel/surface/elevated.
+- Mau nhan accent vang, cyan, success xanh, danger do.
+- Font sans Inter/system-ui.
+- Co animation slideup, fadein va pulse.
+
+
+6. API tong quan
+
+Public:
+
+- GET /health
+- GET /
+- POST /api/accounts/register
+- POST /api/accounts/login
+
+Protected:
+
+- GET /api/accounts/me
+- POST /api/characters
+- GET /api/characters/:id
+- GET /api/characters/:id/stats
+- GET /api/characters/account/me
+- GET /api/wallets/:id
+- GET /api/wallets/:id/history
+- POST /api/wallets/modify
+- GET /api/zones
+- GET /api/zones/:code
+- GET /api/zones/pois/:poiId/activities
+- POST /api/zones/pois/:poiId/execute
+- GET /api/achievements
+- POST /api/achievements/claim-sp
+- POST /api/achievements/equip-title
+- GET /api/jobs
+- GET /api/jobs/player/:playerId
+- POST /api/jobs/unlock
+- POST /api/jobs/forget
+- GET /api/items/templates
+- GET /api/items/recipes
+- GET /api/items/recipes/:code
+- GET /api/items/player/:playerId
+- GET /api/items/player/:playerId/equipped
+- POST /api/items/equip
+- POST /api/items/unequip
+- POST /api/items/use-food
+- POST /api/items/craft
+- GET /api/skills/job/:jobCode
+- GET /api/skills/player/:playerId
+- GET /api/skills/refund-status/:playerId
+- POST /api/skills/unlock
+- POST /api/skills/refund
+- GET /api/progress/:id
+- POST /api/progress/touch
+- GET /api/events/:id
+- POST /api/events/:id/read
+- GET /api/chat/messages
+- POST /api/chat/messages
+
+
+7. Bang du lieu chinh
+
+- accounts: tai khoan nguoi dung.
+- players: nhan vat.
+- zones: khu vuc ban do.
+- world_pois: diem tuong tac trong zone.
+- poi_gameplay_tags: tag gameplay cua POI.
+- jobs_seed: danh muc nghe.
+- player_jobs: nghe cua nhan vat.
+- wallets: vi tien cua nhan vat.
+- wallet_transactions: lich su giao dich.
+- leveling_rules: quy tac level.
+- curel_item_power_matrix: ma tran item power.
+- curel_rarity_weights: trong so rarity theo CUREL.
+- item_type_rules: luat loai item.
+- stat_definitions: dinh nghia chi so.
+- item_templates: mau vat pham.
+- items: vat pham thuc te.
+- recipes: cong thuc che tao.
+- recipe_tag_inputs: yeu cau nguyen lieu theo tag.
+- recipe_ingredients: nguyen lieu theo template.
+- player_recipes: cong thuc da mo cua nguoi choi.
+- achievements: danh muc thanh tuu.
+- player_achievements: tien do thanh tuu.
+- user_progress_timestamps: moc thoi gian dong bo tien do.
+- job_skills: skill cua nghe.
+- player_skills: skill nguoi choi da mo.
+- skill_refund_log: lich su refund skill.
+- player_events: su kien/thong bao nguoi choi.
+- chat_messages: tin nhan chat.
+
+
+8. Cach chay local
+
+Backend:
+
+- Vao thu muc backend.
+- Cai package bang npm install.
+- Cau hinh database bang file .env.
+- Chay dev bang npm run dev.
+- Mac dinh API chay o http://localhost:5000 neu khong cau hinh PORT khac.
+
+Frontend:
+
+- Vao thu muc frontend.
+- Cai package bang npm install.
+- Neu backend khong chay o localhost:5000, cau hinh VITE_API_URL.
+- Chay dev bang npm run dev.
+
+Smoke test backend:
+
+- Co script npm run test:logic trong backend de chay backend/scripts/loadLogicSmokeTest.js.
+
+
+9. Bien moi truong quan trong
+
+Backend:
+
+- NODE_ENV
+- PORT
+- DATABASE_URL
+- DB_HOST
+- DB_PORT
+- DB_USER
+- DB_PASSWORD
+- DB_NAME
+- DB_SSL
+- CORS_ORIGIN
+- JWT_SECRET
+- JWT_EXPIRES_IN
+- LOG_LEVEL
+- RESET_DATABASE_ON_START
+
+Frontend:
+
+- VITE_API_URL
+
+
+10. Ghi chu ky thuat
+
+- Du an dang tach kha ro route, repository, service va middleware o backend.
+- Backend tu khoi tao schema PostgreSQL khi boot.
+- Nhieu du lieu seed cho game duoc nap tu repositories jobsSeed, itemsSeed, skillsSeed va designSeed.
+- Frontend hien tai dung fetch truc tiep, chua co state manager rieng.
+- Dashboard polling du lieu moi 30 giay.
+- DEPLOY.md da dinh huong deploy monorepo: frontend va backend deploy rieng, database dung PostgreSQL managed.
+- Agent.txt quy dinh coding standard: ten class/function/variable bang tieng Anh, comment/log khong dau, UI text tieng Viet co dau, file co single responsibility va uu tien guard clause.
+
+
+11. Tom tat ngan gon
+
+Zystem la mot full-stack web game gom React/Vite frontend va Express/PostgreSQL backend. San pham hien co day du nen tang cho mot game survival MMORPG alpha: dang nhap, tao nhan vat, dashboard gameplay, map/POI activity, exp/level, jobs, skill tree, inventory, equipment, food, crafting, loot, wallet, achievements, events va chat. Kien truc backend duoc chia theo route - repository - service, database tu khoi tao schema va seed du lieu game khi server khoi dong.
