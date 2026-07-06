@@ -588,13 +588,13 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                     </div>
                 ) : (
                     <div
-                        className="card p-3 overflow-visible relative z-30"
+                        className="card p-3 overflow-visible relative z-30 h-full min-h-[360px]"
                         onClick={closeSkillPopover}
                         ref={skillTreeRef}
                     >
                         <div
                             ref={skillScrollRef}
-                            className={`overflow-auto pb-2 relative touch-none select-none ${isPanningTree ? 'cursor-grabbing' : 'cursor-grab'}`}
+                            className={`h-full overflow-auto pb-2 relative touch-none select-none ${isPanningTree ? 'cursor-grabbing' : 'cursor-grab'}`}
                             onClick={closeSkillPopover}
                             onPointerDown={startTreePan}
                             onPointerMove={moveTreePan}
