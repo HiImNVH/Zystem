@@ -357,7 +357,7 @@ function formatActionResult(result) {
     return `Energy -${result.energy_cost}, fatigue +${result.fatigue_gained}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
 }
 
-function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onExecute, executingId, result }) {
+function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onExecute, executingId }) {
     if (!activityType) return null;
 
     const titleMap = {
@@ -385,13 +385,6 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
-                {result && (
-                    <div className="mb-3 rounded-lg border border-success/30 bg-success/10 p-3">
-                        <p className="text-sm font-semibold text-success">{result.poi_name}</p>
-                        <p className="text-xs text-textSecondary mt-1">{formatActionResult(result)}</p>
-                    </div>
-                )}
-
                 {!isLoading && activityType !== 'dungeon' && (
                     <div className="space-y-2">
                         {list.map(item => (
@@ -479,12 +472,12 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
 
     async function openPoiActivity(poi, type) {
         setExecutingActivityId('');
-        setActivitySheet({ type, poi, data: null, isLoading: true, error: '', result: null });
+        setActivitySheet({ type, poi, data: null, isLoading: true, error: '' });
         try {
             const result = await getPoiActivities(poi.id, type);
-            setActivitySheet({ type, poi, data: result.data, isLoading: false, error: '', result: null });
+            setActivitySheet({ type, poi, data: result.data, isLoading: false, error: '' });
         } catch (err) {
-            setActivitySheet({ type, poi, data: null, isLoading: false, error: err.message, result: null });
+            setActivitySheet({ type, poi, data: null, isLoading: false, error: err.message });
         }
     }
 
@@ -503,7 +496,8 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 target.id,
                 options
             );
-            setActivitySheet(current => current ? { ...current, result: result.data, error: '' } : current);
+            const refreshed = await getPoiActivities(activitySheet.poi.id, activitySheet.type);
+            setActivitySheet(current => current ? { ...current, data: refreshed.data, error: '' } : current);
             notify(formatActionResult(result.data), 'success');
             await onUpdate?.();
         } catch (err) {
@@ -714,7 +708,6 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     activityData={activitySheet.data}
                     isLoading={activitySheet.isLoading}
                     error={activitySheet.error}
-                    result={activitySheet.result}
                     executingId={executingActivityId}
                     onExecute={executeActivity}
                     onClose={() => setActivitySheet(null)}

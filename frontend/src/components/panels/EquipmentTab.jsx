@@ -48,7 +48,7 @@ function EquipSlot({ label, item, onUnequip, isLoading }) {
             disabled={isLoading}
             className="card p-3 flex flex-col items-center justify-center aspect-square text-center group relative"
         >
-            <span className={`text-[9px] font-semibold mb-1 ${rarityClass}`}>{item.item_power}</span>
+            <span className={`text-[9px] font-semibold mb-1 ${rarityClass}`}>Lv.{item.item_level || 1}</span>
             <span className="text-[10px] text-textMuted truncate w-full px-1">{label}</span>
             {itemStats.length > 0 && (
                 <span className="text-[8px] text-textMuted mt-1">

@@ -63,7 +63,7 @@ function ItemTile({ item, onSelect }) {
                 <span className="absolute top-1 left-1 text-[8px] font-bold text-danger">OLD</span>
             )}
             <span className="text-xs font-bold text-textSecondary">{mark}</span>
-            <span className={`text-[10px] font-mono font-semibold ${style.text}`}>{item.item_power}</span>
+            <span className={`text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</span>
         </button>
     );
 }
@@ -131,12 +131,12 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
 
                 <div className="grid grid-cols-2 gap-3 text-sm mb-3">
                     <div className="card p-3">
-                        <p className="text-textMuted text-xs mb-1">Item Power</p>
-                        <p className="font-mono font-semibold text-accent">{item.item_power}</p>
+                        <p className="text-textMuted text-xs mb-1">Item Level</p>
+                        <p className="font-mono font-semibold text-accent">{item.item_level || 1}</p>
                     </div>
                     <div className="card p-3">
-                        <p className="text-textMuted text-xs mb-1">Required level</p>
-                        <p className="font-mono font-semibold">{item.item_level}</p>
+                        <p className="text-textMuted text-xs mb-1">Category</p>
+                        <p className="font-mono font-semibold">{normalizedCategory || 'ITEM'}</p>
                     </div>
                 </div>
 
