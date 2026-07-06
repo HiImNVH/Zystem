@@ -47,8 +47,35 @@ function getSkillInitials(skillName) {
 
 const JOB_ORDER = ['fighting', 'scavenging', 'cooking', 'gathering', 'crafting', 'building'];
 const SKILL_LEVEL_GAPS = [1, 5, 10, 15, 20, 25, 30, 35, 40];
+const ROMAN_CHAIN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 
-function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect }) {
+function normalizeSkillChainName(name) {
+    return String(name || '')
+        .replace(/\s+(I|II|III|IV|V|VI)$/i, '')
+        .trim()
+        .toLowerCase();
+}
+
+function inferPrerequisiteSkill(skill, branchSkills) {
+    if (skill.prerequisite_skill_code) {
+        return branchSkills.find(item => item.skill_code === skill.prerequisite_skill_code) || null;
+    }
+
+    const match = String(skill.skill_name || '').match(/\s+(I|II|III|IV|V|VI)$/i);
+    if (!match) return null;
+
+    const currentIndex = ROMAN_CHAIN.indexOf(match[1].toUpperCase());
+    if (currentIndex <= 0) return null;
+
+    const expectedName = normalizeSkillChainName(skill.skill_name);
+    const previousRoman = ROMAN_CHAIN[currentIndex - 1];
+    return branchSkills.find(item =>
+        normalizeSkillChainName(item.skill_name) === expectedName &&
+        new RegExp(`\\s${previousRoman}$`, 'i').test(item.skill_name || '')
+    ) || null;
+}
+
+function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect, hasPrerequisite }) {
     const isUnlocked = skill.is_unlocked;
     const meetsLevel = jobLevel >= skill.lv_required;
     const isFree = skill.sp_cost === 0;
@@ -56,8 +83,10 @@ function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSe
 
     return (
         <div className="relative flex items-center flex-shrink-0">
-            {!isFirst && (
-                <div className={`w-8 h-px ${isUnlocked ? 'bg-accent/60' : 'bg-border'}`} />
+            {hasPrerequisite && (
+                <div className="absolute top-8 -left-6 w-7 h-px bg-border">
+                    <span className="absolute -right-1 -top-[3px] w-0 h-0 border-y-[4px] border-y-transparent border-l-[6px] border-l-border" />
+                </div>
             )}
             <button
                 onClick={event => {
@@ -274,8 +303,9 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     }
 
     function canUnlock(skill) {
-        if (!skill.prerequisite_skill_code) return true;
-        const prerequisite = skills.find(item => item.skill_code === skill.prerequisite_skill_code);
+        const sameBranchSkills = skills.filter(item => item.job_code === skill.job_code && (item.branch || 'general') === (skill.branch || 'general'));
+        const prerequisite = inferPrerequisiteSkill(skill, sameBranchSkills);
+        if (!prerequisite) return true;
         return prerequisite?.is_unlocked === true;
     }
 
@@ -303,7 +333,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         }));
     const selectedSkill = currentBranchSkills.find(skill => skill.skill_code === selectedSkillCode) || null;
     const selectedSkillHasUnlockedChild = selectedSkill
-        ? currentBranchSkills.some(skill => skill.prerequisite_skill_code === selectedSkill.skill_code && skill.is_unlocked)
+        ? currentBranchSkills.some(skill => inferPrerequisiteSkill(skill, currentBranchSkills)?.skill_code === selectedSkill.skill_code && skill.is_unlocked)
         : false;
     const viewTitle = selectedBranch
         ? (BRANCH_LABELS[selectedBranch] || selectedBranch)
@@ -415,17 +445,15 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                             <div className="flex items-start min-w-max pr-2">
                                 {levelColumns.map((group, groupIndex) => (
                                     <div key={group.level} className="flex items-stretch">
-                                        {groupIndex > 0 && <div className="w-8 h-px bg-border mt-[84px]" />}
+                                        {groupIndex > 0 && <div className="w-8 flex-shrink-0" />}
                                         <div className="w-[132px] flex-shrink-0">
                                             <div className="h-8 flex items-center justify-center border-b border-border mb-3">
                                                 <span className="text-xs font-semibold text-accent">Lv.{group.level}</span>
                                             </div>
                                             <div className="space-y-3">
-                                                {group.skills.length === 0 ? (
-                                                    <div className="w-[118px] min-h-[96px] flex items-start justify-center pt-8">
-                                                        <span className="block w-full h-px bg-border/80" />
-                                                    </div>
-                                                ) : group.skills.map((skill, index) => (
+                                                {group.skills.map((skill, index) => {
+                                                    const prerequisite = inferPrerequisiteSkill(skill, currentBranchSkills);
+                                                    return (
                                                     <SkillNode
                                                         key={skill.skill_code}
                                                         skill={skill}
@@ -435,8 +463,10 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                                         showLevel={false}
                                                         isSelected={selectedSkillCode === skill.skill_code}
                                                         onSelect={openSkillPopover}
+                                                        hasPrerequisite={Boolean(prerequisite)}
                                                     />
-                                                ))}
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     </div>
