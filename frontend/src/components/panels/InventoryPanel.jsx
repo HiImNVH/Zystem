@@ -11,6 +11,25 @@ const RARITY_COLORS = {
     LEGENDARY: { ring: 'ring-accent/50', text: 'text-accent' },
 };
 
+const TAG_MARKS = [
+    { tokens: ['medicine', 'medical', 'first aid', 'bandage'], mark: 'MD' },
+    { tokens: ['electronics', 'electronic', 'circuit', 'battery', 'wire'], mark: 'EL' },
+    { tokens: ['plastic'], mark: 'PL' },
+    { tokens: ['metal', 'scrap metal', 'steel', 'iron'], mark: 'ME' },
+    { tokens: ['wood', 'timber', 'branch'], mark: 'WD' },
+    { tokens: ['stone', 'rock', 'ore', 'mineral'], mark: 'OR' },
+    { tokens: ['cloth', 'fabric', 'leather'], mark: 'CL' },
+    { tokens: ['food', 'meat', 'edible', 'canned', 'grain'], mark: 'FD' },
+    { tokens: ['water', 'salt'], mark: 'WT' },
+    { tokens: ['chemical', 'fuel', 'acid'], mark: 'CH' },
+    { tokens: ['glass'], mark: 'GL' },
+    { tokens: ['tool'], mark: 'TL' },
+    { tokens: ['weapon'], mark: 'WP' },
+    { tokens: ['armor', 'gear', 'equipment'], mark: 'EQ' },
+    { tokens: ['building', 'container'], mark: 'BD' },
+    { tokens: ['rubbish', 'junk', 'recyclable'], mark: 'RB' },
+];
+
 const CATEGORY_MARKS = {
     RUBBISH: 'RB',
     MATERIAL: 'MT',
@@ -19,7 +38,6 @@ const CATEGORY_MARKS = {
     TOOL: 'TL',
     BUILDING: 'BD',
     FOOD: 'FD',
-    Food: 'FD',
 };
 
 const FILTERS = [
@@ -46,10 +64,20 @@ function formatExpiry(expiresAt) {
     });
 }
 
+function getItemMark(item) {
+    const text = [
+        item?.display_name,
+        item?.category,
+        ...(Array.isArray(item?.tags) ? item.tags : []),
+    ].join(' ').toLowerCase();
+    const match = TAG_MARKS.find(entry => entry.tokens.some(token => text.includes(token)));
+    return match?.mark || CATEGORY_MARKS[String(item?.category || '').toUpperCase()] || 'IT';
+}
+
 function ItemTile({ item, onSelect }) {
     const rarity = (item.rarity || 'COMMON').toUpperCase();
     const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
-    const mark = CATEGORY_MARKS[item.category] || 'IT';
+    const mark = getItemMark(item);
 
     return (
         <button
@@ -120,7 +148,7 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                     <div className="flex items-start gap-3 min-w-0">
                         <div className="flex-shrink-0 text-center">
                             <div className="w-14 h-14 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">
-                                {CATEGORY_MARKS[item.category] || 'IT'}
+                                {getItemMark(item)}
                             </div>
                             <p className={`mt-1 text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</p>
                         </div>

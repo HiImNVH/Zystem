@@ -99,6 +99,25 @@ const ZONE_FATIGUE_MULTIPLIER = {
     desert: 1.45,
 };
 
+const ITEM_TAG_MARKS = [
+    { tokens: ['medicine', 'medical', 'first aid', 'bandage'], mark: 'MD' },
+    { tokens: ['electronics', 'electronic', 'circuit', 'battery', 'wire'], mark: 'EL' },
+    { tokens: ['plastic'], mark: 'PL' },
+    { tokens: ['metal', 'scrap metal', 'steel', 'iron'], mark: 'ME' },
+    { tokens: ['wood', 'timber', 'branch'], mark: 'WD' },
+    { tokens: ['stone', 'rock', 'ore', 'mineral'], mark: 'OR' },
+    { tokens: ['cloth', 'fabric', 'leather'], mark: 'CL' },
+    { tokens: ['food', 'meat', 'edible', 'canned', 'grain'], mark: 'FD' },
+    { tokens: ['water', 'salt'], mark: 'WT' },
+    { tokens: ['chemical', 'fuel', 'acid'], mark: 'CH' },
+    { tokens: ['glass'], mark: 'GL' },
+    { tokens: ['tool'], mark: 'TL' },
+    { tokens: ['weapon'], mark: 'WP' },
+    { tokens: ['armor', 'gear', 'equipment'], mark: 'EQ' },
+    { tokens: ['building', 'container'], mark: 'BD' },
+    { tokens: ['rubbish', 'junk', 'recyclable'], mark: 'RB' },
+];
+
 const ITEM_CATEGORY_MARKS = {
     RUBBISH: 'RB',
     MATERIAL: 'MT',
@@ -146,8 +165,17 @@ function itemMatchesIngredient(item, tagQuery) {
     return tokens.some(token => itemText.includes(token));
 }
 
-function getItemMark(category) {
-    return ITEM_CATEGORY_MARKS[String(category || '').toUpperCase()] || 'IT';
+function getItemMark(itemOrCategory, tags = []) {
+    const item = typeof itemOrCategory === 'object' ? itemOrCategory : null;
+    const category = item ? item.category : itemOrCategory;
+    const itemTags = item ? item.tags : tags;
+    const text = [
+        item?.display_name,
+        category,
+        ...(Array.isArray(itemTags) ? itemTags : []),
+    ].join(' ').toLowerCase();
+    const match = ITEM_TAG_MARKS.find(entry => entry.tokens.some(token => text.includes(token)));
+    return match?.mark || ITEM_CATEGORY_MARKS[String(category || '').toUpperCase()] || 'IT';
 }
 
 function calculateResourcePreview(actionType, durationSeconds, zoneType, tag) {
@@ -306,7 +334,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                 >
                                     <div className="flex-shrink-0 text-center">
                                         <div className="w-10 h-10 rounded bg-elevated flex items-center justify-center text-[10px] font-bold text-accent">
-                                            {getItemMark(recipe.output_category)}
+                                            {getItemMark(recipe.output_category, recipe.output_item_tags)}
                                         </div>
                                         <p className="mt-0.5 text-[9px] font-mono text-textMuted">Lv.{recipe.output_item_level || 1}</p>
                                     </div>
@@ -332,7 +360,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                 <div className="card p-3 mb-3 flex items-start gap-3">
                                     <div className="flex-shrink-0 text-center">
                                         <div className="w-16 h-16 rounded-lg bg-elevated flex items-center justify-center text-sm font-bold text-accent">
-                                            {getItemMark(selectedRecipe.output_category)}
+                                            {getItemMark(selectedRecipe.output_category, selectedRecipe.output_item_tags)}
                                         </div>
                                         <p className="mt-1 text-[10px] font-mono text-accent">Lv.{selectedRecipe.output_item_level || 1}</p>
                                     </div>
@@ -367,7 +395,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                                     <div className="mb-2 rounded-lg border border-accent/40 bg-accent/10 p-2 flex items-center gap-2">
                                                         <div className="text-center flex-shrink-0">
                                                             <div className="w-9 h-9 rounded bg-elevated flex items-center justify-center text-[10px] font-bold text-accent">
-                                                                {getItemMark(selectedItem.category)}
+                                                                {getItemMark(selectedItem)}
                                                             </div>
                                                             <p className="mt-0.5 text-[9px] font-mono text-accent">Lv.{selectedItem.item_level || 1}</p>
                                                         </div>
@@ -393,7 +421,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
                                                                 } ${isDisabled ? 'opacity-35 cursor-not-allowed' : ''}`}
                                                             >
                                                                 <div className="mx-auto w-9 h-9 rounded bg-elevated flex items-center justify-center text-[10px] font-bold text-textSecondary">
-                                                                    {getItemMark(item.category)}
+                                                                    {getItemMark(item)}
                                                                 </div>
                                                                 <p className={`mt-1 text-[9px] font-mono ${rarityClass}`}>Lv.{item.item_level || 1}</p>
                                                             </button>
