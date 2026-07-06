@@ -77,30 +77,71 @@ function inferPrerequisiteSkill(skill, branchSkills) {
 }
 
 function buildAlignedSkillColumns(branchSkills, levelGaps) {
-    const occupiedRowsByLevel = {};
     const rowBySkillCode = {};
     const sortedSkills = [...branchSkills].sort((a, b) =>
         a.lv_required - b.lv_required ||
         a.tier - b.tier ||
         a.skill_name.localeCompare(b.skill_name)
     );
+    const parentByCode = {};
+    sortedSkills.forEach(skill => {
+        parentByCode[skill.skill_code] = skill.skill_code;
+    });
 
-    function reserveRow(level, preferredRow) {
-        if (!occupiedRowsByLevel[level]) occupiedRowsByLevel[level] = new Set();
-        const occupiedRows = occupiedRowsByLevel[level];
-        let row = Number.isInteger(preferredRow) ? preferredRow : 0;
-        while (occupiedRows.has(row)) row++;
-        occupiedRows.add(row);
-        return row;
+    function findRoot(skillCode) {
+        if (parentByCode[skillCode] !== skillCode) {
+            parentByCode[skillCode] = findRoot(parentByCode[skillCode]);
+        }
+        return parentByCode[skillCode];
     }
 
     sortedSkills.forEach(skill => {
         const prerequisite = inferPrerequisiteSkill(skill, branchSkills);
-        const preferredRow = prerequisite ? rowBySkillCode[prerequisite.skill_code] : undefined;
-        rowBySkillCode[skill.skill_code] = reserveRow(skill.lv_required, preferredRow);
+        if (prerequisite) {
+            parentByCode[findRoot(skill.skill_code)] = findRoot(prerequisite.skill_code);
+        }
     });
 
-    const maxRow = Math.max(0, ...Object.values(rowBySkillCode));
+    const componentsByRoot = {};
+    sortedSkills.forEach(skill => {
+        const root = findRoot(skill.skill_code);
+        if (!componentsByRoot[root]) componentsByRoot[root] = [];
+        componentsByRoot[root].push(skill);
+    });
+
+    const componentRows = Object.entries(componentsByRoot)
+        .map(([root, componentSkills]) => ({
+            root,
+            skills: componentSkills,
+            firstLevel: Math.min(...componentSkills.map(skill => skill.lv_required)),
+            firstTier: Math.min(...componentSkills.map(skill => skill.tier || 0)),
+            name: componentSkills
+                .slice()
+                .sort((a, b) => a.lv_required - b.lv_required || a.skill_name.localeCompare(b.skill_name))[0]?.skill_name || root,
+        }))
+        .sort((a, b) =>
+            a.firstLevel - b.firstLevel ||
+            a.firstTier - b.firstTier ||
+            a.name.localeCompare(b.name)
+        );
+
+    componentRows.forEach((component, rowIndex) => {
+        component.skills.forEach(skill => {
+            rowBySkillCode[skill.skill_code] = rowIndex;
+        });
+    });
+
+    const occupiedRowsByLevel = {};
+    sortedSkills.forEach(skill => {
+        const level = skill.lv_required;
+        if (!occupiedRowsByLevel[level]) occupiedRowsByLevel[level] = new Set();
+        let row = rowBySkillCode[skill.skill_code];
+        while (occupiedRowsByLevel[level].has(row)) row++;
+        occupiedRowsByLevel[level].add(row);
+        rowBySkillCode[skill.skill_code] = row;
+    });
+
+    const maxRow = Math.max(0, componentRows.length - 1, ...Object.values(rowBySkillCode));
     return levelGaps.map(level => {
         const rows = Array.from({ length: maxRow + 1 }, () => null);
         sortedSkills
@@ -258,7 +299,9 @@ function SkillConnectorOverlay({ connectors, width, height }) {
             {connectors.map(connector => (
                 <path
                     key={`${connector.from}-${connector.to}`}
-                    d={`M ${connector.x1} ${connector.y1} L ${connector.x2} ${connector.y2}`}
+                    d={connector.y1 === connector.y2
+                        ? `M ${connector.x1} ${connector.y1} L ${connector.x2} ${connector.y2}`
+                        : `M ${connector.x1} ${connector.y1} L ${connector.midX} ${connector.y1} L ${connector.midX} ${connector.y2} L ${connector.x2} ${connector.y2}`}
                     stroke="#2a2d37"
                     strokeWidth="1"
                     fill="none"
@@ -518,6 +561,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                 y1: from.top + 32,
                 x2: to.left - gap,
                 y2: to.top + 32,
+                midX: from.left + from.width + ((to.left - from.left - from.width) / 2),
             };
         });
     const viewTitle = selectedBranch
