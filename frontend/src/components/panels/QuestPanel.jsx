@@ -47,12 +47,51 @@ function getSkillInitials(skillName) {
 
 const JOB_ORDER = ['fighting', 'scavenging', 'cooking', 'gathering', 'crafting', 'building'];
 
-function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction, isFirst, showLevel = true }) {
-    const [isLoading, setIsLoading] = useState(false);
+function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect }) {
     const isUnlocked = skill.is_unlocked;
     const meetsLevel = jobLevel >= skill.lv_required;
     const isFree = skill.sp_cost === 0;
     const isReady = !isUnlocked && meetsLevel && canUnlock;
+
+    return (
+        <div className="relative flex items-center flex-shrink-0">
+            {!isFirst && (
+                <div className={`w-8 h-px ${isUnlocked ? 'bg-accent/60' : 'bg-border'}`} />
+            )}
+            <button
+                onClick={() => onSelect(skill)}
+                className={`w-[118px] min-h-[118px] rounded-lg border p-3 flex flex-col items-center text-center transition-colors ${
+                isUnlocked
+                    ? 'border-accent bg-accent/10'
+                    : (isReady ? 'border-cyan bg-cyan/10' : 'border-border bg-surface opacity-70')
+                } ${isSelected ? 'ring-1 ring-cyan' : ''}`}
+                type="button"
+            >
+                <div className={`w-14 h-14 flex items-center justify-center text-xs font-bold mb-2 ${
+                    isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
+                }`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
+                    {isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}
+                </div>
+                {showLevel && <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>}
+                <p className="text-xs font-semibold leading-snug min-h-[32px] line-clamp-2">{skill.skill_name}</p>
+                <span className={`mt-auto pt-2 text-[10px] ${isUnlocked || isReady ? 'text-accent' : 'text-textMuted'}`}>
+                    {isFree ? 'AUTO' : (isUnlocked ? 'LEARNED' : (isReady ? `${skill.sp_cost} SP` : 'LOCKED'))}
+                </span>
+            </button>
+        </div>
+    );
+}
+
+function SkillDetailCard({ skill, jobLevel, canUnlock, hasUnlockedChild, playerId, refundsLeft, onAction, onClose }) {
+    const [isLoading, setIsLoading] = useState(false);
+    if (!skill) return null;
+
+    const isUnlocked = skill.is_unlocked;
+    const isFree = skill.sp_cost === 0;
+    const meetsLevel = jobLevel >= skill.lv_required;
+    const canLearn = !isFree && !isUnlocked && meetsLevel && canUnlock;
+    const canForget = isUnlocked && !isFree && !hasUnlockedChild && refundsLeft > 0;
+    const lockedReason = !meetsLevel ? `Need Lv.${skill.lv_required}` : (!canUnlock ? 'Prerequisite required' : '');
 
     async function handleUnlock() {
         setIsLoading(true);
@@ -79,52 +118,43 @@ function SkillNode({ skill, jobLevel, canUnlock, playerId, refundsLeft, onAction
     }
 
     return (
-        <div className="relative flex items-center flex-shrink-0">
-            {!isFirst && (
-                <div className={`w-8 h-px ${isUnlocked ? 'bg-accent/60' : 'bg-border'}`} />
-            )}
-            <div className={`w-[118px] min-h-[142px] rounded-lg border p-3 flex flex-col items-center text-center ${
-                isUnlocked
-                    ? 'border-accent bg-accent/10'
-                    : (isReady ? 'border-cyan bg-cyan/10' : 'border-border bg-surface opacity-70')
-            }`}>
-                <div className={`w-14 h-14 flex items-center justify-center text-xs font-bold mb-2 ${
-                    isUnlocked ? 'bg-accent text-base' : (isReady ? 'bg-cyan text-base' : 'bg-elevated text-textMuted')
-                }`} style={{ clipPath: 'polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%)' }}>
-                    {isFree ? 'AUTO' : (isUnlocked ? 'OK' : getSkillInitials(skill.skill_name))}
+        <div className="card p-4 mt-3 animate-slideup">
+            <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="min-w-0">
+                    <p className="font-semibold">{skill.skill_name}</p>
+                    <p className="text-xs text-textMuted mt-1">
+                        Lv.{skill.lv_required} | {isFree ? 'AUTO' : `${skill.sp_cost} SP`} | {isUnlocked ? 'Learned' : 'Not learned'}
+                    </p>
                 </div>
-                {showLevel && <p className="text-[10px] font-semibold text-textMuted mb-1">Lv.{skill.lv_required}</p>}
-                <p className="text-xs font-semibold leading-snug min-h-[32px] line-clamp-2">{skill.skill_name}</p>
-                {skill.description && (
-                    <p className="text-[10px] text-textMuted leading-snug mt-1 line-clamp-2">{skill.description}</p>
-                )}
-                <div className="mt-auto pt-3 w-full">
-                    {isFree && (
-                        <span className={`block text-[10px] py-1.5 ${isUnlocked ? 'text-accent' : 'text-textMuted'}`}>
-                            {isUnlocked ? 'AUTO' : `Auto Lv.${skill.lv_required}`}
-                        </span>
-                    )}
-                    {isUnlocked && !isFree && (
-                        <button onClick={handleRefund} disabled={isLoading || refundsLeft <= 0} className="btn-ghost text-[10px] w-full py-1.5">
-                            {isLoading ? '...' : 'Refund'}
-                        </button>
-                    )}
-                    {!isFree && !isUnlocked && meetsLevel && canUnlock && (
-                        <button
-                            onClick={handleUnlock}
-                            disabled={isLoading}
-                            className="btn-primary text-[10px] w-full py-1.5"
-                        >
-                            {isLoading ? '...' : `${skill.sp_cost} SP`}
-                        </button>
-                    )}
-                    {!isFree && !isUnlocked && (!meetsLevel || !canUnlock) && (
-                        <span className="block text-[10px] text-textMuted py-1.5">
-                            {!meetsLevel ? `Need Lv.${skill.lv_required}` : 'Prereq'}
-                        </span>
-                    )}
-                </div>
+                <button onClick={onClose} className="text-xs text-textMuted hover:text-textPrimary" type="button">Close</button>
             </div>
+
+            <p className="text-xs text-textSecondary leading-relaxed mb-4">
+                {skill.description || 'No description available.'}
+            </p>
+
+            {isFree && (
+                <p className="text-xs text-accent">This node is learned automatically when the skill reaches the required level.</p>
+            )}
+            {!isFree && !isUnlocked && canLearn && (
+                <button onClick={handleUnlock} disabled={isLoading} className="btn-primary w-full text-sm">
+                    {isLoading ? 'Learning...' : `Learn for ${skill.sp_cost} SP`}
+                </button>
+            )}
+            {!isFree && !isUnlocked && !canLearn && (
+                <p className="text-xs text-textMuted">{lockedReason || 'This node cannot be learned yet.'}</p>
+            )}
+            {isUnlocked && !isFree && canForget && (
+                <button onClick={handleRefund} disabled={isLoading} className="btn-ghost w-full text-sm">
+                    {isLoading ? 'Forgetting...' : 'Forget'}
+                </button>
+            )}
+            {isUnlocked && !isFree && hasUnlockedChild && (
+                <p className="text-xs text-textMuted">Cannot forget while another learned node depends on this one.</p>
+            )}
+            {isUnlocked && !isFree && !hasUnlockedChild && refundsLeft <= 0 && (
+                <p className="text-xs text-textMuted">No refunds left today.</p>
+            )}
         </div>
     );
 }
@@ -175,6 +205,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
     const [refundStatus, setRefundStatus] = useState(null);
     const [selectedJobCode, setSelectedJobCode] = useState(null);
     const [selectedBranch, setSelectedBranch] = useState(null);
+    const [selectedSkillCode, setSelectedSkillCode] = useState(null);
     const [notification, setNotification] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -182,6 +213,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         if (selectedJobCode && !(jobs || []).some(job => job.code === selectedJobCode)) {
             setSelectedJobCode(null);
             setSelectedBranch(null);
+            setSelectedSkillCode(null);
         }
     }, [jobs, selectedJobCode]);
 
@@ -233,6 +265,10 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
             level,
             skills: currentBranchSkills.filter(skill => skill.lv_required === level),
         }));
+    const selectedSkill = currentBranchSkills.find(skill => skill.skill_code === selectedSkillCode) || null;
+    const selectedSkillHasUnlockedChild = selectedSkill
+        ? currentBranchSkills.some(skill => skill.prerequisite_skill_code === selectedSkill.skill_code && skill.is_unlocked)
+        : false;
     const viewTitle = selectedBranch
         ? (BRANCH_LABELS[selectedBranch] || selectedBranch)
         : (currentJob ? (JOB_LABELS[currentJob.code] || currentJob.display_name || currentJob.code) : 'Skills');
@@ -245,8 +281,13 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                         {(selectedJobCode || selectedBranch) && (
                             <button
                                 onClick={() => {
-                                    if (selectedBranch) setSelectedBranch(null);
-                                    else setSelectedJobCode(null);
+                                    if (selectedBranch) {
+                                        setSelectedBranch(null);
+                                        setSelectedSkillCode(null);
+                                    } else {
+                                        setSelectedJobCode(null);
+                                        setSelectedSkillCode(null);
+                                    }
                                 }}
                                 className="text-xs text-textMuted hover:text-textPrimary mb-1"
                                 type="button"
@@ -297,6 +338,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                 onClick={() => {
                                     setSelectedJobCode(job.code);
                                     setSelectedBranch(null);
+                                    setSelectedSkillCode(null);
                                 }}
                             />
                         ))}
@@ -312,7 +354,10 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                     key={branch}
                                     branch={branch}
                                     skills={branchSkills}
-                                    onClick={() => setSelectedBranch(branch)}
+                                    onClick={() => {
+                                        setSelectedBranch(branch);
+                                        setSelectedSkillCode(null);
+                                    }}
                                 />
                             );
                         })}
@@ -338,11 +383,10 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                                     skill={skill}
                                                     jobLevel={currentJob?.job_level || 0}
                                                     canUnlock={canUnlock(skill)}
-                                                    playerId={playerId}
-                                                    refundsLeft={refundStatus?.remaining_today ?? 0}
-                                                    onAction={handleAction}
                                                     isFirst={true}
                                                     showLevel={false}
+                                                    isSelected={selectedSkillCode === skill.skill_code}
+                                                    onSelect={item => setSelectedSkillCode(item.skill_code)}
                                                 />
                                                 ))}
                                             </div>
@@ -354,6 +398,16 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                         {branchLevelGroups.length === 0 && (
                             <p className="text-sm text-textMuted">No skill nodes available.</p>
                         )}
+                        <SkillDetailCard
+                            skill={selectedSkill}
+                            jobLevel={currentJob?.job_level || 0}
+                            canUnlock={selectedSkill ? canUnlock(selectedSkill) : false}
+                            hasUnlockedChild={selectedSkillHasUnlockedChild}
+                            playerId={playerId}
+                            refundsLeft={refundStatus?.remaining_today ?? 0}
+                            onAction={handleAction}
+                            onClose={() => setSelectedSkillCode(null)}
+                        />
                     </div>
                 )}
             </div>
