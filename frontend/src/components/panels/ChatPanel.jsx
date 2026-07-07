@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getChatMessages, getPlayerEvents, markPlayerEventsRead, sendChatMessage } from '../../api/api.game';
+import { getSocket } from '../../api/api.socket';
 
 const CHANNELS = ['GLOBAL', 'ZONE', 'GUILD', 'NOTI'];
 
@@ -47,15 +48,41 @@ export default function ChatPanel({ character, initialChannel = 'GLOBAL' }) {
         setActiveChannel(initialChannel);
     }, [initialChannel]);
 
+    // Lang nghe Socket.IO de nhan tin nhan/thong bao ngay lap tuc, khong can
+    // cho vong poll cua Dashboard hay tu goi lai API sau khi gui
+    useEffect(() => {
+        const socket = getSocket();
+        if (!socket) return;
+
+        function handleChatMessage(payload) {
+            if (payload.channel !== activeChannel) return;
+            setMessages(current => [...current, payload]);
+        }
+
+        function handlePlayerEvent(payload) {
+            if (activeChannel !== 'NOTI') return;
+            setEvents(current => [payload, ...current]);
+        }
+
+        socket.on('chat:message', handleChatMessage);
+        socket.on('player:event', handlePlayerEvent);
+
+        return () => {
+            socket.off('chat:message', handleChatMessage);
+            socket.off('player:event', handlePlayerEvent);
+        };
+    }, [activeChannel]);
+
     async function handleSend() {
         const cleanMessage = message.trim();
         if (!cleanMessage || activeChannel === 'NOTI') return;
 
         setError('');
         try {
+            // Khong can tu goi lai loadContent: tin nhan vua gui se duoc chinh
+            // server phat nguoc lai qua Socket.IO va duoc them vao o tren
             await sendChatMessage(playerId, activeChannel, cleanMessage);
             setMessage('');
-            await loadContent(activeChannel);
         } catch (err) {
             setError(err.message);
         }

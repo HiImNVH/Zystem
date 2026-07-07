@@ -3,6 +3,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
 
 const { initializeDatabaseSchema } = require('./repositories/repositories.database');
 const { seedJobsSeedTable } = require('./repositories/repositories.jobsSeed');
@@ -11,6 +12,7 @@ const { seedSkillTree } = require('./repositories/repositories.skillsSeed');
 const { seedDesignDatabase } = require('./repositories/repositories.designSeed');
 const { globalErrorHandler, notFoundHandler } = require('./middleware/middleware.errorHandler');
 const { globalLimiter } = require('./middleware/middleware.rateLimit');
+const { initializeSocketServer } = require('./sockets/sockets.io');
 
 // Import Routes
 const accountRouter      = require('./routes/routes.account');
@@ -41,20 +43,22 @@ if (process.env.NODE_ENV === 'production') {
     app.set('trust proxy', 1);
 }
 
-app.use(cors({
-    origin(origin, callback) {
-        if (!origin) {
-            callback(null, true);
-            return;
-        }
-
-        const isAllowedOrigin =
-            corsOrigins.includes(origin) ||
-            defaultCorsOriginPatterns.some(pattern => pattern.test(origin));
-
-        callback(null, isAllowedOrigin);
+// Dung chung logic kiem tra origin cho ca REST API (cors) va Socket.IO,
+// tranh lech cau hinh giua hai kenh giao tiep
+function corsOriginChecker(origin, callback) {
+    if (!origin) {
+        callback(null, true);
+        return;
     }
-}));
+
+    const isAllowedOrigin =
+        corsOrigins.includes(origin) ||
+        defaultCorsOriginPatterns.some(pattern => pattern.test(origin));
+
+    callback(null, isAllowedOrigin);
+}
+
+app.use(cors({ origin: corsOriginChecker }));
 app.use(express.json());
 // Rate limiting toan cuc cho toan bo API
 app.use(globalLimiter);
@@ -94,6 +98,11 @@ app.use('/api/chat',         chatRouter);         // Protected
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
+// Dung chung 1 HTTP server cho ca Express (REST) va Socket.IO (realtime),
+// de khong phai mo hai port rieng biet
+const httpServer = http.createServer(app);
+initializeSocketServer(httpServer, { origin: corsOriginChecker });
+
 async function bootUpWebApplication() {
     console.log(`[INFO] Dang khoi dong he thong Zystem Back-end tren cong ${serverPort}...`);
 
@@ -108,8 +117,9 @@ async function bootUpWebApplication() {
     await seedDesignDatabase();
     await seedSkillTree();
 
-    app.listen(serverPort, () => {
+    httpServer.listen(serverPort, () => {
         console.log(`[SUCCESS] Zystem API dang chay tai: http://localhost:${serverPort}`);
+        console.log('[INFO] Socket.IO realtime dang chay chung port voi REST API.');
         console.log('[INFO] Auth flow: POST /api/accounts/login -> nhan token -> gan vao Header: Authorization: Bearer <token>');
         console.log('[INFO] Route map:');
         console.log('  [PUBLIC]    POST /api/accounts/register | POST /api/accounts/login');

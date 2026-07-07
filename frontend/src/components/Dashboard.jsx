@@ -12,6 +12,7 @@ import {
     getInventory, getPlayerJobs,
 } from '../api/api.game';
 import { getMyCharacter } from '../api/api.character';
+import { connectSocket } from '../api/api.socket';
 
 const TAB = { MAIN: 'MAIN', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
 const SIDE_TABS = [
@@ -141,6 +142,14 @@ export default function Dashboard({ initialCharacter, onLogout }) {
         const id = setInterval(loadAll, 30000);
         return () => clearInterval(id);
     }, [loadAll]);
+
+    // Gia nhap room realtime rieng cua player de nhan thong bao (player:event)
+    // ngay lap tuc qua Socket.IO, khong can cho vong poll 30s
+    useEffect(() => {
+        if (!playerId) return;
+        const socket = connectSocket();
+        socket?.emit('join:player', { playerId });
+    }, [playerId]);
 
     const ctx = { playerId, character, zones, inventory, jobs, stats, loadAll, onLogout };
 

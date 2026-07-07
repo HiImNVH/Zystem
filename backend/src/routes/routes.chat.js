@@ -4,6 +4,7 @@ const express = require('express');
 const chatRouter = express.Router();
 const { dbPool } = require('../repositories/repositories.database');
 const { verifyToken } = require('../middleware/middleware.auth');
+const { emitChatMessage } = require('../sockets/sockets.io');
 
 const ALLOWED_CHANNELS = new Set(['GLOBAL', 'ZONE', 'GUILD']);
 
@@ -69,6 +70,8 @@ chatRouter.post('/messages', verifyToken, async (req, res, next) => {
             playerResult.rows[0].character_name,
             cleanMessage,
         ]);
+
+        emitChatMessage(normalizedChannel, result.rows[0]);
 
         return res.status(201).json({ success: true, data: result.rows[0] });
     } catch (error) {

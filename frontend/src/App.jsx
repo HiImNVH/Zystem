@@ -5,6 +5,7 @@ import AuthForm from './components/AuthForm';
 import CreateCharacter from './components/CreateCharacter';
 import Dashboard from './components/Dashboard';
 import { getMyCharacter } from './api/api.character';
+import { disconnectSocket } from './api/api.socket';
 
 const PAGE = { BOOT: 'BOOT', LOGIN: 'LOGIN', CREATE_CHARACTER: 'CREATE_CHARACTER', DASHBOARD: 'DASHBOARD' };
 
@@ -59,6 +60,7 @@ export default function App() {
     }
 
     function handleLogout() {
+        disconnectSocket();
         localStorage.removeItem('zystem_token');
         localStorage.removeItem('zystem_account');
         setAccount(null);

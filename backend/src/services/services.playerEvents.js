@@ -1,6 +1,7 @@
 // backend/src/services/services.playerEvents.js
 
 const { dbPool } = require('../repositories/repositories.database');
+const { emitPlayerEvent } = require('../sockets/sockets.io');
 
 async function logPlayerEvent(playerId, event) {
     if (!playerId || !event) return null;
@@ -20,7 +21,10 @@ async function logPlayerEvent(playerId, event) {
             JSON.stringify(event.payload || {}),
         ]);
 
-        return result.rows[0] || null;
+        const savedEvent = result.rows[0] || null;
+        if (savedEvent) emitPlayerEvent(playerId, savedEvent);
+
+        return savedEvent;
     } catch (error) {
         console.warn('[WARN] Khong ghi duoc player event:', error.message);
         return null;
