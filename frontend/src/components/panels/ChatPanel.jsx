@@ -1,6 +1,6 @@
 ﻿// frontend/src/components/panels/ChatPanel.jsx
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getChatMessages, getPlayerEvents, markPlayerEventsRead, sendChatMessage } from '../../api/api.game';
 import { getSocket } from '../../api/api.socket';
 
@@ -19,6 +19,36 @@ export default function ChatPanel({ character, initialChannel = 'GLOBAL' }) {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const playerId = character?.id;
+
+    // Quan ly cuon: tu dong cuon xuong cuoi khi co noi dung moi, nhung chi khi
+    // nguoi choi dang o gan day danh sach — neu ho da luot len xem lai tin cu
+    // thi khong cuon giat, thay vao do hien nut "quay ve cuoi"
+    const scrollContainerRef = useRef(null);
+    const previousChannelRef = useRef(null);
+    const isNearBottomRef = useRef(true);
+    const [showScrollButton, setShowScrollButton] = useState(false);
+    const [hasNewContent, setHasNewContent] = useState(false);
+
+    const NEAR_BOTTOM_THRESHOLD_PX = 80;
+
+    function scrollToBottom(behavior = 'smooth') {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        container.scrollTo({ top: container.scrollHeight, behavior });
+        isNearBottomRef.current = true;
+        setShowScrollButton(false);
+        setHasNewContent(false);
+    }
+
+    function handleScroll() {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+        const nearBottom = distanceFromBottom < NEAR_BOTTOM_THRESHOLD_PX;
+        isNearBottomRef.current = nearBottom;
+        setShowScrollButton(!nearBottom);
+        if (nearBottom) setHasNewContent(false);
+    }
 
     async function loadContent(channel = activeChannel) {
         if (!playerId) return;
@@ -47,6 +77,25 @@ export default function ChatPanel({ character, initialChannel = 'GLOBAL' }) {
     useEffect(() => {
         setActiveChannel(initialChannel);
     }, [initialChannel]);
+
+    // Moi khi doi kenh: nhay thang xuong cuoi ngay lap tuc (khong animation).
+    // Moi khi co tin nhan/thong bao moi trong cung kenh: neu dang o gan cuoi
+    // thi tu dong cuon muot xuong, neu khong thi chi bao co noi dung moi qua nut.
+    useEffect(() => {
+        const isChannelSwitch = previousChannelRef.current !== activeChannel;
+        previousChannelRef.current = activeChannel;
+
+        if (isChannelSwitch) {
+            requestAnimationFrame(() => scrollToBottom('auto'));
+            return;
+        }
+
+        if (isNearBottomRef.current) {
+            requestAnimationFrame(() => scrollToBottom('smooth'));
+        } else {
+            setHasNewContent(true);
+        }
+    }, [messages, events]);
 
     // Lang nghe Socket.IO de nhan tin nhan/thong bao ngay lap tuc, khong can
     // cho vong poll cua Dashboard hay tu goi lai API sau khi gui
@@ -102,36 +151,53 @@ export default function ChatPanel({ character, initialChannel = 'GLOBAL' }) {
                 ))}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3 space-y-3">
-                {isLoading && <p className="text-sm text-textMuted text-center py-8">Loading...</p>}
-                {error && <p className="text-sm text-danger">{error}</p>}
+            <div className="relative flex-1 min-h-0">
+                <div
+                    ref={scrollContainerRef}
+                    onScroll={handleScroll}
+                    className="h-full overflow-y-auto p-3 space-y-3"
+                >
+                    {isLoading && <p className="text-sm text-textMuted text-center py-8">Loading...</p>}
+                    {error && <p className="text-sm text-danger">{error}</p>}
 
-                {!isLoading && activeChannel === 'NOTI' && events.map(event => (
-                    <div key={event.id} className="card p-3">
-                        <div className="flex items-start justify-between gap-3">
-                            <p className="text-sm font-semibold">{event.title}</p>
-                            <span className="text-[10px] text-textMuted flex-shrink-0">{formatTime(event.created_at)}</span>
+                    {!isLoading && activeChannel === 'NOTI' && events.map(event => (
+                        <div key={event.id} className="card p-3">
+                            <div className="flex items-start justify-between gap-3">
+                                <p className="text-sm font-semibold">{event.title}</p>
+                                <span className="text-[10px] text-textMuted flex-shrink-0">{formatTime(event.created_at)}</span>
+                            </div>
+                            <p className="text-xs text-textSecondary mt-1 leading-relaxed">{event.message}</p>
+                            <p className="text-[10px] text-textMuted mt-2">{event.source}</p>
                         </div>
-                        <p className="text-xs text-textSecondary mt-1 leading-relaxed">{event.message}</p>
-                        <p className="text-[10px] text-textMuted mt-2">{event.source}</p>
-                    </div>
-                ))}
+                    ))}
 
-                {!isLoading && activeChannel !== 'NOTI' && messages.map(chat => (
-                    <div key={chat.id} className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-accent">{chat.sender_name}</span>
-                            <span className="text-[10px] text-textMuted">{formatTime(chat.created_at)}</span>
+                    {!isLoading && activeChannel !== 'NOTI' && messages.map(chat => (
+                        <div key={chat.id} className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-semibold text-accent">{chat.sender_name}</span>
+                                <span className="text-[10px] text-textMuted">{formatTime(chat.created_at)}</span>
+                            </div>
+                            <p className="text-sm text-textSecondary break-words">{chat.message}</p>
                         </div>
-                        <p className="text-sm text-textSecondary break-words">{chat.message}</p>
-                    </div>
-                ))}
+                    ))}
 
-                {!isLoading && activeChannel === 'NOTI' && events.length === 0 && (
-                    <p className="text-sm text-textMuted text-center py-8">No notifications yet.</p>
-                )}
-                {!isLoading && activeChannel !== 'NOTI' && messages.length === 0 && (
-                    <p className="text-sm text-textMuted text-center py-8">No messages yet.</p>
+                    {!isLoading && activeChannel === 'NOTI' && events.length === 0 && (
+                        <p className="text-sm text-textMuted text-center py-8">No notifications yet.</p>
+                    )}
+                    {!isLoading && activeChannel !== 'NOTI' && messages.length === 0 && (
+                        <p className="text-sm text-textMuted text-center py-8">No messages yet.</p>
+                    )}
+                </div>
+
+                {showScrollButton && (
+                    <button
+                        type="button"
+                        onClick={() => scrollToBottom('smooth')}
+                        className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-black text-xs font-semibold shadow-lg hover:opacity-90 transition"
+                    >
+                        {hasNewContent ? 'New messages' : 'Back to bottom'}
+                        <span aria-hidden="true">↓</span>
+                    </button>
                 )}
             </div>
 
