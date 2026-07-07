@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { getChatMessages, getPlayerEvents, markPlayerEventsRead, sendChatMessage } from '../../api/api.game';
-import { getSocket } from '../../api/api.socket';
+import { connectSocket } from '../../api/api.socket';
 
 const CHANNELS = ['GLOBAL', 'ZONE', 'GUILD', 'NOTI'];
 
@@ -100,7 +100,7 @@ export default function ChatPanel({ character, initialChannel = 'GLOBAL' }) {
     // Lang nghe Socket.IO de nhan tin nhan/thong bao ngay lap tuc, khong can
     // cho vong poll cua Dashboard hay tu goi lai API sau khi gui
     useEffect(() => {
-        const socket = getSocket();
+        const socket = connectSocket();
         if (!socket) return;
 
         function handleChatMessage(payload) {

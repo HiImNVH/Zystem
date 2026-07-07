@@ -8,9 +8,12 @@ const SOCKET_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').rep
 // tranh moi ChatPanel tu tao ket noi rieng gay lang phi va trung su kien
 let socketInstance = null;
 
-// Tao ket noi realtime, dung JWT token hien tai de xac thuc voi backend
+// Tao ket noi realtime, dung JWT token hien tai de xac thuc voi backend.
+// Kiem tra theo SU TON TAI cua instance (khong phai .connected) — vi trong
+// luc socket dang o trang thai "connecting" (chua kip bat co .connected=true),
+// neu component khac cung goi ham nay se tao nham mot ket noi thu hai.
 export function connectSocket() {
-    if (socketInstance?.connected) return socketInstance;
+    if (socketInstance) return socketInstance;
 
     const token = localStorage.getItem('zystem_token');
     if (!token) return null;
