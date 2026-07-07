@@ -26,6 +26,7 @@ const skillsRouter       = require('./routes/routes.skills');
 const progressRouter     = require('./routes/routes.progress');
 const eventsRouter       = require('./routes/routes.events');
 const chatRouter         = require('./routes/routes.chat');
+const factionsRouter     = require('./routes/routes.factions');
 
 const app = express();
 const serverPort = process.env.PORT || 5000;
@@ -94,6 +95,7 @@ app.use('/api/skills',       skillsRouter);       // Protected
 app.use('/api/progress',     progressRouter);     // Protected
 app.use('/api/events',       eventsRouter);       // Protected
 app.use('/api/chat',         chatRouter);         // Protected
+app.use('/api/factions',     factionsRouter);     // Protected
 
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
@@ -136,6 +138,7 @@ async function bootUpWebApplication() {
         console.log('  [PROTECTED] GET  /api/progress/:id      | POST /api/progress/touch');
         console.log('  [PROTECTED] GET  /api/events/:id        | POST /api/events/:id/read');
         console.log('  [PROTECTED] GET  /api/chat/messages     | POST /api/chat/messages');
+        console.log('  [PROTECTED] GET  /api/factions          | GET /player/:id | POST / | POST /join | POST /leave');
     });
 }
 

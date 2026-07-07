@@ -643,6 +643,20 @@ async function initializeDatabaseSchema() {
         `);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_chat_messages_channel_created ON chat_messages(channel, created_at DESC);`);
 
+        // ============================================================
+        // BANG: FACTIONS (toi gian — 1 nhan vat chi thuoc 1 faction)
+        // ============================================================
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS factions (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                name VARCHAR(50) NOT NULL UNIQUE,
+                leader_player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+        await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS faction_id UUID REFERENCES factions(id) ON DELETE SET NULL;`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_players_faction ON players(faction_id);`);
+
         await client.query('COMMIT');
         console.log('[SUCCESS] Toan bo he thong bang Zystem da khoi tao thanh cong!');
         return true;
