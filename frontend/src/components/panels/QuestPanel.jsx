@@ -91,7 +91,10 @@ function buildAlignedSkillColumns(branchSkills, levelGaps) {
 
     const componentsByRoot = {};
     sortedSkills.forEach(skill => {
-        const root = getSheetRowKey(skill.skill_name);
+        // Uu tien row_group tuong minh tu backend (cho phep gom cac skill khac
+        // ten vao chung mot hang ma khong bi suy luan noi voi nhau); neu khong
+        // co thi rot ve cach cu: suy luan hang dua tren ten skill (I/II/III...)
+        const root = skill.row_group || getSheetRowKey(skill.skill_name);
         if (!componentsByRoot[root]) componentsByRoot[root] = [];
         componentsByRoot[root].push(skill);
     });

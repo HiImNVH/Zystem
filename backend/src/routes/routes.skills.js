@@ -46,7 +46,7 @@ skillsRouter.get('/player/:playerId', verifyToken, verifyPlayerOwnership, async 
                 js.id, js.job_code, js.branch, js.skill_code, js.skill_name,
                 js.lv_required, js.sp_cost, js.tier,
                 js.effect_type, js.effect_val, js.description,
-                js.prerequisite_skill_code,
+                js.prerequisite_skill_code, js.row_group,
                 pj.job_level,
                 COALESCE(ps.is_unlocked, FALSE) AS is_unlocked,
                 ps.unlocked_at

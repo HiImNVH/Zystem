@@ -551,7 +551,8 @@ const ALL_SKILLS = [
         "lv": 5,
         "sp": 1,
         "tier": 1,
-        "desc": "Unlock Grinding."
+        "desc": "Unlock Grinding.",
+        "rowGroup": "cooking_processing_row"
     },
     {
         "job": "cooking",
@@ -561,7 +562,8 @@ const ALL_SKILLS = [
         "lv": 10,
         "sp": 1,
         "tier": 2,
-        "desc": "Unlock Drying."
+        "desc": "Unlock Drying.",
+        "rowGroup": "cooking_processing_row"
     },
     {
         "job": "cooking",
@@ -571,7 +573,8 @@ const ALL_SKILLS = [
         "lv": 15,
         "sp": 2,
         "tier": 3,
-        "desc": "Unlock Charring."
+        "desc": "Unlock Charring.",
+        "rowGroup": "cooking_processing_row"
     },
     {
         "job": "cooking",
@@ -581,7 +584,8 @@ const ALL_SKILLS = [
         "lv": 20,
         "sp": 2,
         "tier": 4,
-        "desc": "Unlock Smoking."
+        "desc": "Unlock Smoking.",
+        "rowGroup": "cooking_processing_row"
     },
     {
         "job": "cooking",
@@ -721,7 +725,8 @@ const ALL_SKILLS = [
         "lv": 10,
         "sp": 2,
         "tier": 2,
-        "desc": "Unlock Noodle."
+        "desc": "Unlock Noodle.",
+        "rowGroup": "cooking_foods_plain_dishes_row"
     },
     {
         "job": "cooking",
@@ -731,7 +736,8 @@ const ALL_SKILLS = [
         "lv": 15,
         "sp": 3,
         "tier": 3,
-        "desc": "Unlock Bread."
+        "desc": "Unlock Bread.",
+        "rowGroup": "cooking_foods_plain_dishes_row"
     },
     {
         "job": "cooking",
@@ -741,7 +747,8 @@ const ALL_SKILLS = [
         "lv": 20,
         "sp": 3,
         "tier": 4,
-        "desc": "Unlock Burger."
+        "desc": "Unlock Burger.",
+        "rowGroup": "cooking_foods_plain_dishes_row"
     },
     {
         "job": "cooking",
@@ -761,7 +768,8 @@ const ALL_SKILLS = [
         "lv": 30,
         "sp": 4,
         "tier": 6,
-        "desc": "Unlock Pizza."
+        "desc": "Unlock Pizza.",
+        "rowGroup": "cooking_foods_plain_dishes_row"
     },
     {
         "job": "cooking",
@@ -816,12 +824,13 @@ const ALL_SKILLS = [
     {
         "job": "cooking",
         "branch": "drinks",
-        "code": "cooking_drinks_warter_lv10",
-        "name": "Warter",
+        "code": "cooking_drinks_water_lv10",
+        "name": "Water",
         "lv": 10,
         "sp": 2,
         "tier": 2,
-        "desc": "Unlock Warter."
+        "desc": "Unlock Water.",
+        "pre": "cooking_drinks_contaminated_water_lv1"
     },
     {
         "job": "cooking",
@@ -831,7 +840,8 @@ const ALL_SKILLS = [
         "lv": 20,
         "sp": 3,
         "tier": 4,
-        "desc": "Unlock Mineral water."
+        "desc": "Unlock Mineral water.",
+        "pre": "cooking_drinks_water_lv10"
     },
     {
         "job": "cooking",
@@ -891,7 +901,8 @@ const ALL_SKILLS = [
         "lv": 5,
         "sp": 1,
         "tier": 1,
-        "desc": "Unlock Salt."
+        "desc": "Unlock Salt.",
+        "rowGroup": "cooking_spices_pure_row"
     },
     {
         "job": "cooking",
@@ -901,7 +912,8 @@ const ALL_SKILLS = [
         "lv": 10,
         "sp": 2,
         "tier": 2,
-        "desc": "Unlock Sugar."
+        "desc": "Unlock Sugar.",
+        "rowGroup": "cooking_spices_pure_row"
     },
     {
         "job": "cooking",
@@ -911,7 +923,8 @@ const ALL_SKILLS = [
         "lv": 15,
         "sp": 2,
         "tier": 3,
-        "desc": "Unlock Vinegar."
+        "desc": "Unlock Vinegar.",
+        "rowGroup": "cooking_spices_pure_row"
     },
     {
         "job": "cooking",
@@ -941,7 +954,8 @@ const ALL_SKILLS = [
         "lv": 15,
         "sp": 2,
         "tier": 3,
-        "desc": "Unlock Butter."
+        "desc": "Unlock Butter.",
+        "rowGroup": "cooking_spices_processed_edible_row"
     },
     {
         "job": "cooking",
@@ -951,7 +965,8 @@ const ALL_SKILLS = [
         "lv": 20,
         "sp": 3,
         "tier": 4,
-        "desc": "Unlock Cheese."
+        "desc": "Unlock Cheese.",
+        "rowGroup": "cooking_spices_processed_edible_row"
     },
     {
         "job": "cooking",
@@ -1031,7 +1046,8 @@ const ALL_SKILLS = [
         "lv": 40,
         "sp": 4,
         "tier": 8,
-        "desc": "Unlock First aid Kit."
+        "desc": "Unlock First aid Kit.",
+        "pre": "cooking_medicines_bandage_lv10"
     },
     {
         "job": "gathering",
@@ -1156,12 +1172,13 @@ const ALL_SKILLS = [
     {
         "job": "gathering",
         "branch": "minerals",
-        "code": "gathering_minerals_amethys_lv40",
-        "name": "Amethys",
+        "code": "gathering_minerals_amethyst_lv40",
+        "name": "Amethyst",
         "lv": 40,
         "sp": 5,
         "tier": 8,
-        "desc": "Unlock Amethys."
+        "desc": "Unlock Amethyst.",
+        "pre": "gathering_minerals_chemical_minerals_lv25"
     },
     {
         "job": "gathering",
@@ -1411,7 +1428,8 @@ const ALL_SKILLS = [
         "lv": 20,
         "sp": 2,
         "tier": 4,
-        "desc": "Unlock Bone weapon."
+        "desc": "Unlock Bone weapon.",
+        "pre": "crafting_weapon_stone_weapon_lv1"
     },
     {
         "job": "crafting",
@@ -1421,7 +1439,8 @@ const ALL_SKILLS = [
         "lv": 40,
         "sp": 5,
         "tier": 8,
-        "desc": "Unlock Metal weapon."
+        "desc": "Unlock Metal weapon.",
+        "pre": "crafting_weapon_bone_weapon_lv20"
     },
     {
         "job": "crafting",
@@ -1441,17 +1460,19 @@ const ALL_SKILLS = [
         "lv": 20,
         "sp": 2,
         "tier": 4,
-        "desc": "Unlock Crossbow."
+        "desc": "Unlock Crossbow.",
+        "pre": "crafting_weapon_bow_lv1"
     },
     {
         "job": "crafting",
         "branch": "weapon",
-        "code": "crafting_weapon_inproved_bow_lv30",
-        "name": "Inproved bow",
+        "code": "crafting_weapon_improved_bow_lv30",
+        "name": "Improved bow",
         "lv": 30,
         "sp": 4,
         "tier": 6,
-        "desc": "Unlock Inproved bow."
+        "desc": "Unlock Improved bow.",
+        "pre": "crafting_weapon_crossbow_lv20"
     },
     {
         "job": "crafting",
@@ -1461,7 +1482,8 @@ const ALL_SKILLS = [
         "lv": 40,
         "sp": 5,
         "tier": 8,
-        "desc": "Unlock Improved crossbow."
+        "desc": "Unlock Improved crossbow.",
+        "pre": "crafting_weapon_improved_bow_lv30"
     },
     {
         "job": "crafting",
@@ -1741,7 +1763,8 @@ const ALL_SKILLS = [
         "lv": 1,
         "sp": 0,
         "tier": 1,
-        "desc": "Unlock Tent."
+        "desc": "Unlock Tent.",
+        "rowGroup": "building_funiture_tent_bed_row"
     },
     {
         "job": "building",
@@ -1751,7 +1774,8 @@ const ALL_SKILLS = [
         "lv": 10,
         "sp": 1,
         "tier": 2,
-        "desc": "Unlock Bed I."
+        "desc": "Unlock Bed I.",
+        "rowGroup": "building_funiture_tent_bed_row"
     },
     {
         "job": "building",
@@ -1761,7 +1785,8 @@ const ALL_SKILLS = [
         "lv": 30,
         "sp": 2,
         "tier": 6,
-        "desc": "Unlock Bed II."
+        "desc": "Unlock Bed II.",
+        "rowGroup": "building_funiture_tent_bed_row"
     },
     {
         "job": "building",
@@ -1831,7 +1856,8 @@ const ALL_SKILLS = [
         "lv": 1,
         "sp": 0,
         "tier": 1,
-        "desc": "Unlock Campfire."
+        "desc": "Unlock Campfire.",
+        "rowGroup": "building_workbench_campfire_kitchen_row"
     },
     {
         "job": "building",
@@ -1841,7 +1867,8 @@ const ALL_SKILLS = [
         "lv": 10,
         "sp": 2,
         "tier": 2,
-        "desc": "Unlock Kitchen I."
+        "desc": "Unlock Kitchen I.",
+        "rowGroup": "building_workbench_campfire_kitchen_row"
     },
     {
         "job": "building",
@@ -1851,7 +1878,8 @@ const ALL_SKILLS = [
         "lv": 30,
         "sp": 4,
         "tier": 6,
-        "desc": "Unlock Kitchen II."
+        "desc": "Unlock Kitchen II.",
+        "rowGroup": "building_workbench_campfire_kitchen_row"
     },
     {
         "job": "building",
@@ -1926,42 +1954,42 @@ const ALL_SKILLS = [
     {
         "job": "building",
         "branch": "housing",
-        "code": "building_housing_wooden_structure_lv10",
-        "name": "Wooden structure",
+        "code": "building_housing_wall_i_lv10",
+        "name": "Wall I",
         "lv": 10,
         "sp": 1,
         "tier": 2,
-        "desc": "Unlock Wooden structure."
+        "desc": "Unlock Wall I."
     },
     {
         "job": "building",
         "branch": "housing",
-        "code": "building_housing_stone_structure_lv30",
-        "name": "Stone structure",
+        "code": "building_housing_wall_ii_lv30",
+        "name": "Wall II",
         "lv": 30,
         "sp": 3,
         "tier": 6,
-        "desc": "Unlock Stone structure."
+        "desc": "Unlock Wall II."
     },
     {
         "job": "building",
         "branch": "housing",
-        "code": "building_housing_wooden_fence_lv20",
-        "name": "Wooden fence",
+        "code": "building_housing_fence_i_lv20",
+        "name": "Fence I",
         "lv": 20,
         "sp": 2,
         "tier": 4,
-        "desc": "Unlock Wooden fence."
+        "desc": "Unlock Fence I."
     },
     {
         "job": "building",
         "branch": "housing",
-        "code": "building_housing_stone_fence_lv40",
-        "name": "Stone fence",
+        "code": "building_housing_fence_ii_lv40",
+        "name": "Fence II",
         "lv": 40,
         "sp": 4,
         "tier": 8,
-        "desc": "Unlock Stone fence."
+        "desc": "Unlock Fence II."
     }
 ];
 
@@ -2012,12 +2040,12 @@ async function seedSkillTree() {
             await dbPool.query(`
                 INSERT INTO job_skills
                     (job_code, branch, skill_code, skill_name, lv_required, sp_cost, tier,
-                     effect_type, effect_val, description, prerequisite_skill_code)
-                VALUES ($1,$2,$3,$4,$5,$6,$7,'passive',0,$8,$9)
+                     effect_type, effect_val, description, prerequisite_skill_code, row_group)
+                VALUES ($1,$2,$3,$4,$5,$6,$7,'passive',0,$8,$9,$10)
                 ON CONFLICT (skill_code) DO NOTHING;
             `, [
                 skill.job, skill.branch, skill.code, skill.name,
-                skill.lv, skill.sp, skill.tier, skill.desc, skill.pre || null
+                skill.lv, skill.sp, skill.tier, skill.desc, skill.pre || null, skill.rowGroup || null
             ]);
         }
 

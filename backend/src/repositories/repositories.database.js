@@ -584,9 +584,15 @@ async function initializeDatabaseSchema() {
                 effect_val NUMERIC(8,2) NOT NULL DEFAULT 0,
                 description TEXT,
                 prerequisite_skill_code VARCHAR(50),
+                row_group VARCHAR(64),
                 created_at TIMESTAMPTZ DEFAULT NOW()
             );
         `);
+        // row_group: cho phep gom nhieu skill KHAC TEN vao chung mot hang tren
+        // cay skill ma KHONG tao duong noi prerequisite giua chung (vi du:
+        // Campfire dat chung hang voi Kitchen nhung khong phu thuoc nhau).
+        // Neu NULL, frontend tu suy ra hang dua tren ten skill nhu truoc gio.
+        await client.query(`ALTER TABLE job_skills ADD COLUMN IF NOT EXISTS row_group VARCHAR(64);`);
 
         await client.query(`
             CREATE TABLE IF NOT EXISTS player_skills (
