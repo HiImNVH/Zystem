@@ -19,7 +19,6 @@ const SIDE_TABS = [
     { key: TAB.INVENTORY, label: 'Inventory' },
     { key: TAB.CHAT, label: 'Chat' },
 ];
-const RIGHT_TABS = ['Chat', 'Gang', 'Mail', 'Noti.'];
 
 // Ham thuan render panel theo tab, tach ra module-level de khong bi tao lai
 // moi lan Dashboard re-render (tranh unmount/remount lam mat state cua panel con)
@@ -89,24 +88,11 @@ function CenterViewport({ centerTab, onChangeCenterTab, ctx }) {
     );
 }
 
-function RightViewport({ rightTab, onChangeRightTab, character }) {
+function RightViewport({ character }) {
     return (
         <section className="workspace-pane workspace-pane-right">
-            <div className="workspace-tabs workspace-tabs-right">
-                {RIGHT_TABS.map(label => (
-                    <button
-                        key={label}
-                        onClick={() => onChangeRightTab(label)}
-                        className={`workspace-tab ${rightTab === label ? 'workspace-tab-active' : ''}`}
-                        type="button"
-                    >
-                        {label}
-                        {label === 'Mail' && <span className="mail-badge">1</span>}
-                    </button>
-                ))}
-            </div>
             <div className="workspace-pane-body">
-                <ChatPanel character={character} initialChannel={rightTab === 'Noti.' ? 'NOTI' : 'GLOBAL'} />
+                <ChatPanel character={character} />
             </div>
         </section>
     );
@@ -120,7 +106,6 @@ export default function Dashboard({ initialCharacter, onLogout }) {
     const [jobs, setJobs]           = useState([]);
     const [leftTab, setLeftTab]     = useState(TAB.INVENTORY);
     const [centerTab, setCenterTab] = useState(TAB.MAIN);
-    const [rightTab, setRightTab]   = useState('Chat');
 
     const playerId = character?.id;
 
@@ -158,7 +143,7 @@ export default function Dashboard({ initialCharacter, onLogout }) {
             <div className="workspace-shell">
                 <LeftViewport leftTab={leftTab} onChangeLeftTab={setLeftTab} ctx={ctx} />
                 <CenterViewport centerTab={centerTab} onChangeCenterTab={setCenterTab} ctx={ctx} />
-                <RightViewport rightTab={rightTab} onChangeRightTab={setRightTab} character={character} />
+                <RightViewport character={character} />
             </div>
         </div>
     );
