@@ -96,6 +96,52 @@ function ItemTile({ item, onSelect }) {
     );
 }
 
+function groupItemsByCategory(items) {
+    const groups = FILTERS
+        .filter(filterItem => filterItem.value !== 'ALL')
+        .map(filterItem => ({
+            category: filterItem.value,
+            label: filterItem.label,
+            items: [],
+        }));
+    const groupByCategory = Object.fromEntries(groups.map(group => [group.category, group]));
+    const otherGroup = { category: 'OTHER', label: 'Other', items: [] };
+
+    for (const item of items || []) {
+        const category = String(item.category || '').toUpperCase();
+        const group = groupByCategory[category] || otherGroup;
+        group.items.push(item);
+    }
+
+    return [...groups, otherGroup].filter(group => group.items.length > 0);
+}
+
+function InventoryGrid({ items, onSelect }) {
+    return (
+        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+            {items.map(item => (
+                <ItemTile key={item.id} item={item} onSelect={onSelect} />
+            ))}
+        </div>
+    );
+}
+
+function InventoryGroups({ groups, onSelect }) {
+    return (
+        <div className="space-y-5">
+            {groups.map(group => (
+                <section key={group.category}>
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xs font-semibold uppercase text-textMuted">{group.label}</h3>
+                        <span className="text-[10px] font-mono text-textMuted">{group.items.length}</span>
+                    </div>
+                    <InventoryGrid items={group.items} onSelect={onSelect} />
+                </section>
+            ))}
+        </div>
+    );
+}
+
 function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -232,6 +278,7 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
     const [selected, setSelected] = useState(null);
 
     const filtered = (items || []).filter(item => filter === 'ALL' || (item.category || '').toUpperCase() === filter);
+    const groups = filter === 'ALL' ? groupItemsByCategory(filtered) : [];
 
     return (
         <div className="h-full flex flex-col">
@@ -263,11 +310,9 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-                        {filtered.map(item => (
-                            <ItemTile key={item.id} item={item} onSelect={setSelected} />
-                        ))}
-                    </div>
+                    filter === 'ALL'
+                        ? <InventoryGroups groups={groups} onSelect={setSelected} />
+                        : <InventoryGrid items={filtered} onSelect={setSelected} />
                 )}
             </div>
 
