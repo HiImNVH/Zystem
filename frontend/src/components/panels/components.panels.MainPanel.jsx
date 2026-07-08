@@ -546,7 +546,7 @@ function formatDropTable(dropTable) {
         .join(' | ');
 }
 
-function ActivityListSheet({ activityType, activityData, inventory, isLoading, error, onClose, onExecute, executingId }) {
+function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, executingId }) {
     const [combatEnemy, setCombatEnemy] = useState(null);
     if (!activityType) return null;
 
@@ -579,6 +579,7 @@ function ActivityListSheet({ activityType, activityData, inventory, isLoading, e
                 {!isLoading && activityType === 'enemy' && combatEnemy && (
                     <CombatMiniGame
                         enemy={combatEnemy}
+                        character={character}
                         inventory={inventory}
                         isExecuting={Boolean(executingId)}
                         onBack={() => setCombatEnemy(null)}
@@ -1344,6 +1345,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 <ActivityListSheet
                     activityType={activitySheet.type}
                     activityData={activitySheet.data}
+                    character={character}
                     inventory={inventory}
                     isLoading={activitySheet.isLoading}
                     error={activitySheet.error}

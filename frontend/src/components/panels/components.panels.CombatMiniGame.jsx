@@ -66,10 +66,21 @@ function getBaseDamage(enemy) {
     return Math.max(8, Math.round(attack * 2 + level * 3));
 }
 
-export default function CombatMiniGame({ enemy, inventory, isExecuting, onBack, onAttack }) {
+function calculateEnemyCounterDamage(enemy, accuracyResult) {
+    if (accuracyResult.outcome === 'critical') return 0;
+    const enemyAttack = parseInt(enemy?.attack) || 8;
+    const counterMultiplier = accuracyResult.outcome === 'graze' ? 1 : 0.55;
+    return Math.max(1, Math.round(enemyAttack * counterMultiplier));
+}
+
+export default function CombatMiniGame({ enemy, character, inventory, isExecuting, onBack, onAttack }) {
     const [accuracyMarker, setAccuracyMarker] = useState(50);
     const [markerDirection, setMarkerDirection] = useState(1);
     const [lastAccuracyResult, setLastAccuracyResult] = useState(null);
+    const [enemyHealth, setEnemyHealth] = useState(() => parseInt(enemy?.health) || 1);
+    const [playerHealth, setPlayerHealth] = useState(() => parseInt(character?.current_hp) || parseInt(character?.max_hp) || 1);
+    const enemyMaxHealth = Math.max(1, parseInt(enemy?.health) || 1);
+    const playerMaxHealth = Math.max(1, parseInt(character?.max_hp) || playerHealth || 1);
     const weapon = useMemo(() => getEquippedWeapon(inventory), [inventory]);
     const weaponProfile = useMemo(() => getWeaponProfile(weapon), [weapon]);
     const baseDamage = useMemo(() => getBaseDamage(enemy), [enemy]);
@@ -101,6 +112,9 @@ export default function CombatMiniGame({ enemy, inventory, isExecuting, onBack, 
         if (!enemy || isExecuting) return;
         const accuracyResult = getAccuracyResult(Math.round(accuracyMarker));
         const damage = Math.max(1, Math.round(baseDamage * action.damageMultiplier * accuracyResult.multiplier));
+        const nextEnemyHealth = Math.max(0, enemyHealth - damage);
+        const counterDamage = nextEnemyHealth > 0 ? calculateEnemyCounterDamage(enemy, accuracyResult) : 0;
+        const nextPlayerHealth = Math.max(0, playerHealth - counterDamage);
         const combatAction = {
             code: action.code,
             label: action.label,
@@ -110,8 +124,20 @@ export default function CombatMiniGame({ enemy, inventory, isExecuting, onBack, 
             damageMultiplier: action.damageMultiplier,
             calculatedDamage: damage,
         };
-        setLastAccuracyResult({ ...accuracyResult, damage, actionLabel: action.label });
-        onAttack?.({ combatAction, accuracyResult: { ...accuracyResult, damage } });
+        const result = {
+            ...accuracyResult,
+            damage,
+            counterDamage,
+            enemyHealth: nextEnemyHealth,
+            playerHealth: nextPlayerHealth,
+        };
+        setEnemyHealth(nextEnemyHealth);
+        setPlayerHealth(nextPlayerHealth);
+        setLastAccuracyResult({ ...result, actionLabel: action.label });
+
+        if (nextEnemyHealth <= 0) {
+            onAttack?.({ combatAction, accuracyResult: result });
+        }
     }
 
     return (
@@ -125,9 +151,7 @@ export default function CombatMiniGame({ enemy, inventory, isExecuting, onBack, 
                     <div className="min-w-0">
                         <p className="text-[10px] font-semibold text-textMuted">TARGET</p>
                         <h3 className="text-lg font-bold truncate">{enemy?.name || 'Unknown Enemy'}</h3>
-                        <p className="text-xs text-textMuted mt-1">
-                            Lv.{enemy?.level || 1} | HP {enemy?.health || 0} | DEF {enemy?.defense || 0}
-                        </p>
+                        <p className="text-xs text-textMuted mt-1">Lv.{enemy?.level || 1} | DEF {enemy?.defense || 0}</p>
                     </div>
                     <div className="text-right flex-shrink-0">
                         <p className="text-[10px] font-semibold text-textMuted">WEAPON</p>
@@ -135,10 +159,35 @@ export default function CombatMiniGame({ enemy, inventory, isExecuting, onBack, 
                     </div>
                 </div>
 
+                <div className="space-y-3">
+                    <div>
+                        <div className="flex items-center justify-between text-[10px] font-semibold text-textMuted mb-1">
+                            <span>ENEMY HP</span>
+                            <span>{enemyHealth}/{enemyMaxHealth}</span>
+                        </div>
+                        <div className="progress-track">
+                            <div className="progress-fill bg-danger" style={{ width: `${(enemyHealth / enemyMaxHealth) * 100}%` }} />
+                        </div>
+                    </div>
+                    <div>
+                        <div className="flex items-center justify-between text-[10px] font-semibold text-textMuted mb-1">
+                            <span>PLAYER HP</span>
+                            <span>{playerHealth}/{playerMaxHealth}</span>
+                        </div>
+                        <div className="progress-track">
+                            <div className="progress-fill bg-success" style={{ width: `${(playerHealth / playerMaxHealth) * 100}%` }} />
+                        </div>
+                    </div>
+                </div>
+
                 <div className="space-y-2">
                     <div className="flex items-center justify-between text-[10px] font-semibold text-textMuted">
                         <span>ACCURACY</span>
-                        <span>{lastAccuracyResult ? `${lastAccuracyResult.label} | DMG ${lastAccuracyResult.damage}` : 'Time the strike'}</span>
+                        <span>
+                            {lastAccuracyResult
+                                ? `${lastAccuracyResult.label} | DMG ${lastAccuracyResult.damage} | Taken ${lastAccuracyResult.counterDamage}`
+                                : 'Time the strike'}
+                        </span>
                     </div>
                     <div className="relative h-5 overflow-hidden rounded border border-border bg-surface">
                         <div className="absolute inset-0 flex">
@@ -168,17 +217,27 @@ export default function CombatMiniGame({ enemy, inventory, isExecuting, onBack, 
                             key={action.code}
                             type="button"
                             onClick={() => handleAction(action)}
-                            disabled={isExecuting}
+                            disabled={isExecuting || enemyHealth <= 0 || playerHealth <= 0}
                             className="card card-hover p-3 text-left disabled:opacity-50"
                         >
                             <span className="text-[10px] font-bold text-accent block">{action.shortLabel}</span>
                             <span className="text-sm font-semibold block mt-1">{isExecuting ? 'Resolving...' : action.label}</span>
                             <span className="text-[10px] text-textMuted block mt-2">
-                                Base DMG {Math.round(baseDamage * action.damageMultiplier)}
+                                {enemyHealth <= 0 ? 'Claiming reward' : `Base DMG ${Math.round(baseDamage * action.damageMultiplier)}`}
                             </span>
                         </button>
                     ))}
                 </div>
+                {enemyHealth > 0 && playerHealth > 0 && (
+                    <p className="text-[11px] text-textMuted">
+                        Reduce enemy HP to zero to resolve the encounter and claim rewards.
+                    </p>
+                )}
+                {playerHealth <= 0 && (
+                    <p className="text-xs text-danger">
+                        You are down. Retreat to recover before continuing.
+                    </p>
+                )}
             </div>
         </div>
     );
