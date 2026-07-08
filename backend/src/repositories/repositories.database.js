@@ -57,6 +57,7 @@ async function initializeDatabaseSchema() {
                 DROP TABLE IF EXISTS user_progress_timestamps CASCADE;
                 DROP TABLE IF EXISTS chat_messages CASCADE;
                 DROP TABLE IF EXISTS player_events CASCADE;
+                DROP TABLE IF EXISTS factions CASCADE;
                 DROP TABLE IF EXISTS skill_refund_log CASCADE;
                 DROP TABLE IF EXISTS player_skills CASCADE;
                 DROP TABLE IF EXISTS job_skills CASCADE;
@@ -74,6 +75,8 @@ async function initializeDatabaseSchema() {
                 DROP TABLE IF EXISTS wallet_transactions CASCADE;
                 DROP TABLE IF EXISTS wallets CASCADE;
                 DROP TABLE IF EXISTS action_queue CASCADE;
+                DROP TABLE IF EXISTS poi_gameplay_tags CASCADE;
+                DROP TABLE IF EXISTS world_pois CASCADE;
                 DROP TABLE IF EXISTS player_jobs CASCADE;
                 DROP TABLE IF EXISTS jobs_seed CASCADE;
                 DROP TABLE IF EXISTS zones CASCADE;
