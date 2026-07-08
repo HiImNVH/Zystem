@@ -6,7 +6,28 @@ const express = require('express');
 const characterRouter = express.Router();
 const characterRepository = require('../repositories/repositories.character');
 const characterService = require('../services/services.character');
+const { dbPool } = require('../repositories/repositories.database');
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
+
+const SAFE_HOUSE_REST_CONFIG = {
+    homeLevel: 1,
+    bedLevel: 1,
+    baseEnergyPerMinute: 6,
+    baseFatiguePerMinute: 8,
+};
+
+function calculateSafeHouseRestGain(elapsedSeconds) {
+    const safeElapsedSeconds = Math.max(5, Math.min(300, parseInt(elapsedSeconds) || 10));
+    const efficiency = 1 + (SAFE_HOUSE_REST_CONFIG.homeLevel - 1) * 0.08 + (SAFE_HOUSE_REST_CONFIG.bedLevel - 1) * 0.12;
+    const minutes = safeElapsedSeconds / 60;
+
+    return {
+        elapsedSeconds: safeElapsedSeconds,
+        energyRecovered: Math.max(1, Math.floor(SAFE_HOUSE_REST_CONFIG.baseEnergyPerMinute * efficiency * minutes)),
+        fatigueRecovered: Math.max(1, Math.floor(SAFE_HOUSE_REST_CONFIG.baseFatiguePerMinute * efficiency * minutes)),
+        efficiency,
+    };
+}
 
 /**
  * @route   POST /api/characters
@@ -70,6 +91,48 @@ characterRouter.get('/account/me', verifyToken, async (req, res, next) => {
             success: true,
             data: player || null,
             has_character: player !== null
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * @route   POST /api/characters/:id/safe-house/rest
+ * @body    { elapsedSeconds }
+ * @desc    Nghi ngoi trong nha an toan de hoi energy va giam fatigue.
+ * @access  Protected
+ */
+characterRouter.post('/:id/safe-house/rest', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
+    const { id } = req.params;
+    const restGain = calculateSafeHouseRestGain(req.body.elapsedSeconds);
+
+    try {
+        const result = await dbPool.query(`
+            UPDATE players
+            SET current_energy = LEAST(max_energy, current_energy + $1),
+                current_fatigue = GREATEST(0, current_fatigue - $2),
+                updated_at = NOW()
+            WHERE id = $3
+            RETURNING id, current_energy, max_energy, current_fatigue, max_fatigue;
+        `, [restGain.energyRecovered, restGain.fatigueRecovered, id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Character not found.' });
+        }
+
+        return res.json({
+            success: true,
+            message: 'Rested safely at home.',
+            data: {
+                ...result.rows[0],
+                home_level: SAFE_HOUSE_REST_CONFIG.homeLevel,
+                bed_level: SAFE_HOUSE_REST_CONFIG.bedLevel,
+                elapsed_seconds: restGain.elapsedSeconds,
+                energy_recovered: restGain.energyRecovered,
+                fatigue_recovered: restGain.fatigueRecovered,
+                rest_efficiency: restGain.efficiency,
+            }
         });
     } catch (error) {
         next(error);

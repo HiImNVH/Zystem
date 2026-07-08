@@ -24,6 +24,15 @@ export async function getCharacterStats(playerId) {
     return handleResponse(res);
 }
 
+export async function restAtSafeHouse(playerId, elapsedSeconds = 10) {
+    const res = await fetch(`${BASE_URL}/api/characters/${playerId}/safe-house/rest`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ elapsedSeconds })
+    });
+    return handleResponse(res);
+}
+
 export async function getZones() {
     const res = await fetch(`${BASE_URL}/api/zones`, { headers: getHeaders() });
     return handleResponse(res);

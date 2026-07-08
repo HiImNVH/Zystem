@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import {
     getPoiActivities,
     executePoiActivity,
-    getRecipes, getRecipe, craftItem
+    getRecipes, getRecipe, craftItem,
+    restAtSafeHouse
 } from '../../api/api.game';
 import { getFactions, getMyFaction, createFaction, joinFaction, leaveFaction } from '../../api/api.faction';
 
@@ -72,6 +73,20 @@ const EXPLORATION_RINGS = [
         helper: 'Quarries, warehouses, downtown ruins, deep wild zones, wastelands, and high-risk endgame sites.',
     },
 ];
+
+const SAFE_HOUSE_INFO = {
+    level: 1,
+    name: 'Nhà an toàn',
+    condition: 'Ổn định',
+    bedLevel: 1,
+    restEfficiency: 1,
+    workstations: [
+        { id: 'bed', name: 'Giường', level: 1, status: 'Tốt', breaksIn: '72h' },
+        { id: 'campfire', name: 'Bếp nấu', level: 1, status: 'Tốt', breaksIn: '36h' },
+        { id: 'workbench', name: 'Bàn chế tạo', level: 1, status: 'Đã mòn', breaksIn: '24h' },
+    ],
+    slots: 8,
+};
 
 const ACTION_RESOURCE_RULES = {
     EXPLORE: { energyPerUnit: 8, fatiguePerUnit: 10 },
@@ -741,10 +756,214 @@ function FactionSheet({ playerId, onClose, onNotify }) {
     );
 }
 
+function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate, onNotify }) {
+    const [localCharacter, setLocalCharacter] = useState(character);
+    const [activeMode, setActiveMode] = useState('INFO');
+    const [isResting, setIsResting] = useState(false);
+    const [restSeconds, setRestSeconds] = useState(0);
+    const [restError, setRestError] = useState('');
+
+    useEffect(() => {
+        setLocalCharacter(character);
+    }, [character]);
+
+    useEffect(() => {
+        if (!isResting) return undefined;
+
+        const timerId = setInterval(() => {
+            setRestSeconds(value => value + 1);
+        }, 1000);
+
+        const tickId = setInterval(async () => {
+            try {
+                const result = await restAtSafeHouse(playerId, 10);
+                setLocalCharacter(current => ({
+                    ...current,
+                    current_energy: result.data.current_energy,
+                    max_energy: result.data.max_energy,
+                    current_fatigue: result.data.current_fatigue,
+                    max_fatigue: result.data.max_fatigue,
+                }));
+                setRestError('');
+                await onUpdate?.();
+            } catch (err) {
+                setRestError(err.message);
+                setIsResting(false);
+            }
+        }, 10000);
+
+        return () => {
+            clearInterval(timerId);
+            clearInterval(tickId);
+        };
+    }, [isResting, playerId, onUpdate]);
+
+    const energyCurrent = parseInt(localCharacter?.current_energy) || 0;
+    const energyMax = Math.max(1, parseInt(localCharacter?.max_energy) || 1);
+    const fatigueCurrent = parseInt(localCharacter?.current_fatigue) || 0;
+    const fatigueMax = Math.max(1, parseInt(localCharacter?.max_fatigue) || 1);
+    const isFullyRested = energyCurrent >= energyMax && fatigueCurrent <= 0;
+    const restMinutes = Math.floor(restSeconds / 60);
+    const restClock = `${String(restMinutes).padStart(2, '0')}:${String(restSeconds % 60).padStart(2, '0')}`;
+
+    function handleRestClick() {
+        setActiveMode('REST');
+        setRestError('');
+        setIsResting(value => !value);
+    }
+
+    function handleCookingClick() {
+        setActiveMode('COOK');
+        onNotify?.('Màn nấu ăn chưa được nối logic.', 'error');
+    }
+
+    function handleCraftClick() {
+        setActiveMode('CRAFT');
+        onOpenCrafting?.();
+    }
+
+    function renderFunctionContent() {
+        if (activeMode === 'REST') {
+            return (
+                <div className="card p-4 space-y-4">
+                    <div className="flex items-start justify-between gap-3">
+                        <div>
+                            <p className="font-semibold">Nghỉ ngơi AFK</p>
+                            <p className="text-xs text-textMuted mt-1">Năng lượng hồi và độ mệt giảm mỗi 10 giây.</p>
+                        </div>
+                        <span className="text-lg font-mono text-accent">{restClock}</span>
+                    </div>
+                    <div className="space-y-3">
+                        <ResourceMeter label="Energy" current={energyCurrent} max={energyMax} />
+                        <ResourceMeter label="Fatigue" current={fatigueCurrent} max={fatigueMax} tone="fatigue" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="rounded-lg bg-surface p-3">
+                            <p className="text-textMuted">Hiệu suất nhà</p>
+                            <p className="font-semibold mt-1">Lv.{SAFE_HOUSE_INFO.level}</p>
+                        </div>
+                        <div className="rounded-lg bg-surface p-3">
+                            <p className="text-textMuted">Hiệu suất giường</p>
+                            <p className="font-semibold mt-1">Giường Lv.{SAFE_HOUSE_INFO.bedLevel}</p>
+                        </div>
+                    </div>
+                    {restError && <p className="text-sm text-danger">{restError}</p>}
+                    {isFullyRested && <p className="text-sm text-success">Bạn đã hồi phục đầy đủ.</p>}
+                    <button
+                        type="button"
+                        onClick={handleRestClick}
+                        disabled={isFullyRested && !isResting}
+                        className={isResting ? 'btn-secondary w-full' : 'btn-primary w-full'}
+                    >
+                        {isResting ? 'Dừng nghỉ ngơi' : 'Bắt đầu nghỉ ngơi'}
+                    </button>
+                </div>
+            );
+        }
+
+        if (activeMode === 'COOK') {
+            return (
+                <div className="card p-4">
+                    <p className="font-semibold">Nấu ăn</p>
+                    <p className="text-sm text-textMuted mt-2">Nấu ăn cơ bản sẽ dùng bếp nấu. Màn này được giữ cho lượt phát triển tiếp theo.</p>
+                </div>
+            );
+        }
+
+        if (activeMode === 'CRAFT') {
+            return (
+                <div className="card p-4">
+                    <p className="font-semibold">Chế tạo</p>
+                    <p className="text-sm text-textMuted mt-2">Bảng chế tạo hiện có đã được mở. Hãy chọn công thức và nguyên liệu ở đó.</p>
+                </div>
+            );
+        }
+
+        return (
+            <div className="card p-4">
+                <p className="font-semibold">Thông tin nhà an toàn</p>
+                <p className="text-sm text-textMuted mt-2">
+                    Nơi trú ẩn cá nhân cấp cơ bản. Cấp nhà và giường tốt hơn sẽ tăng hiệu suất nghỉ ngơi ở các bước sau.
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-4 space-y-4">
+            <button onClick={onBack} className="w-full btn-secondary text-left">
+                Quay lại trại
+            </button>
+
+            <section className="card p-4 space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                    <div>
+                        <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">HOME</span>
+                        <h2 className="text-lg font-bold">{SAFE_HOUSE_INFO.name} Lv.{SAFE_HOUSE_INFO.level}</h2>
+                        <p className="text-xs text-textMuted mt-1">Tình trạng: {SAFE_HOUSE_INFO.condition}</p>
+                    </div>
+                    <span className="text-3xl font-bold text-accent/30">HM</span>
+                </div>
+
+                <div>
+                    <h3 className="text-sm font-semibold mb-2">Công trình</h3>
+                    <div className="space-y-2">
+                        {SAFE_HOUSE_INFO.workstations.map(station => (
+                            <div key={station.id} className="flex items-center justify-between gap-3 rounded-lg bg-surface p-3">
+                                <div className="min-w-0">
+                                    <p className="text-sm font-semibold truncate">{station.name} Lv.{station.level}</p>
+                                    <p className="text-xs text-textMuted mt-1">{station.status}</p>
+                                </div>
+                                <span className="text-xs font-mono text-accent flex-shrink-0">{station.breaksIn}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 className="text-sm font-semibold mb-2">Ô chức năng</h3>
+                <div className="grid grid-cols-4 gap-2">
+                    {Array.from({ length: SAFE_HOUSE_INFO.slots }).map((_, index) => (
+                        <div key={index} className="aspect-square rounded-lg border border-dashed border-border bg-surface/40 flex items-center justify-center text-[10px] text-textMuted">
+                            Trống
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section>
+                <h3 className="text-sm font-semibold mb-2">Chức năng</h3>
+                <div className="grid grid-cols-2 gap-2">
+                    <button type="button" onClick={handleRestClick} className="card card-hover p-3 text-left">
+                        <span className="text-[10px] font-bold text-accent block mb-1">RS</span>
+                        <span className="text-sm font-semibold block">Nghỉ ngơi</span>
+                    </button>
+                    <button type="button" onClick={handleCookingClick} className="card card-hover p-3 text-left">
+                        <span className="text-[10px] font-bold text-accent block mb-1">CK</span>
+                        <span className="text-sm font-semibold block">Nấu ăn</span>
+                    </button>
+                    <button type="button" onClick={handleCraftClick} className="card card-hover p-3 text-left">
+                        <span className="text-[10px] font-bold text-accent block mb-1">CR</span>
+                        <span className="text-sm font-semibold block">Chế tạo</span>
+                    </button>
+                    <button type="button" onClick={() => setActiveMode('INFO')} className="card card-hover p-3 text-left">
+                        <span className="text-[10px] font-bold text-accent block mb-1">IN</span>
+                        <span className="text-sm font-semibold block">Thông tin nhà</span>
+                    </button>
+                </div>
+            </section>
+
+            {renderFunctionContent()}
+        </div>
+    );
+}
+
 export default function MainPanel({ playerId, character, zones, inventory, onUpdate }) {
     const [showZonePicker, setShowZonePicker] = useState(false);
     const [showCrafting, setShowCrafting] = useState(false);
     const [showFaction, setShowFaction] = useState(false);
+    const [showSafeHouse, setShowSafeHouse] = useState(false);
     const [currentExpeditionZone, setCurrentExpeditionZone] = useState(null);
     const [activitySheet, setActivitySheet] = useState(null);
     const [executingActivityId, setExecutingActivityId] = useState('');
@@ -820,17 +1039,19 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 <span className="absolute top-4 right-4 text-3xl font-bold opacity-20">{banner.mark}</span>
                 <div>
                     <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">
-                        {isExploring ? 'EXPLORING' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP')}
+                        {isExploring ? 'EXPLORING' : (showSafeHouse ? 'NHÀ AN TOÀN' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP'))}
                     </span>
                     <h1 className="text-xl font-bold">
-                        {isExploring ? currentZone.display_name : (isChoosingRoute ? 'Exploration Routes' : (character?.character_name || 'Survivor'))}
+                        {isExploring ? currentZone.display_name : (showSafeHouse ? 'Về nhà' : (isChoosingRoute ? 'Exploration Routes' : (character?.character_name || 'Survivor')))}
                     </h1>
                     <p className="text-sm text-textSecondary mt-1">
                         {isExploring
                             ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${currentZone.biome || currentZone.zone_type} | ${currentZone.pois?.length || 0} POIs`
-                            : (isChoosingRoute
+                            : (showSafeHouse
+                                ? 'Nghỉ ngơi, nấu ăn, chế tạo và quản lý phiên bản đầu của nơi trú ẩn.'
+                                : (isChoosingRoute
                                 ? 'Move outward from the camp edge toward distant high-risk zones.'
-                                : 'Manage your base, meet NPCs, then choose an area to explore.')}
+                                : 'Manage your base, meet NPCs, then choose an area to explore.'))}
                     </p>
                 </div>
             </div>
@@ -843,7 +1064,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 </div>
             )}
 
-            {!isExploring && !showZonePicker ? (
+            {!isExploring && !showZonePicker && !showSafeHouse ? (
                 <div className="p-4 space-y-4">
                     <div className="space-y-3">
                         <button onClick={() => setShowZonePicker(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
@@ -855,13 +1076,13 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                 <p className="text-xs text-textMuted leading-relaxed mt-1">Choose a level-appropriate area and leave camp.</p>
                             </div>
                         </button>
-                        <button onClick={() => setShowCrafting(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
+                        <button onClick={() => setShowSafeHouse(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">HM</span>
                             </div>
                             <div className="min-w-0">
-                                <p className="font-semibold">Personal Home</p>
-                                <p className="text-xs text-textMuted leading-relaxed mt-1">Craft, repair, and turn resources into gear.</p>
+                                <p className="font-semibold">Về nhà</p>
+                                <p className="text-xs text-textMuted leading-relaxed mt-1">Nghỉ ngơi, nấu ăn, chế tạo và quản lý nhà an toàn.</p>
                             </div>
                         </button>
                         <button onClick={() => notify('Trade screen is not wired yet.', 'error')} className="w-full card card-hover p-4 text-left flex items-start gap-4">
@@ -885,6 +1106,15 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     </div>
 
                 </div>
+            ) : showSafeHouse ? (
+                <SafeHousePanel
+                    playerId={playerId}
+                    character={character}
+                    onBack={() => setShowSafeHouse(false)}
+                    onOpenCrafting={() => setShowCrafting(true)}
+                    onUpdate={onUpdate}
+                    onNotify={notify}
+                />
             ) : isChoosingRoute ? (
                 <div className="p-4 space-y-4">
                     <button
