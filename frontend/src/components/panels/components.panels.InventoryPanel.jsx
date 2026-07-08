@@ -42,13 +42,13 @@ const CATEGORY_MARKS = {
 
 const FILTERS = [
     { value: 'ALL', label: 'All' },
-    { value: 'RUBBISH', label: 'Junk' },
-    { value: 'MATERIAL', label: 'Materials' },
-    { value: 'WEAPON', label: 'Weapons' },
-    { value: 'EQUIPMENT', label: 'Gear' },
-    { value: 'TOOL', label: 'Tools' },
-    { value: 'BUILDING', label: 'Building' },
     { value: 'FOOD', label: 'Food' },
+    { value: 'WEAPON', label: 'Weapons' },
+    { value: 'TOOL', label: 'Tools' },
+    { value: 'EQUIPMENT', label: 'Gear' },
+    { value: 'MATERIAL', label: 'Materials' },
+    { value: 'RUBBISH', label: 'Junk' },
+    { value: 'BUILDING', label: 'Building' },
 ];
 
 const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
