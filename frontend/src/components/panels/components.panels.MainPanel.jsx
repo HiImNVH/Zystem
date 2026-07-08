@@ -487,8 +487,9 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
 function formatActionResult(result) {
     if (!result) return '';
     const lootCount = result.items_dropped?.length || 0;
+    const moneyText = result.money_dropped ? `, Money +${parseInt(result.money_dropped).toLocaleString()}` : '';
     const sweepText = result.sweep_event ? `${result.sweep_event.label}: ` : '';
-    return `${sweepText}Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
+    return `${sweepText}Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}${moneyText}.`;
 }
 
 function formatCurrencyName(value) {

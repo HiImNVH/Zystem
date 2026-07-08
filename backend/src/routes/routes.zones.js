@@ -8,6 +8,7 @@ const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware
 const lootService = require('../services/services.loot');
 const progressionService = require('../services/services.progression');
 const playerEventsService = require('../services/services.playerEvents');
+const walletRepository = require('../repositories/repositories.wallet');
 
 const ACTION_RESOURCE_RULES = {
     EXPLORE: { energyPerUnit: 8 },
@@ -132,6 +133,37 @@ function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
         playerExp: Math.max(1, Math.floor(rate.player * durationSeconds * levelMult)),
         jobExp: Math.max(1, Math.floor(rate.job * durationSeconds * levelMult)),
     };
+}
+
+function calculateEnemyMoneyDrop(config) {
+    const { mapLevel, combatResult } = config;
+    const accuracyBonus = combatResult?.accuracy_outcome === 'critical'
+        ? 0.15
+        : (combatResult?.accuracy_outcome === 'hit' ? 0.05 : 0);
+    const dropChance = Math.min(0.85, 0.60 + accuracyBonus);
+    if (Math.random() > dropChance) {
+        return {
+            amount: 0,
+            chance: dropChance,
+            didDrop: false,
+        };
+    }
+
+    const level = Math.max(1, parseInt(mapLevel) || 1);
+    const baseAmount = 8 + (level * 3);
+    const variance = Math.floor(Math.random() * Math.max(4, level + 4));
+    return {
+        amount: baseAmount + variance,
+        chance: dropChance,
+        didDrop: true,
+    };
+}
+
+function shouldDropEnemyMoney(config) {
+    const { activityType, sweepEvent } = config;
+    if (activityType === 'enemy') return true;
+
+    return ['combat', 'boss'].includes(sweepEvent?.type);
 }
 
 async function findJobIdByCode(jobCode) {
@@ -689,6 +721,12 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
                 actual_duration_s: durationSeconds,
                 zone_min_level: mapLevel,
             });
+        const moneyDrop = shouldDropEnemyMoney({ activityType, sweepEvent })
+            ? calculateEnemyMoneyDrop({ mapLevel, combatResult })
+            : { amount: 0, chance: 0, didDrop: false };
+        const walletResult = moneyDrop.amount > 0
+            ? await walletRepository.modifyWalletBalance(playerId, 'money', moneyDrop.amount, 'DEPOSIT')
+            : null;
 
         executionSummary = {
             poi_id: poi.poi_id,
@@ -710,6 +748,8 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             player_exp_result: playerExpResult,
             job_exp_result: jobExpResult,
             items_dropped: lootResult.items_dropped || [],
+            money_dropped: walletResult?.success ? moneyDrop.amount : 0,
+            money_drop_chance: moneyDrop.chance,
             player_resources: updatedPlayer.rows[0],
         };
 

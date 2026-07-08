@@ -76,7 +76,8 @@ function calculateEnemyCounterDamage(enemy, accuracyResult) {
 function formatEncounterReward(result) {
     if (!result) return 'Encounter resolved.';
     const lootCount = result.items_dropped?.length || 0;
-    return `Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
+    const moneyText = result.money_dropped ? `, Money +${parseInt(result.money_dropped).toLocaleString()}` : '';
+    return `Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}${moneyText}.`;
 }
 
 export default function CombatMiniGame({ enemy, character, inventory, isExecuting, onBack, onAttack }) {
