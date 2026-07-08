@@ -236,10 +236,16 @@ function CurrencyBadge({ label, value, colorClassName }) {
     );
 }
 
+function calculateExpRequiredForLevel(level) {
+    const safeLevel = Math.max(1, parseInt(level) || 1);
+    return Math.floor(0.7 * Math.pow(safeLevel, 3) + 20 * Math.pow(safeLevel, 2) + 100 * safeLevel + 50);
+}
+
 // Thanh trang thai nhan vat: luon hien thi o tren cung, khong bien mat khi
 // chuyen giua man Refugee Camp / chon route / dang kham pha
 function PlayerStatusBar({ character }) {
     const playerLevel = character?.player_level || 1;
+    const expRequired = calculateExpRequiredForLevel(playerLevel);
     const money = character?.money ?? character?.copper ?? 0;
     const silverCoin = character?.silver_coin ?? character?.silver ?? 0;
     const goldCoin = character?.gold_coin ?? character?.gold ?? 0;
@@ -247,6 +253,7 @@ function PlayerStatusBar({ character }) {
     return (
         <div className="sticky top-0 z-20 bg-base px-3 pt-3 pb-2">
             <div className="card p-2.5 space-y-2">
+                <ResourceMeter label="EXP" current={character?.current_exp} max={expRequired} />
                 <div className="flex items-center justify-between gap-3">
                     <p className="font-semibold truncate">{character?.character_name || 'Survivor'}</p>
                     <span className="text-xs font-semibold text-accent flex-shrink-0">Level {playerLevel}</span>
