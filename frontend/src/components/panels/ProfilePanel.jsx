@@ -4,13 +4,167 @@ import { useState } from 'react';
 import EquipmentTab from './EquipmentTab';
 
 const STAT_INFO = {
-    str: { label: 'STR', desc: 'Physical damage and carry capacity' },
-    agi: { label: 'AGI', desc: 'Reflexes, evasion, and action speed' },
-    dex: { label: 'DEX', desc: 'Precision, accuracy, and critical chance' },
-    vit: { label: 'VIT', desc: 'Max HP, toughness, and endurance' },
-    int: { label: 'INT', desc: 'Reasoning, recipes, and tool use' },
-    chr: { label: 'CHR', desc: 'Communication, trade, and presence' },
+    str: { label: 'Strength', shortLabel: 'STR', desc: 'Physical damage and carry capacity' },
+    agi: { label: 'Agility', shortLabel: 'AGI', desc: 'Reflexes, evasion, and action speed' },
+    dex: { label: 'Dexterity', shortLabel: 'DEX', desc: 'Precision, accuracy, and critical chance' },
+    vit: { label: 'Vitality', shortLabel: 'VIT', desc: 'Max HP, toughness, and endurance' },
+    int: { label: 'Insight', shortLabel: 'INT', desc: 'Reasoning, recipes, and tool use' },
+    chr: { label: 'Charisma', shortLabel: 'CHR', desc: 'Communication, trade, and presence' },
 };
+
+const HEX_STAT_ORDER = ['str', 'agi', 'int', 'chr', 'dex', 'vit'];
+
+function buildHexPoint(center, radius, index, total = 6) {
+    const angle = (-90 + (360 / total) * index) * (Math.PI / 180);
+    return {
+        x: center + Math.cos(angle) * radius,
+        y: center + Math.sin(angle) * radius,
+    };
+}
+
+function formatPointList(points) {
+    return points.map(point => `${point.x.toFixed(2)},${point.y.toFixed(2)}`).join(' ');
+}
+
+function StatHexGrid({ stats }) {
+    const [selectedStat, setSelectedStat] = useState('str');
+    const totalStats = stats?.total || {};
+    const statEntries = HEX_STAT_ORDER.map(key => ({
+        key,
+        ...STAT_INFO[key],
+        value: parseFloat(totalStats[key] || 0),
+    }));
+    const maxValue = Math.max(20, ...statEntries.map(stat => stat.value));
+    const center = 150;
+    const radius = 92;
+    const labelRadius = 126;
+    const gridRadii = [radius / 3, (radius / 3) * 2, radius];
+    const axisPoints = statEntries.map((stat, index) => ({
+        ...stat,
+        point: buildHexPoint(center, radius, index),
+    }));
+    const fillPoints = statEntries.map((stat, index) => {
+        const statRadius = Math.max(8, (stat.value / maxValue) * radius);
+        return buildHexPoint(center, statRadius, index);
+    });
+    const selected = statEntries.find(stat => stat.key === selectedStat) || statEntries[0];
+
+    return (
+        <div className="card p-4">
+            <div className="flex items-center justify-between gap-3 mb-2">
+                <p className="text-xs font-semibold text-textMuted">CORE ATTRIBUTES</p>
+                <span className="text-[10px] text-textMuted">Hover or tap a direction</span>
+            </div>
+
+            <div className="relative mx-auto max-w-[340px]">
+                <svg viewBox="0 0 300 300" className="w-full aspect-square" role="img" aria-label="Core attribute hex grid">
+                    {gridRadii.map(gridRadius => {
+                        const points = statEntries.map((_, index) => buildHexPoint(center, gridRadius, index));
+                        return (
+                            <polygon
+                                key={gridRadius}
+                                points={formatPointList(points)}
+                                fill="none"
+                                stroke="rgba(147, 150, 163, 0.35)"
+                                strokeWidth="1"
+                            />
+                        );
+                    })}
+                    {axisPoints.map(axis => (
+                        <line
+                            key={axis.key}
+                            x1={center}
+                            y1={center}
+                            x2={axis.point.x}
+                            y2={axis.point.y}
+                            stroke="rgba(147, 150, 163, 0.35)"
+                            strokeWidth="1"
+                        />
+                    ))}
+                    <polygon
+                        points={formatPointList(fillPoints)}
+                        fill="rgba(16, 185, 129, 0.72)"
+                        stroke="#10b981"
+                        strokeWidth="2"
+                    />
+                    {axisPoints.map(axis => (
+                        <g
+                            key={axis.key}
+                            onMouseEnter={() => setSelectedStat(axis.key)}
+                            onFocus={() => setSelectedStat(axis.key)}
+                            onClick={() => setSelectedStat(axis.key)}
+                            tabIndex="0"
+                            role="button"
+                            aria-label={`${axis.label}: ${axis.value.toFixed(1)}`}
+                            className="cursor-pointer outline-none"
+                        >
+                            <circle
+                                cx={axis.point.x}
+                                cy={axis.point.y}
+                                r={selectedStat === axis.key ? 9 : 6}
+                                fill={selectedStat === axis.key ? '#fbbf24' : '#22d3ee'}
+                                stroke="#0d0e12"
+                                strokeWidth="3"
+                            />
+                            <circle
+                                cx={axis.point.x}
+                                cy={axis.point.y}
+                                r="24"
+                                fill="transparent"
+                            />
+                        </g>
+                    ))}
+                    {axisPoints.map(axis => {
+                        const labelPoint = buildHexPoint(center, labelRadius, HEX_STAT_ORDER.indexOf(axis.key));
+                        const textAnchor = Math.abs(labelPoint.x - center) < 8
+                            ? 'middle'
+                            : (labelPoint.x > center ? 'start' : 'end');
+                        const dy = labelPoint.y < center - 20 ? '-0.35em' : (labelPoint.y > center + 20 ? '0.95em' : '0.35em');
+
+                        return (
+                            <g
+                                key={`${axis.key}-label`}
+                                onMouseEnter={() => setSelectedStat(axis.key)}
+                                onFocus={() => setSelectedStat(axis.key)}
+                                onClick={() => setSelectedStat(axis.key)}
+                                tabIndex="0"
+                                role="button"
+                                aria-label={`Show ${axis.label}`}
+                                className="cursor-pointer outline-none"
+                            >
+                                <text
+                                    x={labelPoint.x}
+                                    y={labelPoint.y}
+                                    dy={dy}
+                                    textAnchor={textAnchor}
+                                    fill={selectedStat === axis.key ? '#fbbf24' : '#f87171'}
+                                    fontSize="13"
+                                    fontWeight="700"
+                                >
+                                    {axis.label}
+                                </text>
+                                <circle cx={labelPoint.x} cy={labelPoint.y} r="22" fill="transparent" />
+                            </g>
+                        );
+                    })}
+                </svg>
+            </div>
+
+            <div className="mt-3 rounded-lg bg-surface p-3">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                        <p className="font-semibold">{selected.label}</p>
+                        <p className="text-xs text-textMuted mt-1">{selected.desc}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                        <p className="text-xl font-bold font-mono text-accent">{selected.value.toFixed(1)}</p>
+                        <p className="text-[10px] text-textMuted">{selected.shortLabel}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 const JOB_MARKS = {
     fighting: 'FG',
@@ -33,22 +187,7 @@ function StatsTab({ stats }) {
 
     return (
         <div className="p-4 space-y-4">
-            <div className="space-y-2">
-                {Object.entries(STAT_INFO).map(([key, info]) => {
-                    const total = parseFloat(stats.total?.[key] || 0);
-                    return (
-                        <div key={key} className="card p-3 flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent flex-shrink-0">
-                                {info.label}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="text-xs text-textMuted truncate">{info.desc}</p>
-                            </div>
-                            <p className="text-lg font-bold font-mono flex-shrink-0">{total.toFixed(1)}</p>
-                        </div>
-                    );
-                })}
-            </div>
+            <StatHexGrid stats={stats} />
 
             <div className="card p-4">
                 <p className="text-xs font-semibold text-textMuted mb-3">COMBAT</p>
