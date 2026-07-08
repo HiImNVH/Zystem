@@ -93,7 +93,7 @@ export default function AuthForm({ onAuthSuccess }) {
                         <div>
                             <label className="block text-xs font-medium text-textSecondary mb-1.5">Password</label>
                             <input type="password" name="password" value={formData.password} onChange={handleChange}
-                                   placeholder={mode === 'register' ? 'Min. 6 characters' : '••••••••'}
+                                   placeholder={mode === 'register' ? 'Min. 6 characters' : 'Password'}
                                    className="input-field" disabled={isLoading} />
                         </div>
 
@@ -110,7 +110,7 @@ export default function AuthForm({ onAuthSuccess }) {
                 </div>
 
                 <p className="text-center text-xs text-textMuted mt-5">
-                    Alpha build — data may be reset at any time
+                    Alpha build - data may be reset at any time
                 </p>
             </div>
         </div>

@@ -21,7 +21,7 @@ export default function ChatPanel({ character, initialChannel = 'GLOBAL' }) {
     const playerId = character?.id;
 
     // Quan ly cuon: tu dong cuon xuong cuoi khi co noi dung moi, nhung chi khi
-    // nguoi choi dang o gan day danh sach — neu ho da luot len xem lai tin cu
+    // nguoi choi dang o gan day danh sach - neu ho da luot len xem lai tin cu
     // thi khong cuon giat, thay vao do hien nut "quay ve cuoi"
     const scrollContainerRef = useRef(null);
     const previousChannelRef = useRef(null);

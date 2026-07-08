@@ -25,7 +25,7 @@ const DESTINATIONS = {
 const ACTION_CONFIG = {
     BATTLE:  { label: 'Battle', mark: 'BT', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'High risk, high EXP, and a chance to find equipment.' },
     EXPLORE: { label: 'Explore', mark: 'EX', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Search POIs for supplies, crafting materials, and salvage.' },
-    SWEEP:   { label: 'Càn quét', mark: 'CQ', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Clear a POI through combat, search, or retreat events.' },
+    SWEEP:   { label: 'Sweep', mark: 'CQ', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Clear a POI through combat, search, or retreat events.' },
     MINE:    { label: 'Mine', mark: 'MI', destination: 'EXPEDITION', zones: ['rural', 'desert'], helper: 'Gather stone, ore, and base materials.' },
     CHOP:    { label: 'Chop Wood', mark: 'CH', destination: 'EXPEDITION', zones: ['forest', 'rural'], helper: 'Gather wood, branches, and building materials.' },
     HUNT:    { label: 'Skirmish', mark: 'HU', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Hunt local threats for survival materials and combat EXP.' },
@@ -56,21 +56,21 @@ const ZONE_BANNERS = {
 };
 
 const ZONE_TAG_LABELS = {
-    rural: 'Nông thôn',
-    town: 'Th? tr?n',
-    city: 'Thành ph?',
-    forest: 'R?ng',
-    coast: 'Bi?n',
-    industrial: 'Khu công nghi?p',
-    geological_mine: 'M? d?a ch?t',
+    rural: 'Rural',
+    town: 'Town',
+    city: 'City',
+    forest: 'Forest',
+    coast: 'Coast',
+    industrial: 'Industrial',
+    geological_mine: 'Geological Mine',
 };
 
 const POI_TAG_LABELS = {
-    EXPLORATION: 'Thu lu?m',
-    SKIRMISH: 'Quái v?t',
-    BATTLE: 'Quái v?t',
-    SWEEP: 'Càn quét',
-    DUNGEON: 'Càn quét',
+    EXPLORATION: 'Scavenge',
+    SKIRMISH: 'Enemy',
+    BATTLE: 'Enemy',
+    SWEEP: 'Sweep',
+    DUNGEON: 'Sweep',
 };
 
 const RESOURCE_METER_FILL_CLASSES = {
@@ -239,9 +239,9 @@ function getRotatingPois(zone, rotationSlot) {
 
 function getPoiActionOptions(poi) {
     const actionOptions = [
-        { type: 'enemy', label: 'Tìm ki?m quái v?t', mark: 'QM', tags: ['BATTLE', 'SKIRMISH'] },
-        { type: 'gather', label: 'Thu lu?m v?t tu', mark: 'TL', tags: ['EXPLORATION'] },
-        { type: 'sweep', label: 'Càn quét', mark: 'CQ', tags: ['SWEEP', 'DUNGEON'] },
+        { type: 'enemy', label: 'Find enemies', mark: 'QM', tags: ['BATTLE', 'SKIRMISH'] },
+        { type: 'gather', label: 'Scavenge supplies', mark: 'TL', tags: ['EXPLORATION'] },
+        { type: 'sweep', label: 'Sweep', mark: 'CQ', tags: ['SWEEP', 'DUNGEON'] },
     ];
 
     return actionOptions.map(option => ({
@@ -269,7 +269,7 @@ function ResourceMeter({ label, current, max }) {
     );
 }
 
-// Cong thuc EXP can de len cap tiep theo — PHAI dong bo voi backend:
+// Cong thuc EXP can de len cap tiep theo - PHAI dong bo voi backend:
 // backend/src/services/services.progression.js -> calculateExpRequired()
 function calculateExpRequiredForLevel(level) {
     const L = Math.max(1, parseInt(level) || 1);
@@ -539,7 +539,7 @@ function formatActionResult(result) {
 }
 
 function formatDropTable(dropTable) {
-    if (!Array.isArray(dropTable) || dropTable.length === 0) return 'Không có d? li?u roi d?';
+    if (!Array.isArray(dropTable) || dropTable.length === 0) return 'No drop data';
     return dropTable
         .map(drop => `${drop.tag_query} ${Math.round((drop.chance || 0) * 100)}%`)
         .join(' | ');
@@ -549,10 +549,10 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
     if (!activityType) return null;
 
     const titleMap = {
-        enemy: 'Tìm ki?m quái v?t',
-        gather: 'Thu lu?m',
-        sweep: 'Càn quét',
-        dungeon: 'Càn quét',
+        enemy: 'Find enemies',
+        gather: 'Scavenge',
+        sweep: 'Sweep',
+        dungeon: 'Sweep',
     };
     const list = activityType === 'enemy'
         ? (activityData?.enemies || [])
@@ -589,13 +589,13 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                                 Lv.{item.level} | HP {item.health} | ATK {item.attack} | DEF {item.defense}
                                             </p>
                                             <p className="text-[11px] text-textMuted truncate">
-                                                Roi: {formatDropTable(item.drop_table)}
+                                                Drops: {formatDropTable(item.drop_table)}
                                             </p>
                                         </>
                                     ) : (
                                         <>
                                             <p className="text-xs text-textMuted truncate">
-                                                C?p zone {item.item_level} | {item.category_label || item.category}
+                                                Zone Lv.{item.item_level} | {item.category_label || item.category}
                                             </p>
                                             <p className="text-[11px] text-textMuted truncate">
                                                 {item.reward_hint}
@@ -609,7 +609,7 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     disabled={Boolean(executingId)}
                                     className="btn-primary px-3 py-2 text-xs flex-shrink-0"
                                 >
-                                    {executingId === item.id ? 'Ðang làm...' : (activityType === 'enemy' ? 'Ðánh' : 'Tìm')}
+                                    {executingId === item.id ? 'Working...' : (activityType === 'enemy' ? 'Fight' : 'Search')}
                                 </button>
                             </div>
                         ))}
@@ -627,12 +627,12 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                 <p className="text-xs text-textMuted mt-1">Map Lv.{sweep.map_level} | Boss Lv.{sweep.boss_level}</p>
                                 {sweep.event_pool?.length > 0 && (
                                     <p className="text-[11px] text-textMuted mt-1 truncate">
-                                        S? ki?n: {sweep.event_pool.map(event => event.label).join(' | ')}
+                                        Events: {sweep.event_pool.map(event => event.label).join(' | ')}
                                     </p>
                                 )}
                             </div>
                             <div className="w-full card p-3 text-left">
-                                <p className="text-sm font-semibold">Càn quét lu?t ti?p theo</p>
+                                <p className="text-sm font-semibold">Next sweep turn</p>
                                 <p className="text-xs text-textMuted mt-1">{sweep.normal.reward_hint}</p>
                                 <button
                                     type="button"
@@ -640,7 +640,7 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     disabled={Boolean(executingId)}
                                     className="btn-primary mt-3 px-3 py-2 text-xs"
                                 >
-                                    {executingId === `${sweep.id}:normal` ? 'Ðang càn quét...' : 'Càn quét'}
+                                    {executingId === `${sweep.id}:normal` ? 'Sweeping...' : 'Sweep'}
                                 </button>
                             </div>
                             <div className="w-full card p-3 text-left">
@@ -652,12 +652,12 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     disabled={Boolean(executingId)}
                                     className="btn-secondary mt-3 px-3 py-2 text-xs"
                                 >
-                                    {executingId === `${sweep.id}:retreat` ? 'Ðang rút...' : 'Rút lui'}
+                                    {executingId === `${sweep.id}:retreat` ? 'Retreating...' : 'Retreat'}
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <p className="text-sm text-textMuted py-6 text-center">POI này chua có lu?t càn quét.</p>
+                        <p className="text-sm text-textMuted py-6 text-center">This POI has no sweep route yet.</p>
                     )
                 )}
             </div>
@@ -1260,7 +1260,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                                     </p>
                                                     {isLocked && (
                                                         <p className="text-[11px] text-danger mt-1">
-                                                            Khóa: c?n trong ph?m vi +10 c?p.
+                                                            Locked: requires a zone within +10 levels.
                                                         </p>
                                                     )}
                                                 </div>

@@ -278,7 +278,7 @@ export default function ProfilePanel({ character, stats, jobs, playerId, onUpdat
                     </div>
                     <div>
                         <p className="font-semibold">{character?.character_name}</p>
-                        <p className="text-xs text-textMuted">Level {character?.player_level} · SP: {character?.skill_points}</p>
+                        <p className="text-xs text-textMuted">Level {character?.player_level} | SP: {character?.skill_points}</p>
                     </div>
                 </div>
                 <div className="flex gap-1.5">
