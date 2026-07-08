@@ -49,6 +49,102 @@ const JOB_ORDER = ['fighting', 'scavenging', 'cooking', 'gathering', 'crafting',
 const SKILL_LEVEL_GAPS = [1, 5, 10, 15, 20, 25, 30, 35, 40];
 const ROMAN_CHAIN = ['I', 'II', 'III', 'IV', 'V', 'VI'];
 const SKILL_NODE_ROW_HEIGHT = 124;
+const SHEET_ROW_GROUPS = {
+    'fighting|melee': [
+        ['brawler'], ['one_handed'], ['two_handed'], ['stab'], ['swing'], ['slash'],
+    ],
+    'fighting|ranged': [
+        ['shooter'], ['bow_and_crossbow'], ['gun'], ['bullseye'],
+    ],
+    'scavenging|looter': [
+        ['carrier'], ['treasure_hunter'], ['quick_hand'],
+    ],
+    'cooking|processing': [
+        ['grinding', 'drying', 'charring', 'smoking'],
+    ],
+    'cooking|foods': [
+        ['grilling'],
+        ['frying'],
+        ['boiling'],
+        ['steaming'],
+        ['noodle', 'bread', 'burger', 'sandwich', 'pizza', 'cake', 'ramen'],
+        ['canned_food'],
+    ],
+    'cooking|drinks': [
+        ['contaminated_water', 'warter', 'mineral_water'],
+        ['juice', 'smoothie'],
+        ['coffe'],
+        ['alcohol'],
+    ],
+    'cooking|spices': [
+        ['salt', 'sugar', 'vinegar', 'soysauce'],
+        ['yeast', 'butter', 'cheese'],
+        ['fat', 'veg_oil'],
+    ],
+    'cooking|medicines': [
+        ['medicine'],
+        ['booster'],
+        ['bandage', 'first_aid_kit'],
+    ],
+    'gathering|foraging': [
+        ['seed'], ['foraging'],
+    ],
+    'gathering|woods': [
+        ['wood'],
+    ],
+    'gathering|minerals': [
+        ['rock', 'amethys'],
+        ['ore'],
+        ['chemical_minerals'],
+    ],
+    'gathering|hunting': [
+        ['meat', 'bone'],
+        ['leather'],
+    ],
+    'crafting|refining': [
+        ['smelting_i'],
+        ['salvage_processing'],
+        ['smelting_ii'],
+    ],
+    'crafting|tool': [
+        ['tool'],
+        ['cooking_tool'],
+        ['building_tool'],
+    ],
+    'crafting|weapon': [
+        ['stone_weapon', 'bone_weapon', 'metal_weapon'],
+        ['bow', 'crossbow', 'inproved_bow', 'improved_crossbow'],
+        ['gun'],
+    ],
+    'crafting|ammo': [
+        ['arrow'],
+        ['gunpowder', 'ammo'],
+    ],
+    'crafting|armor_and_clothes': [
+        ['armor'],
+        ['cooking_clothes'],
+        ['building_clothes'],
+        ['gathering_clothes'],
+        ['scaving_clothes'],
+        ['crafting_clothes'],
+        ['backpack'],
+    ],
+    'building|funiture': [
+        ['tent', 'bed'],
+        ['container'],
+        ['funiture_set'],
+    ],
+    'building|workbench': [
+        ['campfire', 'kitchen'],
+        ['workstation'],
+        ['medical_lab'],
+        ['smelter'],
+    ],
+    'building|housing': [
+        ['wooden_structure', 'stone_structure'],
+        ['wooden_fence', 'stone_fence'],
+    ],
+};
 
 function normalizeSkillChainName(name) {
     return String(name || '')
@@ -57,9 +153,26 @@ function normalizeSkillChainName(name) {
         .toLowerCase();
 }
 
-function getSheetRowKey(skillName) {
-    const baseName = normalizeSkillChainName(skillName);
-    return baseName.split(':')[0].trim();
+function normalizeSheetKey(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/&/g, 'and')
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
+}
+
+function getSheetRowKey(skill) {
+    const branchKey = `${skill.job_code}|${skill.branch || 'general'}`;
+    const baseName = normalizeSheetKey(normalizeSkillChainName(skill.skill_name).split(':')[0]);
+    const rowGroups = SHEET_ROW_GROUPS[branchKey] || [];
+    const rowIndex = rowGroups.findIndex(group => group.includes(baseName));
+
+    return rowIndex >= 0 ? `${branchKey}|row_${rowIndex}` : `${branchKey}|${baseName}`;
+}
+
+function getSheetRowOrder(rowKey) {
+    const match = String(rowKey || '').match(/\|row_(\d+)$/);
+    return match ? parseInt(match[1]) : null;
 }
 
 function inferPrerequisiteSkill(skill, branchSkills) {
@@ -67,6 +180,10 @@ function inferPrerequisiteSkill(skill, branchSkills) {
         return branchSkills.find(item => item.skill_code === skill.prerequisite_skill_code) || null;
     }
 
+    return inferRomanChainPrerequisiteSkill(skill, branchSkills);
+}
+
+function inferRomanChainPrerequisiteSkill(skill, branchSkills) {
     const match = String(skill.skill_name || '').match(/\s+(I|II|III|IV|V|VI)$/i);
     if (!match) return null;
 
@@ -91,10 +208,7 @@ function buildAlignedSkillColumns(branchSkills, levelGaps) {
 
     const componentsByRoot = {};
     sortedSkills.forEach(skill => {
-        // Uu tien row_group tuong minh tu backend (cho phep gom cac skill khac
-        // ten vao chung mot hang ma khong bi suy luan noi voi nhau); neu khong
-        // co thi rot ve cach cu: suy luan hang dua tren ten skill (I/II/III...)
-        const root = skill.row_group || getSheetRowKey(skill.skill_name);
+        const root = skill.row_group || getSheetRowKey(skill);
         if (!componentsByRoot[root]) componentsByRoot[root] = [];
         componentsByRoot[root].push(skill);
     });
@@ -105,15 +219,17 @@ function buildAlignedSkillColumns(branchSkills, levelGaps) {
             skills: componentSkills,
             firstLevel: Math.min(...componentSkills.map(skill => skill.lv_required)),
             firstTier: Math.min(...componentSkills.map(skill => skill.tier || 0)),
+            sheetOrder: getSheetRowOrder(root),
             name: componentSkills
                 .slice()
                 .sort((a, b) => a.lv_required - b.lv_required || a.skill_name.localeCompare(b.skill_name))[0]?.skill_name || root,
         }))
-        .sort((a, b) =>
-            a.firstLevel - b.firstLevel ||
-            a.firstTier - b.firstTier ||
-            a.name.localeCompare(b.name)
-        );
+        .sort((a, b) => {
+            if (a.sheetOrder !== null && b.sheetOrder !== null) return a.sheetOrder - b.sheetOrder;
+            if (a.sheetOrder !== null) return -1;
+            if (b.sheetOrder !== null) return 1;
+            return a.firstLevel - b.firstLevel || a.firstTier - b.firstTier || a.name.localeCompare(b.name);
+        });
 
     componentRows.forEach((component, rowIndex) => {
         component.skills.forEach(skill => {
@@ -538,7 +654,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         ? currentBranchSkills.some(skill => inferPrerequisiteSkill(skill, currentBranchSkills)?.skill_code === selectedSkill.skill_code && skill.is_unlocked)
         : false;
     const skillConnectors = currentBranchSkills
-        .map(skill => ({ skill, prerequisite: inferPrerequisiteSkill(skill, currentBranchSkills) }))
+        .map(skill => ({ skill, prerequisite: inferRomanChainPrerequisiteSkill(skill, currentBranchSkills) }))
         .filter(({ skill, prerequisite }) => prerequisite && nodeRects[skill.skill_code] && nodeRects[prerequisite.skill_code])
         .map(({ skill, prerequisite }) => {
             const from = nodeRects[prerequisite.skill_code];
