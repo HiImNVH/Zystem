@@ -32,8 +32,6 @@ const ACTION_CONFIG = {
     FORAGE:  { label: 'Forage', mark: 'FO', destination: 'EXPEDITION', zones: ['forest', 'rural', 'coast'], helper: 'Gather food, herbs, and small materials.' },
     CRAFT:   { label: 'Craft', mark: 'CR', destination: 'HOME', zones: ['safe'], helper: 'Use time at home to create craftable items.' },
     TRADE:   { label: 'Trade', mark: 'TR', destination: 'HOME', zones: ['safe'], helper: 'Sell junk and common materials for copper.' },
-    REST:    { label: 'Rest at Campfire', mark: 'RS', destination: 'HOME', zones: ['safe'], helper: 'Spend quiet time to reduce fatigue.' },
-    SLEEP:   { label: 'Sleep', mark: 'SL', destination: 'HOME', zones: ['safe'], helper: 'Recover fatigue faster at home.' },
 };
 
 const DURATION_OPTIONS = [
@@ -86,33 +84,6 @@ const SAFE_HOUSE_INFO = {
         { id: 'workbench', name: 'Workbench', level: 1, status: 'Worn', breaksIn: '24h' },
     ],
     slots: 8,
-};
-
-const ACTION_RESOURCE_RULES = {
-    EXPLORE: { energyPerUnit: 8, fatiguePerUnit: 10 },
-    BATTLE:  { energyPerUnit: 10, fatiguePerUnit: 12 },
-    DUNGEON: { energyPerUnit: 14, fatiguePerUnit: 18 },
-    MINE:    { energyPerUnit: 7, fatiguePerUnit: 9 },
-    CHOP:    { energyPerUnit: 6, fatiguePerUnit: 8 },
-    HUNT:    { energyPerUnit: 9, fatiguePerUnit: 11 },
-    FORAGE:  { energyPerUnit: 4, fatiguePerUnit: 6 },
-    CRAFT:   { energyPerUnit: 5, fatiguePerUnit: 5 },
-    TRADE:   { energyPerUnit: 2, fatiguePerUnit: 3 },
-    REST:    { energyPerUnit: 0, fatiguePerUnit: -16 },
-    SLEEP:   { energyPerUnit: 0, fatiguePerUnit: -28 },
-};
-
-const ZONE_FATIGUE_MULTIPLIER = {
-    safe: 0.75,
-    urban: 1.05,
-    rural: 0.95,
-    coast: 1.1,
-    forest: 1,
-    mine: 1.1,
-    ruins: 1.2,
-    dungeon: 1.25,
-    hazard: 1.35,
-    desert: 1.45,
 };
 
 const ITEM_TAG_MARKS = [
@@ -194,32 +165,14 @@ function getItemMark(itemOrCategory, tags = []) {
     return match?.mark || ITEM_CATEGORY_MARKS[String(category || '').toUpperCase()] || 'IT';
 }
 
-function calculateResourcePreview(actionType, durationSeconds, zoneType, tag) {
-    const rule = ACTION_RESOURCE_RULES[actionType] || ACTION_RESOURCE_RULES.EXPLORE;
-    const actionUnits = Math.max(1, Math.ceil((durationSeconds || 0) / 1800));
-    const zoneMultiplier = ZONE_FATIGUE_MULTIPLIER[zoneType] || 1;
-    const isRecovery = rule.fatiguePerUnit < 0;
-    const energyMultiplier = parseFloat(tag?.energy_cost_mult) || 1;
-    const tagFatigueMultiplier = parseFloat(tag?.fatigue_mult) || 1;
-    const fatigueValue = rule.fatiguePerUnit * actionUnits * (isRecovery ? 1 : zoneMultiplier * tagFatigueMultiplier);
-
-    return {
-        energyCost: Math.max(0, Math.ceil(rule.energyPerUnit * actionUnits * energyMultiplier)),
-        fatigueChange: isRecovery ? Math.floor(fatigueValue) : Math.ceil(fatigueValue),
-    };
-}
-
 function getZoneLevel(zone) {
     return parseInt(zone?.level_gap || zone?.min_player_lv || 1);
 }
 
-function ResourceMeter({ label, current, max, tone }) {
+function ResourceMeter({ label, current, max }) {
     const safeMax = Math.max(1, parseInt(max) || 1);
     const safeCurrent = Math.max(0, parseInt(current) || 0);
     const pct = Math.min(100, Math.round((safeCurrent / safeMax) * 100));
-    const fillClass = tone === 'fatigue'
-        ? (pct >= 88 ? 'bg-danger' : pct >= 75 ? 'bg-accent' : 'bg-cyan')
-        : 'bg-success';
 
     return (
         <div>
@@ -228,7 +181,7 @@ function ResourceMeter({ label, current, max, tone }) {
                 <span className="font-mono text-textSecondary">{safeCurrent}/{safeMax}</span>
             </div>
             <div className="progress-track">
-                <div className={`progress-fill ${fillClass}`} style={{ width: `${pct}%` }} />
+                <div className="progress-fill bg-success" style={{ width: `${pct}%` }} />
             </div>
         </div>
     );
@@ -255,9 +208,8 @@ function PlayerStatusBar({ character }) {
                     <span className="text-xs font-semibold text-accent flex-shrink-0">Level {playerLevel}</span>
                 </div>
                 <ResourceMeter label="EXP" current={character?.current_exp} max={expRequired} />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                     <ResourceMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
-                    <ResourceMeter label="Fatigue" current={character?.current_fatigue} max={character?.max_fatigue} tone="fatigue" />
                 </div>
             </div>
         </div>
@@ -499,7 +451,7 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
 function formatActionResult(result) {
     if (!result) return '';
     const lootCount = result.items_dropped?.length || 0;
-    return `Energy -${result.energy_cost}, fatigue +${result.fatigue_gained}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
+    return `Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
 }
 
 function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onExecute, executingId }) {
@@ -781,8 +733,6 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
                     ...current,
                     current_energy: result.data.current_energy,
                     max_energy: result.data.max_energy,
-                    current_fatigue: result.data.current_fatigue,
-                    max_fatigue: result.data.max_fatigue,
                 }));
                 setRestError('');
                 await onUpdate?.();
@@ -800,9 +750,7 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
 
     const energyCurrent = parseInt(localCharacter?.current_energy) || 0;
     const energyMax = Math.max(1, parseInt(localCharacter?.max_energy) || 1);
-    const fatigueCurrent = parseInt(localCharacter?.current_fatigue) || 0;
-    const fatigueMax = Math.max(1, parseInt(localCharacter?.max_fatigue) || 1);
-    const isFullyRested = energyCurrent >= energyMax && fatigueCurrent <= 0;
+    const isFullyRested = energyCurrent >= energyMax;
     const restMinutes = Math.floor(restSeconds / 60);
     const restClock = `${String(restMinutes).padStart(2, '0')}:${String(restSeconds % 60).padStart(2, '0')}`;
 
@@ -829,13 +777,12 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
                     <div className="flex items-start justify-between gap-3">
                         <div>
                             <p className="font-semibold">AFK Rest</p>
-                            <p className="text-xs text-textMuted mt-1">Energy recovers and fatigue drops every 10 seconds.</p>
+                            <p className="text-xs text-textMuted mt-1">Energy recovers every 10 seconds.</p>
                         </div>
                         <span className="text-lg font-mono text-accent">{restClock}</span>
                     </div>
                     <div className="space-y-3">
                         <ResourceMeter label="Energy" current={energyCurrent} max={energyMax} />
-                        <ResourceMeter label="Fatigue" current={fatigueCurrent} max={fatigueMax} tone="fatigue" />
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-lg bg-surface p-3">

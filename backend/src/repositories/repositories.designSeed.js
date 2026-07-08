@@ -1176,13 +1176,6 @@ const STAT_DEFINITIONS = [
     },
     {
         "statType": "SECONDARY",
-        "code": "FATIGUE",
-        "fullName": "Fatigue",
-        "purpose": "Physical fatigue. High fatigue reduces work and combat efficiency.",
-        "notes": "Maximum 400; 300 = tired, 350 = exhausted."
-    },
-    {
-        "statType": "SECONDARY",
         "code": "ENERGY",
         "fullName": "Energy",
         "purpose": "Energy spent to perform actions such as foraging fruit, carrying firewood, and exploring.",

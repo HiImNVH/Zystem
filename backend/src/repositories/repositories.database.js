@@ -121,8 +121,6 @@ async function initializeDatabaseSchema() {
                 current_hp INT DEFAULT 100,
                 max_energy INT DEFAULT 100 CHECK (max_energy > 0),
                 current_energy INT DEFAULT 100 CHECK (current_energy >= 0),
-                max_fatigue INT DEFAULT 400 CHECK (max_fatigue > 0),
-                current_fatigue INT DEFAULT 0 CHECK (current_fatigue BETWEEN 0 AND 400),
                 infection_pct NUMERIC(5,2) DEFAULT 0.00 CHECK (infection_pct BETWEEN 0 AND 100),
                 radiation_pct NUMERIC(5,2) DEFAULT 0.00 CHECK (radiation_pct BETWEEN 0 AND 100),
                 infection_status VARCHAR(20) DEFAULT 'HEALTHY',
@@ -223,7 +221,6 @@ async function initializeDatabaseSchema() {
                 tag_type VARCHAR(30) NOT NULL,
                 action_type VARCHAR(30) NOT NULL,
                 energy_cost_mult NUMERIC(4,2) NOT NULL DEFAULT 1.00,
-                fatigue_mult NUMERIC(4,2) NOT NULL DEFAULT 1.00,
                 loot_focus TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
                 monster_profile VARCHAR(80),
                 dungeon_rank_rewards BOOLEAN NOT NULL DEFAULT FALSE,
@@ -282,17 +279,13 @@ async function initializeDatabaseSchema() {
 
         await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS max_energy INT DEFAULT 100 CHECK (max_energy > 0);`);
         await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS current_energy INT DEFAULT 100 CHECK (current_energy >= 0);`);
-        await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS max_fatigue INT DEFAULT 400 CHECK (max_fatigue > 0);`);
-        await client.query(`ALTER TABLE players ADD COLUMN IF NOT EXISTS current_fatigue INT DEFAULT 0 CHECK (current_fatigue BETWEEN 0 AND 400);`);
         await client.query(`
             UPDATE players
             SET max_energy = GREATEST(1, FLOOR(100 + COALESCE(base_vit, 0) + COALESCE(base_str, 0) * 0.2))::INT,
                 current_energy = LEAST(
                     GREATEST(1, FLOOR(100 + COALESCE(base_vit, 0) + COALESCE(base_str, 0) * 0.2))::INT,
                     COALESCE(current_energy, GREATEST(1, FLOOR(100 + COALESCE(base_vit, 0) + COALESCE(base_str, 0) * 0.2))::INT)
-                ),
-                max_fatigue = COALESCE(max_fatigue, 400),
-                current_fatigue = LEAST(400, GREATEST(0, COALESCE(current_fatigue, 0)));
+                );
         `);
 
         // ============================================================

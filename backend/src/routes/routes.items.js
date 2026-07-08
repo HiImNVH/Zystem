@@ -15,22 +15,18 @@ function calculateFoodRestore(item) {
     const tags = (item.tags || []).map(tag => String(tag).toLowerCase());
     const level = parseInt(item.item_level) || 1;
     let energyRestore = 12 + Math.floor(level * 1.5);
-    let fatigueRestore = 2 + Math.floor(level / 10);
 
     if (tags.includes('raw')) {
         energyRestore = Math.max(4, Math.floor(energyRestore * 0.6));
-        fatigueRestore = 0;
     }
     if (tags.includes('processed') || tags.includes('dried') || tags.includes('smoked')) {
         energyRestore += 4;
-        fatigueRestore += 1;
     }
     if (tags.includes('canned')) {
         energyRestore += 8;
-        fatigueRestore += 2;
     }
 
-    return { energyRestore, fatigueRestore };
+    return { energyRestore };
 }
 
 function getEquipSlot(item) {
@@ -498,7 +494,7 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
 /**
  * @route   POST /api/items/use-food
  * @body    { playerId, itemId }
- * @desc    Dung 1 food item de hoi energy va hoi nhe fatigue.
+ * @desc    Dung 1 food item de hoi energy.
  */
 itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
     const { playerId, itemId } = req.body;
@@ -563,11 +559,10 @@ itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
         const updatedPlayer = await client.query(`
             UPDATE players
             SET current_energy = LEAST(max_energy, current_energy + $1),
-                current_fatigue = GREATEST(0, current_fatigue - $2),
                 updated_at = NOW()
-            WHERE id = $3
-            RETURNING current_energy, max_energy, current_fatigue, max_fatigue;
-        `, [restore.energyRestore, restore.fatigueRestore, playerId]);
+            WHERE id = $2
+            RETURNING current_energy, max_energy;
+        `, [restore.energyRestore, playerId]);
 
         if (item.quantity > 1) {
             await client.query(`UPDATE items SET quantity = quantity - 1 WHERE id = $1;`, [itemId]);
@@ -580,12 +575,11 @@ itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
             eventType: 'FOOD_USED',
             source: 'Zystem',
             title: 'Food Used',
-            message: `Ate ${item.display_name}. Energy +${restore.energyRestore}, fatigue -${restore.fatigueRestore}.`,
+            message: `Ate ${item.display_name}. Energy +${restore.energyRestore}.`,
             payload: {
                 item_id: itemId,
                 item_name: item.display_name,
                 energy_restored: restore.energyRestore,
-                fatigue_restored: restore.fatigueRestore,
             },
         });
 
@@ -596,7 +590,6 @@ itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
                 item_id: itemId,
                 item_name: item.display_name,
                 energy_restored: restore.energyRestore,
-                fatigue_restored: restore.fatigueRestore,
                 player_resources: updatedPlayer.rows[0]
             }
         });

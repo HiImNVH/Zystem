@@ -10,26 +10,13 @@ const progressionService = require('../services/services.progression');
 const playerEventsService = require('../services/services.playerEvents');
 
 const ACTION_RESOURCE_RULES = {
-    EXPLORE: { energyPerUnit: 8, fatiguePerUnit: 10 },
-    BATTLE:  { energyPerUnit: 10, fatiguePerUnit: 12 },
-    DUNGEON: { energyPerUnit: 14, fatiguePerUnit: 18 },
-    MINE:    { energyPerUnit: 7, fatiguePerUnit: 9 },
-    CHOP:    { energyPerUnit: 6, fatiguePerUnit: 8 },
-    HUNT:    { energyPerUnit: 9, fatiguePerUnit: 11 },
-    FORAGE:  { energyPerUnit: 4, fatiguePerUnit: 6 },
-};
-
-const ZONE_FATIGUE_MULTIPLIER = {
-    safe: 0.75,
-    urban: 1.05,
-    rural: 0.95,
-    coast: 1.1,
-    forest: 1,
-    mine: 1.1,
-    ruins: 1.2,
-    dungeon: 1.25,
-    hazard: 1.35,
-    desert: 1.45,
+    EXPLORE: { energyPerUnit: 8 },
+    BATTLE:  { energyPerUnit: 10 },
+    DUNGEON: { energyPerUnit: 14 },
+    MINE:    { energyPerUnit: 7 },
+    CHOP:    { energyPerUnit: 6 },
+    HUNT:    { energyPerUnit: 9 },
+    FORAGE:  { energyPerUnit: 4 },
 };
 
 const ACTION_JOB_CODE = {
@@ -72,16 +59,13 @@ function normalizeActivityType(activityType) {
     return null;
 }
 
-function calculateActionResourceCost(actionType, durationSeconds, zoneType, tag) {
+function calculateActionResourceCost(actionType, durationSeconds, tag) {
     const rule = ACTION_RESOURCE_RULES[actionType] || ACTION_RESOURCE_RULES.EXPLORE;
     const actionUnits = Math.max(1, Math.ceil((parseInt(durationSeconds) || 0) / 1800));
-    const zoneMultiplier = ZONE_FATIGUE_MULTIPLIER[zoneType] || 1;
     const energyMultiplier = parseFloat(tag?.energy_cost_mult) || 1;
-    const tagFatigueMultiplier = parseFloat(tag?.fatigue_mult) || 1;
 
     return {
         energyCost: Math.max(0, Math.ceil(rule.energyPerUnit * actionUnits * energyMultiplier)),
-        fatigueChange: Math.max(1, Math.ceil(rule.fatiguePerUnit * actionUnits * zoneMultiplier * tagFatigueMultiplier)),
     };
 }
 
@@ -201,7 +185,6 @@ zonesRouter.get('/', async (req, res, next) => {
                             'tag_type', pgt.tag_type,
                             'action_type', pgt.action_type,
                             'energy_cost_mult', pgt.energy_cost_mult,
-                            'fatigue_mult', pgt.fatigue_mult,
                             'loot_focus', pgt.loot_focus,
                             'monster_profile', pgt.monster_profile,
                             'dungeon_rank_rewards', pgt.dungeon_rank_rewards
@@ -255,7 +238,6 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
                                'tag_type', pgt.tag_type,
                                'action_type', pgt.action_type,
                                'energy_cost_mult', pgt.energy_cost_mult,
-                               'fatigue_mult', pgt.fatigue_mult,
                                'loot_focus', pgt.loot_focus,
                                'monster_profile', pgt.monster_profile,
                                'dungeon_rank_rewards', pgt.dungeon_rank_rewards
@@ -340,7 +322,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
 
         const playerResult = await client.query(`
             SELECT id, account_id, player_level, current_energy, max_energy,
-                   current_fatigue, max_fatigue, infection_pct, radiation_pct
+                   infection_pct, radiation_pct
             FROM players
             WHERE id = $1
             FOR UPDATE;
@@ -364,7 +346,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
                    z.zone_type, z.biome, z.level_gap, z.min_player_lv,
                    z.base_duration_s, z.infection_risk, z.radiation_risk,
                    pgt.id AS tag_id, pgt.tag_type, pgt.action_type,
-                   pgt.energy_cost_mult, pgt.fatigue_mult, pgt.loot_focus,
+                   pgt.energy_cost_mult, pgt.loot_focus,
                    pgt.monster_profile, pgt.dungeon_rank_rewards
             FROM world_pois wp
             JOIN zones z ON z.id = wp.zone_id
@@ -395,26 +377,15 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             : baseDuration;
         const tag = {
             energy_cost_mult: poi.energy_cost_mult,
-            fatigue_mult: poi.fatigue_mult,
         };
-        const cost = calculateActionResourceCost(actionType, durationSeconds, poi.biome || poi.zone_type, tag);
+        const cost = calculateActionResourceCost(actionType, durationSeconds, tag);
         const currentEnergy = parseInt(player.current_energy) || 0;
-        const currentFatigue = parseInt(player.current_fatigue) || 0;
-        const maxFatigue = parseInt(player.max_fatigue) || 400;
 
         if (currentEnergy < cost.energyCost) {
             await client.query('ROLLBACK');
             return res.status(400).json({
                 success: false,
                 message: `Not enough energy. Need ${cost.energyCost}, current ${currentEnergy}.`
-            });
-        }
-
-        if (currentFatigue + cost.fatigueChange > maxFatigue) {
-            await client.query('ROLLBACK');
-            return res.status(400).json({
-                success: false,
-                message: `Too fatigued. Rest before doing this activity.`
             });
         }
 
@@ -426,13 +397,12 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
         const updatedPlayer = await client.query(`
             UPDATE players
             SET current_energy = current_energy - $1,
-                current_fatigue = LEAST(max_fatigue, current_fatigue + $2),
-                infection_pct = LEAST(100, infection_pct + $3),
-                radiation_pct = LEAST(100, radiation_pct + $4),
+                infection_pct = LEAST(100, infection_pct + $2),
+                radiation_pct = LEAST(100, radiation_pct + $3),
                 updated_at = NOW()
-            WHERE id = $5
-            RETURNING current_energy, max_energy, current_fatigue, max_fatigue, infection_pct, radiation_pct;
-        `, [cost.energyCost, cost.fatigueChange, hazard.infectionGain, hazard.radiationGain, playerId]);
+            WHERE id = $4
+            RETURNING current_energy, max_energy, infection_pct, radiation_pct;
+        `, [cost.energyCost, hazard.infectionGain, hazard.radiationGain, playerId]);
 
         await client.query('COMMIT');
 
@@ -459,7 +429,6 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             action_type: actionType,
             duration_seconds: durationSeconds,
             energy_cost: cost.energyCost,
-            fatigue_gained: cost.fatigueChange,
             infection_gained: hazard.infectionGain,
             radiation_gained: hazard.radiationGain,
             player_exp: expReward.playerExp,
@@ -474,7 +443,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             eventType: 'POI_ACTIVITY',
             source: 'Zystem',
             title: `${activity.label} Completed`,
-            message: `${activity.label} at ${poi.poi_name}. Energy -${cost.energyCost}, fatigue +${cost.fatigueChange}.`,
+            message: `${activity.label} at ${poi.poi_name}. Energy -${cost.energyCost}.`,
             payload: executionSummary,
         });
 
@@ -518,7 +487,6 @@ zonesRouter.get('/:code', async (req, res, next) => {
                             'tag_type', pgt.tag_type,
                             'action_type', pgt.action_type,
                             'energy_cost_mult', pgt.energy_cost_mult,
-                            'fatigue_mult', pgt.fatigue_mult,
                             'loot_focus', pgt.loot_focus,
                             'monster_profile', pgt.monster_profile,
                             'dungeon_rank_rewards', pgt.dungeon_rank_rewards

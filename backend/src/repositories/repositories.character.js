@@ -91,8 +91,8 @@ async function createCharacter(characterData) {
             INSERT INTO players
                 (account_id, character_name, player_level, current_exp, skill_points,
                  base_str, base_agi, base_dex, base_vit, base_int, base_chr,
-                 max_hp, current_hp, max_energy, current_energy, max_fatigue, current_fatigue)
-            VALUES ($1, $2, 1, 0, 5, $3, $4, $5, $6, $7, $8, $9, $9, $10, $10, 400, 0)
+                 max_hp, current_hp, max_energy, current_energy)
+            VALUES ($1, $2, 1, 0, 5, $3, $4, $5, $6, $7, $8, $9, $9, $10, $10)
             RETURNING *;
         `, [
             characterData.accountId,
@@ -156,7 +156,12 @@ async function findCharacterById(characterId) {
 
     try {
         const result = await dbPool.query(`
-            SELECT p.*, w.copper, w.silver, w.gold
+            SELECT p.id, p.account_id, p.character_name, p.player_level, p.current_exp, p.skill_points,
+                   p.base_str, p.base_agi, p.base_dex, p.base_vit, p.base_int, p.base_chr,
+                   p.max_hp, p.current_hp, p.max_energy, p.current_energy,
+                   p.infection_pct, p.radiation_pct, p.infection_status, p.is_alive,
+                   p.equipped_title_id, p.created_at, p.updated_at,
+                   w.copper, w.silver, w.gold
             FROM players p
             LEFT JOIN wallets w ON p.id = w.player_id
             WHERE p.id = $1;
@@ -177,7 +182,7 @@ async function findCharacterByAccount(accountId) {
             SELECT p.id, p.character_name, p.player_level, p.current_exp, p.skill_points,
                    p.base_str, p.base_agi, p.base_dex, p.base_vit, p.base_int, p.base_chr,
                    p.max_hp, p.current_hp, p.max_energy, p.current_energy,
-                   p.max_fatigue, p.current_fatigue, p.infection_pct, p.radiation_pct,
+                   p.infection_pct, p.radiation_pct,
                    p.infection_status, p.is_alive, p.created_at,
                    w.copper, w.silver, w.gold
             FROM players p
@@ -205,7 +210,7 @@ async function updateCharacterStats(characterId, statsUpdate) {
     const allowedFields = [
         'player_level', 'current_exp', 'skill_points',
         'base_str', 'base_agi', 'base_dex', 'base_vit', 'base_int', 'base_chr',
-        'max_hp', 'current_hp', 'max_energy', 'current_energy', 'max_fatigue', 'current_fatigue',
+        'max_hp', 'current_hp', 'max_energy', 'current_energy',
         'infection_pct', 'radiation_pct',
         'infection_status', 'is_alive', 'equipped_title_id'
     ];

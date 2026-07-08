@@ -13,7 +13,6 @@ const SAFE_HOUSE_REST_CONFIG = {
     homeLevel: 1,
     bedLevel: 1,
     baseEnergyPerMinute: 6,
-    baseFatiguePerMinute: 8,
 };
 
 function calculateSafeHouseRestGain(elapsedSeconds) {
@@ -24,7 +23,6 @@ function calculateSafeHouseRestGain(elapsedSeconds) {
     return {
         elapsedSeconds: safeElapsedSeconds,
         energyRecovered: Math.max(1, Math.floor(SAFE_HOUSE_REST_CONFIG.baseEnergyPerMinute * efficiency * minutes)),
-        fatigueRecovered: Math.max(1, Math.floor(SAFE_HOUSE_REST_CONFIG.baseFatiguePerMinute * efficiency * minutes)),
         efficiency,
     };
 }
@@ -100,7 +98,7 @@ characterRouter.get('/account/me', verifyToken, async (req, res, next) => {
 /**
  * @route   POST /api/characters/:id/safe-house/rest
  * @body    { elapsedSeconds }
- * @desc    Nghi ngoi trong nha an toan de hoi energy va giam fatigue.
+ * @desc    Nghi ngoi trong nha an toan de hoi energy.
  * @access  Protected
  */
 characterRouter.post('/:id/safe-house/rest', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
@@ -111,11 +109,10 @@ characterRouter.post('/:id/safe-house/rest', verifyToken, verifyPlayerOwnership,
         const result = await dbPool.query(`
             UPDATE players
             SET current_energy = LEAST(max_energy, current_energy + $1),
-                current_fatigue = GREATEST(0, current_fatigue - $2),
                 updated_at = NOW()
-            WHERE id = $3
-            RETURNING id, current_energy, max_energy, current_fatigue, max_fatigue;
-        `, [restGain.energyRecovered, restGain.fatigueRecovered, id]);
+            WHERE id = $2
+            RETURNING id, current_energy, max_energy;
+        `, [restGain.energyRecovered, id]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Character not found.' });
@@ -130,7 +127,6 @@ characterRouter.post('/:id/safe-house/rest', verifyToken, verifyPlayerOwnership,
                 bed_level: SAFE_HOUSE_REST_CONFIG.bedLevel,
                 elapsed_seconds: restGain.elapsedSeconds,
                 energy_recovered: restGain.energyRecovered,
-                fatigue_recovered: restGain.fatigueRecovered,
                 rest_efficiency: restGain.efficiency,
             }
         });

@@ -201,13 +201,12 @@ async function seedJobsSeedTable() {
         `;
         const insertTagQuery = `
             INSERT INTO poi_gameplay_tags
-                (poi_id, tag_type, action_type, energy_cost_mult, fatigue_mult,
+                (poi_id, tag_type, action_type, energy_cost_mult,
                  loot_focus, monster_profile, dungeon_rank_rewards)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+            VALUES ($1,$2,$3,$4,$5,$6,$7)
             ON CONFLICT (poi_id, tag_type) DO UPDATE SET
                 action_type = EXCLUDED.action_type,
                 energy_cost_mult = EXCLUDED.energy_cost_mult,
-                fatigue_mult = EXCLUDED.fatigue_mult,
                 loot_focus = EXCLUDED.loot_focus,
                 monster_profile = EXCLUDED.monster_profile,
                 dungeon_rank_rewards = EXCLUDED.dungeon_rank_rewards;
@@ -235,7 +234,6 @@ async function seedJobsSeedTable() {
                     tag,
                     TAG_ACTION_TYPE[tag],
                     isDungeon ? 1.35 : (isBattle ? 1.15 : 1.00),
-                    isDungeon ? 1.35 : (isBattle ? 1.20 : 1.00),
                     tag === 'EXPLORATION' ? ['materials', 'food', 'salvage'] : ['combat', 'gear', 'materials'],
                     isBattle || isDungeon ? `${poi.type}_threats` : null,
                     isDungeon,
