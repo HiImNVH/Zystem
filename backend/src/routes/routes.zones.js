@@ -116,7 +116,7 @@ async function findGatherItems(config) {
           AND origin = ANY($2::TEXT[])
           AND item_level BETWEEN $3 AND $4
         ORDER BY ABS(item_level - $5), category ASC, display_name ASC
-        LIMIT 8;
+        LIMIT 40;
     `, [
         categories,
         ['Gatherable', 'Loot-only'],
@@ -126,6 +126,31 @@ async function findGatherItems(config) {
     ]);
 
     return result.rows;
+}
+
+const GATHER_CATEGORY_LABELS = {
+    FOOD: 'Nguồn thực phẩm',
+    MATERIAL: 'Vật liệu thu nhặt',
+    RUBBISH: 'Phế liệu tái chế',
+    TOOL: 'Dụng cụ còn dùng được',
+    WEAPON: 'Vũ khí sót lại',
+    EQUIPMENT: 'Trang bị sót lại',
+};
+
+function getGenericGatherName(category) {
+    return GATHER_CATEGORY_LABELS[category] || 'Vật tư ngẫu nhiên';
+}
+
+function getGenericGatherTags(items) {
+    const tags = new Set();
+    for (const item of items) {
+        for (const itemTag of item.tags || []) {
+            if (tags.size >= 4) break;
+            tags.add(itemTag);
+        }
+        if (tags.size >= 4) break;
+    }
+    return [...tags];
 }
 
 function scaleMonsterStats(monster, monsterLevel) {
@@ -179,16 +204,24 @@ function buildGatherList(config) {
     const { zone, tag, items } = config;
     if (!tag) return [];
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
+    const itemGroups = items.reduce((groups, item) => {
+        const category = item.category || 'MATERIAL';
+        if (!groups[category]) groups[category] = [];
+        groups[category].push(item);
+        return groups;
+    }, {});
 
-    return items.map(item => ({
-        id: item.id,
-        code: item.code,
-        name: item.display_name,
-        category: item.category,
-        tags: item.tags || [],
+    return Object.entries(itemGroups).map(([category, groupItems]) => ({
+        id: `${category.toLowerCase()}_gather_pool_${baseLevel}`,
+        code: `${category}_GATHER_POOL`,
+        name: getGenericGatherName(category),
+        category,
+        category_label: getGenericGatherName(category),
+        tags: getGenericGatherTags(groupItems),
+        pool_size: groupItems.length,
         item_level: baseLevel,
-        rarity_hint: 'Zone-scaled drop',
-        reward_hint: (item.tags || []).slice(0, 4).join(', ') || tag.loot_focus?.join(', ') || 'materials',
+        rarity_hint: 'Rơi ngẫu nhiên theo POI',
+        reward_hint: `Ngẫu nhiên trong ${groupItems.length} vật phẩm phù hợp`,
         action_type: tag.action_type,
         gameplay_tag: tag,
     }));

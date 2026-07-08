@@ -587,10 +587,10 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     ) : (
                                         <>
                                             <p className="text-xs text-textMuted truncate">
-                                                Cấp zone {item.item_level} | {item.category}
+                                                Cấp zone {item.item_level} | {item.category_label || item.category}
                                             </p>
                                             <p className="text-[11px] text-textMuted truncate">
-                                                Tag: {item.reward_hint}
+                                                {item.reward_hint}
                                             </p>
                                         </>
                                     )}
