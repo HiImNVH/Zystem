@@ -243,13 +243,15 @@ function CompactStatusMeter({ label, current, max }) {
     const fillClassName = RESOURCE_METER_FILL_CLASSES[label] || 'bg-success';
 
     return (
-        <div>
-            <div className="flex items-center justify-between text-[11px] mb-1">
-                <span className="text-textMuted uppercase font-semibold">{label}</span>
-                <span className="font-mono text-textSecondary">{safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}</span>
-            </div>
-            <div className="progress-track">
-                <div className={`progress-fill ${fillClassName}`} style={{ width: `${pct}%` }} />
+        <div className="contents">
+            <span className="text-[11px] text-textMuted uppercase font-semibold self-center">{label}</span>
+            <div className="self-center min-w-0">
+                <div className="flex items-center justify-end text-[11px] mb-1">
+                    <span className="font-mono text-textSecondary">{safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}</span>
+                </div>
+                <div className="progress-track">
+                    <div className={`progress-fill ${fillClassName}`} style={{ width: `${pct}%` }} />
+                </div>
             </div>
         </div>
     );
@@ -272,11 +274,11 @@ function PlayerStatusBar({ character }) {
     return (
         <div className="sticky top-0 z-20 bg-base px-3 pt-3 pb-2">
             <div className="card p-2.5 space-y-2">
-                <div className="grid grid-cols-[3rem_1fr] gap-2">
-                    <div className="row-span-2 min-h-16 border border-textSecondary bg-base flex items-center justify-center">
+                <div className="grid grid-cols-[4rem_1fr_3rem] gap-x-2 gap-y-1">
+                    <CompactStatusMeter label="EXP" current={character?.current_exp} max={expRequired} />
+                    <div className="row-span-2 col-start-3 row-start-1 min-h-16 border border-textSecondary bg-base flex items-center justify-center">
                         <span className="text-lg font-bold text-textPrimary">{playerLevel}</span>
                     </div>
-                    <CompactStatusMeter label="EXP" current={character?.current_exp} max={expRequired} />
                     <CompactStatusMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
                 </div>
                 <div className="grid grid-cols-3 gap-2">
