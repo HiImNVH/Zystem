@@ -158,7 +158,7 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                             {normalizedCategory && <p className="text-[10px] text-textMuted mt-1">{normalizedCategory}</p>}
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">×</button>
+                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
                 </div>
 
                 {tags.length > 0 && (

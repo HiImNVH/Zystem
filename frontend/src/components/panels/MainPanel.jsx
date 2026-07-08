@@ -76,14 +76,14 @@ const EXPLORATION_RINGS = [
 
 const SAFE_HOUSE_INFO = {
     level: 1,
-    name: 'Nhà an toàn',
-    condition: 'Ổn định',
+    name: 'Safe House',
+    condition: 'Stable',
     bedLevel: 1,
     restEfficiency: 1,
     workstations: [
-        { id: 'bed', name: 'Giường', level: 1, status: 'Tốt', breaksIn: '72h' },
-        { id: 'campfire', name: 'Bếp nấu', level: 1, status: 'Tốt', breaksIn: '36h' },
-        { id: 'workbench', name: 'Bàn chế tạo', level: 1, status: 'Đã mòn', breaksIn: '24h' },
+        { id: 'bed', name: 'Bed', level: 1, status: 'Good', breaksIn: '72h' },
+        { id: 'campfire', name: 'Cooking Fire', level: 1, status: 'Good', breaksIn: '36h' },
+        { id: 'workbench', name: 'Workbench', level: 1, status: 'Worn', breaksIn: '24h' },
     ],
     slots: 8,
 };
@@ -814,7 +814,7 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
 
     function handleCookingClick() {
         setActiveMode('COOK');
-        onNotify?.('Màn nấu ăn chưa được nối logic.', 'error');
+        onNotify?.('Cooking is not wired yet.', 'error');
     }
 
     function handleCraftClick() {
@@ -828,8 +828,8 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
                 <div className="card p-4 space-y-4">
                     <div className="flex items-start justify-between gap-3">
                         <div>
-                            <p className="font-semibold">Nghỉ ngơi AFK</p>
-                            <p className="text-xs text-textMuted mt-1">Năng lượng hồi và độ mệt giảm mỗi 10 giây.</p>
+                            <p className="font-semibold">AFK Rest</p>
+                            <p className="text-xs text-textMuted mt-1">Energy recovers and fatigue drops every 10 seconds.</p>
                         </div>
                         <span className="text-lg font-mono text-accent">{restClock}</span>
                     </div>
@@ -839,23 +839,23 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="rounded-lg bg-surface p-3">
-                            <p className="text-textMuted">Hiệu suất nhà</p>
+                            <p className="text-textMuted">Home efficiency</p>
                             <p className="font-semibold mt-1">Lv.{SAFE_HOUSE_INFO.level}</p>
                         </div>
                         <div className="rounded-lg bg-surface p-3">
-                            <p className="text-textMuted">Hiệu suất giường</p>
-                            <p className="font-semibold mt-1">Giường Lv.{SAFE_HOUSE_INFO.bedLevel}</p>
+                            <p className="text-textMuted">Bed efficiency</p>
+                            <p className="font-semibold mt-1">Bed Lv.{SAFE_HOUSE_INFO.bedLevel}</p>
                         </div>
                     </div>
                     {restError && <p className="text-sm text-danger">{restError}</p>}
-                    {isFullyRested && <p className="text-sm text-success">Bạn đã hồi phục đầy đủ.</p>}
+                    {isFullyRested && <p className="text-sm text-success">You are fully rested.</p>}
                     <button
                         type="button"
                         onClick={handleRestClick}
                         disabled={isFullyRested && !isResting}
                         className={isResting ? 'btn-secondary w-full' : 'btn-primary w-full'}
                     >
-                        {isResting ? 'Dừng nghỉ ngơi' : 'Bắt đầu nghỉ ngơi'}
+                        {isResting ? 'Stop Resting' : 'Start Resting'}
                     </button>
                 </div>
             );
@@ -864,8 +864,8 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
         if (activeMode === 'COOK') {
             return (
                 <div className="card p-4">
-                    <p className="font-semibold">Nấu ăn</p>
-                    <p className="text-sm text-textMuted mt-2">Nấu ăn cơ bản sẽ dùng bếp nấu. Màn này được giữ cho lượt phát triển tiếp theo.</p>
+                    <p className="font-semibold">Cooking</p>
+                    <p className="text-sm text-textMuted mt-2">Basic cooking will use the Cooking Fire. This screen is reserved for the next pass.</p>
                 </div>
             );
         }
@@ -873,17 +873,17 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
         if (activeMode === 'CRAFT') {
             return (
                 <div className="card p-4">
-                    <p className="font-semibold">Chế tạo</p>
-                    <p className="text-sm text-textMuted mt-2">Bảng chế tạo hiện có đã được mở. Hãy chọn công thức và nguyên liệu ở đó.</p>
+                    <p className="font-semibold">Crafting</p>
+                    <p className="text-sm text-textMuted mt-2">The existing crafting sheet is open. Choose a recipe and materials there.</p>
                 </div>
             );
         }
 
         return (
             <div className="card p-4">
-                <p className="font-semibold">Thông tin nhà an toàn</p>
+                <p className="font-semibold">Safe House Information</p>
                 <p className="text-sm text-textMuted mt-2">
-                    Nơi trú ẩn cá nhân cấp cơ bản. Cấp nhà và giường tốt hơn sẽ tăng hiệu suất nghỉ ngơi ở các bước sau.
+                    A basic personal shelter. Higher levels and better beds will improve rest efficiency later.
                 </p>
             </div>
         );
@@ -892,7 +892,7 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
     return (
         <div className="p-4 space-y-4">
             <button onClick={onBack} className="w-full btn-secondary text-left">
-                Quay lại trại
+                Back to Refugee Camp
             </button>
 
             <section className="card p-4 space-y-4">
@@ -900,13 +900,13 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
                     <div>
                         <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">HOME</span>
                         <h2 className="text-lg font-bold">{SAFE_HOUSE_INFO.name} Lv.{SAFE_HOUSE_INFO.level}</h2>
-                        <p className="text-xs text-textMuted mt-1">Tình trạng: {SAFE_HOUSE_INFO.condition}</p>
+                        <p className="text-xs text-textMuted mt-1">Condition: {SAFE_HOUSE_INFO.condition}</p>
                     </div>
                     <span className="text-3xl font-bold text-accent/30">HM</span>
                 </div>
 
                 <div>
-                    <h3 className="text-sm font-semibold mb-2">Công trình</h3>
+                    <h3 className="text-sm font-semibold mb-2">Workstations</h3>
                     <div className="space-y-2">
                         {SAFE_HOUSE_INFO.workstations.map(station => (
                             <div key={station.id} className="flex items-center justify-between gap-3 rounded-lg bg-surface p-3">
@@ -922,34 +922,34 @@ function SafeHousePanel({ playerId, character, onBack, onOpenCrafting, onUpdate,
             </section>
 
             <section>
-                <h3 className="text-sm font-semibold mb-2">Ô chức năng</h3>
+                <h3 className="text-sm font-semibold mb-2">House Slots</h3>
                 <div className="grid grid-cols-4 gap-2">
                     {Array.from({ length: SAFE_HOUSE_INFO.slots }).map((_, index) => (
                         <div key={index} className="aspect-square rounded-lg border border-dashed border-border bg-surface/40 flex items-center justify-center text-[10px] text-textMuted">
-                            Trống
+                            Empty
                         </div>
                     ))}
                 </div>
             </section>
 
             <section>
-                <h3 className="text-sm font-semibold mb-2">Chức năng</h3>
+                <h3 className="text-sm font-semibold mb-2">Actions</h3>
                 <div className="grid grid-cols-2 gap-2">
                     <button type="button" onClick={handleRestClick} className="card card-hover p-3 text-left">
                         <span className="text-[10px] font-bold text-accent block mb-1">RS</span>
-                        <span className="text-sm font-semibold block">Nghỉ ngơi</span>
+                        <span className="text-sm font-semibold block">Rest</span>
                     </button>
                     <button type="button" onClick={handleCookingClick} className="card card-hover p-3 text-left">
                         <span className="text-[10px] font-bold text-accent block mb-1">CK</span>
-                        <span className="text-sm font-semibold block">Nấu ăn</span>
+                        <span className="text-sm font-semibold block">Cook</span>
                     </button>
                     <button type="button" onClick={handleCraftClick} className="card card-hover p-3 text-left">
                         <span className="text-[10px] font-bold text-accent block mb-1">CR</span>
-                        <span className="text-sm font-semibold block">Chế tạo</span>
+                        <span className="text-sm font-semibold block">Craft</span>
                     </button>
                     <button type="button" onClick={() => setActiveMode('INFO')} className="card card-hover p-3 text-left">
                         <span className="text-[10px] font-bold text-accent block mb-1">IN</span>
-                        <span className="text-sm font-semibold block">Thông tin nhà</span>
+                        <span className="text-sm font-semibold block">Home Info</span>
                     </button>
                 </div>
             </section>
@@ -1039,16 +1039,16 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 <span className="absolute top-4 right-4 text-3xl font-bold opacity-20">{banner.mark}</span>
                 <div>
                     <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">
-                        {isExploring ? 'EXPLORING' : (showSafeHouse ? 'NHÀ AN TOÀN' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP'))}
+                        {isExploring ? 'EXPLORING' : (showSafeHouse ? 'SAFE HOUSE' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP'))}
                     </span>
                     <h1 className="text-xl font-bold">
-                        {isExploring ? currentZone.display_name : (showSafeHouse ? 'Về nhà' : (isChoosingRoute ? 'Exploration Routes' : (character?.character_name || 'Survivor')))}
+                        {isExploring ? currentZone.display_name : (showSafeHouse ? 'Personal Home' : (isChoosingRoute ? 'Exploration Routes' : (character?.character_name || 'Survivor')))}
                     </h1>
                     <p className="text-sm text-textSecondary mt-1">
                         {isExploring
                             ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${currentZone.biome || currentZone.zone_type} | ${currentZone.pois?.length || 0} POIs`
                             : (showSafeHouse
-                                ? 'Nghỉ ngơi, nấu ăn, chế tạo và quản lý phiên bản đầu của nơi trú ẩn.'
+                                ? 'Rest, cook, craft, and manage the first version of your safe shelter.'
                                 : (isChoosingRoute
                                 ? 'Move outward from the camp edge toward distant high-risk zones.'
                                 : 'Manage your base, meet NPCs, then choose an area to explore.'))}
@@ -1081,8 +1081,8 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">HM</span>
                             </div>
                             <div className="min-w-0">
-                                <p className="font-semibold">Về nhà</p>
-                                <p className="text-xs text-textMuted leading-relaxed mt-1">Nghỉ ngơi, nấu ăn, chế tạo và quản lý nhà an toàn.</p>
+                                <p className="font-semibold">Personal Home</p>
+                                <p className="text-xs text-textMuted leading-relaxed mt-1">Rest, cook, craft, and manage your safe house.</p>
                             </div>
                         </button>
                         <button onClick={() => notify('Trade screen is not wired yet.', 'error')} className="w-full card card-hover p-4 text-left flex items-start gap-4">
