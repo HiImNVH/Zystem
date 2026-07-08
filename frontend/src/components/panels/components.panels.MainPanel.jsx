@@ -1154,9 +1154,11 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
             setActivitySheet(current => current ? { ...current, data: refreshed.data, error: '' } : current);
             notify(formatActionResult(result.data), 'success');
             await onUpdate?.();
+            return result;
         } catch (err) {
             setActivitySheet(current => current ? { ...current, error: err.message } : current);
             notify(err.message, 'error');
+            return { success: false, error: err.message };
         } finally {
             setExecutingActivityId('');
         }

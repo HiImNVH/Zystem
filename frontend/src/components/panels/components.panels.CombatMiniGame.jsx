@@ -73,12 +73,20 @@ function calculateEnemyCounterDamage(enemy, accuracyResult) {
     return Math.max(1, Math.round(enemyAttack * counterMultiplier));
 }
 
+function formatEncounterReward(result) {
+    if (!result) return 'Encounter resolved.';
+    const lootCount = result.items_dropped?.length || 0;
+    return `Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
+}
+
 export default function CombatMiniGame({ enemy, character, inventory, isExecuting, onBack, onAttack }) {
     const [accuracyMarker, setAccuracyMarker] = useState(50);
     const [markerDirection, setMarkerDirection] = useState(1);
     const [lastAccuracyResult, setLastAccuracyResult] = useState(null);
     const [enemyHealth, setEnemyHealth] = useState(() => parseInt(enemy?.health) || 1);
     const [playerHealth, setPlayerHealth] = useState(() => parseInt(character?.current_hp) || parseInt(character?.max_hp) || 1);
+    const [combatOutcome, setCombatOutcome] = useState(null);
+    const [isResolving, setIsResolving] = useState(false);
     const enemyMaxHealth = Math.max(1, parseInt(enemy?.health) || 1);
     const playerMaxHealth = Math.max(1, parseInt(character?.max_hp) || playerHealth || 1);
     const weapon = useMemo(() => getEquippedWeapon(inventory), [inventory]);
@@ -108,8 +116,8 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
         return () => clearInterval(timerId);
     }, [markerDirection]);
 
-    function handleAction(action) {
-        if (!enemy || isExecuting) return;
+    async function handleAction(action) {
+        if (!enemy || isExecuting || isResolving || combatOutcome) return;
         const accuracyResult = getAccuracyResult(Math.round(accuracyMarker));
         const damage = Math.max(1, Math.round(baseDamage * action.damageMultiplier * accuracyResult.multiplier));
         const nextEnemyHealth = Math.max(0, enemyHealth - damage);
@@ -136,7 +144,24 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
         setLastAccuracyResult({ ...result, actionLabel: action.label });
 
         if (nextEnemyHealth <= 0) {
-            onAttack?.({ combatAction, accuracyResult: result });
+            setIsResolving(true);
+            try {
+                const execution = await onAttack?.({ combatAction, accuracyResult: result });
+                if (execution?.success === false) {
+                    setCombatOutcome({ type: 'error', message: execution.error || 'Could not resolve the encounter.' });
+                    return;
+                }
+                setCombatOutcome({ type: 'victory', result: execution?.data });
+            } catch (error) {
+                setCombatOutcome({ type: 'error', message: error.message || 'Could not resolve the encounter.' });
+            } finally {
+                setIsResolving(false);
+            }
+            return;
+        }
+
+        if (nextPlayerHealth <= 0) {
+            setCombatOutcome({ type: 'defeat', message: 'You lost the fight. No reward was claimed.' });
         }
     }
 
@@ -217,23 +242,41 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
                             key={action.code}
                             type="button"
                             onClick={() => handleAction(action)}
-                            disabled={isExecuting || enemyHealth <= 0 || playerHealth <= 0}
+                            disabled={isExecuting || isResolving || Boolean(combatOutcome) || enemyHealth <= 0 || playerHealth <= 0}
                             className="card card-hover p-3 text-left disabled:opacity-50"
                         >
                             <span className="text-[10px] font-bold text-accent block">{action.shortLabel}</span>
-                            <span className="text-sm font-semibold block mt-1">{isExecuting ? 'Resolving...' : action.label}</span>
+                            <span className="text-sm font-semibold block mt-1">{isExecuting || isResolving ? 'Resolving...' : action.label}</span>
                             <span className="text-[10px] text-textMuted block mt-2">
                                 {enemyHealth <= 0 ? 'Claiming reward' : `Base DMG ${Math.round(baseDamage * action.damageMultiplier)}`}
                             </span>
                         </button>
                     ))}
                 </div>
-                {enemyHealth > 0 && playerHealth > 0 && (
+                {combatOutcome?.type === 'victory' && (
+                    <div className="rounded-lg border border-success/40 bg-success/10 p-3">
+                        <p className="text-sm font-semibold text-success">Victory</p>
+                        <p className="text-xs text-textSecondary mt-1">{formatEncounterReward(combatOutcome.result)}</p>
+                    </div>
+                )}
+                {combatOutcome?.type === 'defeat' && (
+                    <div className="rounded-lg border border-danger/40 bg-danger/10 p-3">
+                        <p className="text-sm font-semibold text-danger">Defeat</p>
+                        <p className="text-xs text-textSecondary mt-1">{combatOutcome.message}</p>
+                    </div>
+                )}
+                {combatOutcome?.type === 'error' && (
+                    <div className="rounded-lg border border-danger/40 bg-danger/10 p-3">
+                        <p className="text-sm font-semibold text-danger">Resolution failed</p>
+                        <p className="text-xs text-textSecondary mt-1">{combatOutcome.message}</p>
+                    </div>
+                )}
+                {!combatOutcome && enemyHealth > 0 && playerHealth > 0 && (
                     <p className="text-[11px] text-textMuted">
                         Reduce enemy HP to zero to resolve the encounter and claim rewards.
                     </p>
                 )}
-                {playerHealth <= 0 && (
+                {!combatOutcome && playerHealth <= 0 && (
                     <p className="text-xs text-danger">
                         You are down. Retreat to recover before continuing.
                     </p>

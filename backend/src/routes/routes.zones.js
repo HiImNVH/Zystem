@@ -33,10 +33,6 @@ const ACTION_JOB_CODE = {
     CHOP: 'gathering',
 };
 
-function pickActivityTag(poi, tagTypes) {
-    return (poi.gameplay_tags || []).find(tag => tagTypes.includes(tag.tag_type));
-}
-
 function buildFallbackActivityTag(config) {
     const { tagType, actionType, lootFocus, monsterProfile } = config;
     return {
@@ -51,21 +47,21 @@ function buildFallbackActivityTag(config) {
     };
 }
 
-function resolvePoiActivityTags(poi) {
+function resolvePoiActivityTags() {
     return {
-        enemy: pickActivityTag(poi, ['BATTLE', 'SKIRMISH']) || buildFallbackActivityTag({
+        enemy: buildFallbackActivityTag({
             tagType: 'BATTLE',
             actionType: 'BATTLE',
             lootFocus: ['gear', 'salvage'],
             monsterProfile: null,
         }),
-        gather: pickActivityTag(poi, ['EXPLORATION']) || buildFallbackActivityTag({
+        gather: buildFallbackActivityTag({
             tagType: 'EXPLORATION',
             actionType: 'EXPLORE',
             lootFocus: ['salvage', 'food'],
             monsterProfile: null,
         }),
-        sweep: pickActivityTag(poi, ['SWEEP', 'DUNGEON']) || buildFallbackActivityTag({
+        sweep: buildFallbackActivityTag({
             tagType: 'SWEEP',
             actionType: 'SWEEP',
             lootFocus: ['salvage', 'gear'],
@@ -525,7 +521,7 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
             radiation_risk: poi.radiation_risk,
         };
 
-        const activityTags = resolvePoiActivityTags(poi);
+        const activityTags = resolvePoiActivityTags();
         const baseDuration = Math.max(30, parseInt(poi.base_duration_s || zone.base_duration_s) || 60);
         const zoneLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
         const enemyMonsters = await findMonstersByProfile(activityTags.enemy.monster_profile);
@@ -608,27 +604,12 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
                    wp.poi_type, wp.is_dungeon,
                    z.id AS zone_id, z.code AS zone_code, z.display_name AS zone_name,
                    z.zone_type, z.biome, z.zone_tags, z.level_gap, z.min_player_lv,
-                   z.base_duration_s, z.infection_risk, z.radiation_risk,
-                   pgt.id AS tag_id, pgt.tag_type, pgt.action_type,
-                   pgt.energy_cost_mult, pgt.loot_focus,
-                   pgt.monster_profile, pgt.dungeon_rank_rewards
+                   z.base_duration_s, z.infection_risk, z.radiation_risk
             FROM world_pois wp
             JOIN zones z ON z.id = wp.zone_id
-            LEFT JOIN poi_gameplay_tags pgt
-                ON pgt.poi_id = wp.id
-               AND pgt.tag_type = ANY($2::VARCHAR[])
             WHERE wp.id = $1
-            ORDER BY
-                CASE pgt.tag_type
-                    WHEN 'SWEEP' THEN 1
-                    WHEN 'DUNGEON' THEN 1
-                    WHEN 'BATTLE' THEN 2
-                    WHEN 'SKIRMISH' THEN 3
-                    WHEN 'EXPLORATION' THEN 4
-                    ELSE 5
-                END
             LIMIT 1;
-        `, [poiId, activity.tagTypes]);
+        `, [poiId]);
 
         if (poiResult.rows.length === 0) {
             await client.query('ROLLBACK');
@@ -646,9 +627,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             });
         }
 
-        const actionType = poi.action_type === 'DUNGEON'
-            ? 'SWEEP'
-            : (poi.action_type || activity.fallbackAction);
+        const actionType = activity.fallbackAction;
         const isSweepAction = actionType === 'SWEEP';
         const sweepEvent = isSweepAction
             ? (mode === 'retreat'
@@ -658,7 +637,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
         const baseDuration = Math.max(30, parseInt(poi.base_duration_s) || 60);
         const durationSeconds = baseDuration;
         const tag = {
-            energy_cost_mult: poi.energy_cost_mult,
+            energy_cost_mult: 1,
         };
         const cost = calculateActionResourceCost(actionType, durationSeconds, tag);
         const currentEnergy = parseInt(player.current_energy) || 0;
