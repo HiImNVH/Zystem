@@ -14,11 +14,11 @@ const STAT_INFO = {
 
 const HEX_STAT_ORDER = ['str', 'agi', 'int', 'chr', 'dex', 'vit'];
 
-function buildHexPoint(center, radius, index, total = 6) {
+function buildHexPoint(centerX, centerY, radius, index, total = 6) {
     const angle = (-90 + (360 / total) * index) * (Math.PI / 180);
     return {
-        x: center + Math.cos(angle) * radius,
-        y: center + Math.sin(angle) * radius,
+        x: centerX + Math.cos(angle) * radius,
+        y: centerY + Math.sin(angle) * radius,
     };
 }
 
@@ -34,18 +34,22 @@ function StatHexGrid({ stats }) {
         ...STAT_INFO[key],
         value: parseFloat(totalStats[key] || 0),
     }));
-    const maxValue = Math.max(20, ...statEntries.map(stat => stat.value));
-    const center = 150;
-    const radius = 92;
-    const labelRadius = 126;
+    const highestStatValue = Math.max(...statEntries.map(stat => stat.value));
+    const maxValue = Math.max(20, highestStatValue * 1.25);
+    const chartWidth = 420;
+    const chartHeight = 320;
+    const centerX = chartWidth / 2;
+    const centerY = chartHeight / 2;
+    const radius = 86;
+    const labelRadius = 140;
     const gridRadii = [radius / 3, (radius / 3) * 2, radius];
     const axisPoints = statEntries.map((stat, index) => ({
         ...stat,
-        point: buildHexPoint(center, radius, index),
+        point: buildHexPoint(centerX, centerY, radius, index),
     }));
     const fillPoints = statEntries.map((stat, index) => {
         const statRadius = Math.max(8, (stat.value / maxValue) * radius);
-        return buildHexPoint(center, statRadius, index);
+        return buildHexPoint(centerX, centerY, statRadius, index);
     });
     const selected = statEntries.find(stat => stat.key === selectedStat) || statEntries[0];
 
@@ -56,10 +60,10 @@ function StatHexGrid({ stats }) {
                 <span className="text-[10px] text-textMuted">Hover or tap a direction</span>
             </div>
 
-            <div className="relative mx-auto max-w-[340px]">
-                <svg viewBox="0 0 300 300" className="w-full aspect-square" role="img" aria-label="Core attribute hex grid">
+            <div className="relative mx-auto max-w-[420px]">
+                <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full aspect-[21/16]" role="img" aria-label="Core attribute hex grid">
                     {gridRadii.map(gridRadius => {
-                        const points = statEntries.map((_, index) => buildHexPoint(center, gridRadius, index));
+                        const points = statEntries.map((_, index) => buildHexPoint(centerX, centerY, gridRadius, index));
                         return (
                             <polygon
                                 key={gridRadius}
@@ -73,8 +77,8 @@ function StatHexGrid({ stats }) {
                     {axisPoints.map(axis => (
                         <line
                             key={axis.key}
-                            x1={center}
-                            y1={center}
+                            x1={centerX}
+                            y1={centerY}
                             x2={axis.point.x}
                             y2={axis.point.y}
                             stroke="rgba(147, 150, 163, 0.35)"
@@ -101,25 +105,33 @@ function StatHexGrid({ stats }) {
                             <circle
                                 cx={axis.point.x}
                                 cy={axis.point.y}
-                                r={selectedStat === axis.key ? 9 : 6}
-                                fill={selectedStat === axis.key ? '#fbbf24' : '#22d3ee'}
-                                stroke="#0d0e12"
-                                strokeWidth="3"
+                                r={selectedStat === axis.key ? 15 : 13}
+                                fill="#15171d"
+                                stroke={selectedStat === axis.key ? '#fbbf24' : '#22d3ee'}
+                                strokeWidth={selectedStat === axis.key ? 4 : 3}
                             />
                             <circle
                                 cx={axis.point.x}
                                 cy={axis.point.y}
-                                r="24"
+                                r={selectedStat === axis.key ? 6 : 5}
+                                fill={selectedStat === axis.key ? '#fbbf24' : '#22d3ee'}
+                                stroke="#0d0e12"
+                                strokeWidth="2"
+                            />
+                            <circle
+                                cx={axis.point.x}
+                                cy={axis.point.y}
+                                r="28"
                                 fill="transparent"
                             />
                         </g>
                     ))}
                     {axisPoints.map(axis => {
-                        const labelPoint = buildHexPoint(center, labelRadius, HEX_STAT_ORDER.indexOf(axis.key));
-                        const textAnchor = Math.abs(labelPoint.x - center) < 8
+                        const labelPoint = buildHexPoint(centerX, centerY, labelRadius, HEX_STAT_ORDER.indexOf(axis.key));
+                        const textAnchor = Math.abs(labelPoint.x - centerX) < 8
                             ? 'middle'
-                            : (labelPoint.x > center ? 'start' : 'end');
-                        const dy = labelPoint.y < center - 20 ? '-0.35em' : (labelPoint.y > center + 20 ? '0.95em' : '0.35em');
+                            : (labelPoint.x > centerX ? 'start' : 'end');
+                        const dy = labelPoint.y < centerY - 20 ? '-0.35em' : (labelPoint.y > centerY + 20 ? '0.95em' : '0.35em');
 
                         return (
                             <g
