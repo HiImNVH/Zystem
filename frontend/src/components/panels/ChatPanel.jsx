@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getChatMessages, getPlayerEvents, markPlayerEventsRead, sendChatMessage } from '../../api/api.game';
 import { connectSocket } from '../../api/api.socket';
 
-const CHANNELS = ['GLOBAL', 'ZONE', 'GUILD', 'NOTI'];
+const CHANNELS = ['GLOBAL', 'GUILD', 'NOTI'];
 
 function formatTime(value) {
     if (!value) return '';

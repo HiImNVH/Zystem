@@ -1,7 +1,6 @@
 ﻿// frontend/src/components/layout/TopBar.jsx
 
 const DESKTOP_NAV = [
-    { key: 'CHAT', label: 'Chat' },
     { key: 'QUEST', label: 'Skills' },
     { key: 'PROFILE', label: 'Profile' },
 ];
