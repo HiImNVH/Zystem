@@ -103,6 +103,52 @@ const TAG_ACTION_TYPE = {
     DUNGEON: 'DUNGEON',
 };
 
+const monsterProfileSeeds = [
+    { profile: 'residential_threats', theme: 'Suburb', drops: ['Rubbish, Recyclable', 'Food, Canned', 'Material, Fabric'] },
+    { profile: 'market_threats', theme: 'Market', drops: ['Food, Canned', 'Medicine', 'Rubbish, Plastic'] },
+    { profile: 'dungeon_threats', theme: 'Depth', drops: ['Weapon', 'Equipment', 'Material, Metal'] },
+    { profile: 'industrial_threats', theme: 'Industrial', drops: ['Material, Metal, Iron', 'Tool', 'Rubbish, Recyclable'] },
+    { profile: 'utility_threats', theme: 'Utility', drops: ['Material, Component', 'Rubbish, Copper', 'Tool'] },
+    { profile: 'landmark_threats', theme: 'Landmark', drops: ['Material, Wood', 'Food', 'Rubbish'] },
+    { profile: 'camp_threats', theme: 'Camp', drops: ['Material, Leather', 'Food, Meat', 'Weapon'] },
+    { profile: 'pier_threats', theme: 'Pier', drops: ['Material, Cordage', 'Food', 'Rubbish, Plastic'] },
+    { profile: 'farm_threats', theme: 'Farm', drops: ['Seed', 'Food, Grain', 'Tool'] },
+    { profile: 'mine_threats', theme: 'Mine', drops: ['Material, Ore', 'Material, Stone', 'Tool'] },
+    { profile: 'warehouse_threats', theme: 'Warehouse', drops: ['Material, Component', 'Equipment', 'Rubbish, Recyclable'] },
+    { profile: 'medical_threats', theme: 'Quarantine', drops: ['Medicine', 'Material, Fabric', 'Equipment'] },
+    { profile: 'forest_threats', theme: 'Wildwood', drops: ['Material, Wood', 'Food, Mushroom', 'Medicine'] },
+    { profile: 'shipwreck_threats', theme: 'Cargo', drops: ['Material, Salt', 'Material, Cordage', 'Equipment'] },
+    { profile: 'desert_ruin_threats', theme: 'Solar', drops: ['Material, Glass', 'Material, Component', 'Equipment'] },
+    { profile: 'ranch_threats', theme: 'Ranch', drops: ['Food, Meat', 'Material, Leather', 'Medicine'] },
+    { profile: 'highrise_threats', theme: 'Highrise', drops: ['Equipment', 'Weapon', 'Material, Component'] },
+    { profile: 'nuclear_threats', theme: 'Reactor', drops: ['Medicine, Booster', 'Material, Component', 'Equipment'] },
+    { profile: 'military_threats', theme: 'Military', drops: ['Weapon', 'Equipment', 'Medicine'] },
+    { profile: 'offshore_threats', theme: 'Offshore', drops: ['Material, Fuel', 'Tool', 'Equipment'] },
+];
+
+function buildMonsterRows() {
+    const roles = [
+        { suffix: 'stray', name: 'Stray Infected', rank: 'Common', levelOffset: 0, health: 80, attack: 11, defense: 4 },
+        { suffix: 'stalker', name: 'Zone Stalker', rank: 'Veteran', levelOffset: 1, health: 125, attack: 17, defense: 8 },
+        { suffix: 'brute', name: 'Mutated Brute', rank: 'Elite', levelOffset: 2, health: 190, attack: 24, defense: 13 },
+    ];
+
+    return monsterProfileSeeds.flatMap(seed => roles.map(role => ({
+        code: `${seed.profile}_${role.suffix}`,
+        name: `${seed.theme} ${role.name}`,
+        profile: seed.profile,
+        levelOffset: role.levelOffset,
+        health: role.health,
+        attack: role.attack,
+        defense: role.defense,
+        rank: role.rank,
+        drops: seed.drops.map((drop, index) => ({
+            tag_query: drop,
+            chance: Number((0.48 - index * 0.12 + role.levelOffset * 0.04).toFixed(2)),
+        })),
+    })));
+}
+
 async function seedJobsSeedTable() {
     try {
         const jobCount = await dbPool.query('SELECT COUNT(*) FROM jobs_seed;');
@@ -241,6 +287,36 @@ async function seedJobsSeedTable() {
             }
         }
         console.log('[SUCCESS] Da nap/cap nhat POI va gameplay tags thanh cong!');
+
+        const insertMonsterQuery = `
+            INSERT INTO monsters
+                (code, display_name, monster_profile, base_level_offset,
+                 health, attack, defense, drop_table, threat_rank)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+            ON CONFLICT (code) DO UPDATE SET
+                display_name = EXCLUDED.display_name,
+                monster_profile = EXCLUDED.monster_profile,
+                base_level_offset = EXCLUDED.base_level_offset,
+                health = EXCLUDED.health,
+                attack = EXCLUDED.attack,
+                defense = EXCLUDED.defense,
+                drop_table = EXCLUDED.drop_table,
+                threat_rank = EXCLUDED.threat_rank;
+        `;
+        for (const monster of buildMonsterRows()) {
+            await dbPool.query(insertMonsterQuery, [
+                monster.code,
+                monster.name,
+                monster.profile,
+                monster.levelOffset,
+                monster.health,
+                monster.attack,
+                monster.defense,
+                JSON.stringify(monster.drops),
+                monster.rank,
+            ]);
+        }
+        console.log('[SUCCESS] Da nap/cap nhat bang quai vat thanh cong!');
     } catch (error) {
         console.error('[ERROR] Loi khi seed du lieu nen tang:', error.message);
     }

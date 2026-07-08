@@ -75,6 +75,7 @@ async function initializeDatabaseSchema() {
                 DROP TABLE IF EXISTS wallet_transactions CASCADE;
                 DROP TABLE IF EXISTS wallets CASCADE;
                 DROP TABLE IF EXISTS action_queue CASCADE;
+                DROP TABLE IF EXISTS monsters CASCADE;
                 DROP TABLE IF EXISTS poi_gameplay_tags CASCADE;
                 DROP TABLE IF EXISTS world_pois CASCADE;
                 DROP TABLE IF EXISTS player_jobs CASCADE;
@@ -231,6 +232,26 @@ async function initializeDatabaseSchema() {
                 UNIQUE(poi_id, tag_type)
             );
         `);
+
+        // ============================================================
+        // BANG 5.3: MONSTERS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS monsters (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                code VARCHAR(80) NOT NULL UNIQUE,
+                display_name VARCHAR(128) NOT NULL,
+                monster_profile VARCHAR(80) NOT NULL,
+                base_level_offset SMALLINT NOT NULL DEFAULT 0,
+                health INT NOT NULL CHECK (health > 0),
+                attack INT NOT NULL CHECK (attack >= 0),
+                defense INT NOT NULL CHECK (defense >= 0),
+                drop_table JSONB NOT NULL DEFAULT '[]'::JSONB,
+                threat_rank VARCHAR(20) NOT NULL DEFAULT 'Common',
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_monsters_profile ON monsters(monster_profile);`);
 
         // ============================================================
         // BANG 7: WALLETS

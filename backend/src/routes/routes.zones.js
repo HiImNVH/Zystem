@@ -29,24 +29,6 @@ const ACTION_JOB_CODE = {
     CHOP: 'gathering',
 };
 
-const BIOME_ENEMY_LIST = {
-    urban: ['Infected scavenger', 'Barricade raider', 'Basement stalker'],
-    rural: ['Dust-bitten raider', 'Field infected', 'Ranch marauder'],
-    coast: ['Dock raider', 'Drowned infected', 'Harbor smuggler'],
-    forest: ['Lost hunter', 'Spore infected', 'Trail ambusher'],
-    desert: ['Sun-bleached raider', 'Wasteland stalker', 'Drone remnant'],
-    safe: [],
-};
-
-const BIOME_GATHER_LIST = {
-    urban: ['Scrap metal', 'Medicine cabinet', 'Electronics box', 'Canned food shelf'],
-    rural: ['Seed crate', 'Irrigation water', 'Old tool rack', 'Stored grain'],
-    coast: ['Salt deposit', 'Plastic salvage', 'Fishing crate', 'Rope coil'],
-    forest: ['Medicinal herbs', 'Fallen timber', 'Mushroom cluster', 'Hidden supply cache'],
-    desert: ['Solar cell shard', 'Glass scrap', 'Battery casing', 'Dry research crate'],
-    safe: [],
-};
-
 function pickActivityTag(poi, tagTypes) {
     return (poi.gameplay_tags || []).find(tag => tagTypes.includes(tag.tag_type));
 }
@@ -93,41 +75,108 @@ async function findJobIdByCode(jobCode) {
     return result.rows[0]?.id || null;
 }
 
-function buildEnemyList(zone, poi, tag) {
+async function findMonstersByProfile(monsterProfile) {
+    if (!monsterProfile) return [];
+    const result = await dbPool.query(`
+        SELECT id, code, display_name, base_level_offset, health, attack,
+               defense, drop_table, threat_rank
+        FROM monsters
+        WHERE monster_profile = $1
+        ORDER BY base_level_offset ASC, display_name ASC;
+    `, [monsterProfile]);
+
+    return result.rows;
+}
+
+function getGatherCategories(lootFocus) {
+    const focusText = (lootFocus || []).join(' ').toLowerCase();
+    const categories = new Set(['MATERIAL']);
+    if (focusText.includes('food')) categories.add('FOOD');
+    if (focusText.includes('salvage')) categories.add('RUBBISH');
+    if (focusText.includes('gear')) {
+        categories.add('WEAPON');
+        categories.add('EQUIPMENT');
+        categories.add('TOOL');
+    }
+    return [...categories];
+}
+
+async function findGatherItems(config) {
+    const { tag, zoneLevel } = config;
+    if (!tag) return [];
+
+    const categories = getGatherCategories(tag.loot_focus);
+    const result = await dbPool.query(`
+        SELECT id, code, display_name, category, tags, item_level
+        FROM item_templates
+        WHERE category = ANY($1::TEXT[])
+          AND origin = ANY($2::TEXT[])
+          AND item_level BETWEEN $3 AND $4
+        ORDER BY ABS(item_level - $5), category ASC, display_name ASC
+        LIMIT 8;
+    `, [
+        categories,
+        ['Gatherable', 'Loot-only'],
+        Math.max(1, zoneLevel - 5),
+        zoneLevel + 5,
+        zoneLevel,
+    ]);
+
+    return result.rows;
+}
+
+function scaleMonsterStats(monster, zoneLevel) {
+    const level = zoneLevel + (parseInt(monster.base_level_offset) || 0);
+    const growth = Math.max(0, level - 1);
+    return {
+        level,
+        health: Math.round((parseInt(monster.health) || 1) + growth * 7),
+        attack: Math.round((parseInt(monster.attack) || 0) + growth * 1.8),
+        defense: Math.round((parseInt(monster.defense) || 0) + growth * 1.2),
+    };
+}
+
+function buildEnemyList(config) {
+    const { zone, poi, tag, monsters } = config;
     if (!tag) return [];
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
-    const biome = zone.biome || zone.zone_type || 'urban';
-    const names = BIOME_ENEMY_LIST[biome] || BIOME_ENEMY_LIST.urban;
 
-    return names.map((name, index) => ({
-        id: `${poi.code}_enemy_${index + 1}`,
-        name,
-        level: baseLevel + index,
-        threat: index === 2 ? 'Elite' : (index === 1 ? 'Veteran' : 'Common'),
-        reward_hint: index === 2 ? 'Better gear chance' : 'EXP and common loot',
+    return monsters.map(monster => ({
+        id: monster.id,
+        code: monster.code,
+        name: monster.display_name,
+        ...scaleMonsterStats(monster, baseLevel),
+        threat: monster.threat_rank,
+        reward_hint: (monster.drop_table || [])
+            .map(drop => drop.tag_query)
+            .join(', '),
+        drop_table: monster.drop_table || [],
         action_type: tag.action_type,
         gameplay_tag: tag,
     }));
 }
 
-function buildGatherList(zone, poi, tag) {
+function buildGatherList(config) {
+    const { zone, tag, items } = config;
     if (!tag) return [];
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
-    const biome = zone.biome || zone.zone_type || 'urban';
-    const names = BIOME_GATHER_LIST[biome] || BIOME_GATHER_LIST.urban;
 
-    return names.map((name, index) => ({
-        id: `${poi.code}_gather_${index + 1}`,
-        name,
+    return items.map(item => ({
+        id: item.id,
+        code: item.code,
+        name: item.display_name,
+        category: item.category,
+        tags: item.tags || [],
         item_level: baseLevel,
-        rarity_hint: index >= 2 ? 'Uncommon chance' : 'Common',
-        reward_hint: tag.loot_focus?.join(', ') || 'materials',
+        rarity_hint: 'Zone-scaled drop',
+        reward_hint: (item.tags || []).slice(0, 4).join(', ') || tag.loot_focus?.join(', ') || 'materials',
         action_type: tag.action_type,
         gameplay_tag: tag,
     }));
 }
 
-function buildDungeonInfo(zone, poi, tag) {
+function buildDungeonInfo(config) {
+    const { zone, poi, tag, monsters } = config;
     if (!tag) return null;
     const mapLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
     return {
@@ -143,6 +192,14 @@ function buildDungeonInfo(zone, poi, tag) {
             new_player_aura: 'HP and armor boosted, damage unchanged',
             reward_hint: 'Low-level players get better rarity; high-level players get upgrade materials',
         },
+        monsters: monsters.map(monster => ({
+            id: monster.id,
+            code: monster.code,
+            name: monster.display_name,
+            ...scaleMonsterStats(monster, mapLevel),
+            threat: monster.threat_rank,
+            drop_table: monster.drop_table || [],
+        })),
         action_type: tag.action_type,
         gameplay_tag: tag,
     };
@@ -272,6 +329,10 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
         const enemyTag = pickActivityTag(poi, ['BATTLE', 'SKIRMISH']);
         const gatherTag = pickActivityTag(poi, ['EXPLORATION']);
         const dungeonTag = pickActivityTag(poi, ['DUNGEON']);
+        const zoneLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
+        const enemyMonsters = await findMonstersByProfile(enemyTag?.monster_profile);
+        const gatherItems = await findGatherItems({ tag: gatherTag, zoneLevel });
+        const dungeonMonsters = await findMonstersByProfile(dungeonTag?.monster_profile);
         const payload = {
             poi: {
                 id: poi.id,
@@ -282,9 +343,9 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
                 entry_requirement: poi.entry_requirement,
             },
             zone,
-            enemies: buildEnemyList(zone, poi, enemyTag),
-            gatherables: buildGatherList(zone, poi, gatherTag),
-            dungeon: buildDungeonInfo(zone, poi, dungeonTag),
+            enemies: buildEnemyList({ zone, poi, tag: enemyTag, monsters: enemyMonsters }),
+            gatherables: buildGatherList({ zone, tag: gatherTag, items: gatherItems }),
+            dungeon: buildDungeonInfo({ zone, poi, tag: dungeonTag, monsters: dungeonMonsters }),
         };
 
         if (type === 'enemy') return res.json({ success: true, data: { ...payload, gatherables: [], dungeon: null } });
@@ -370,6 +431,15 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
 
         const poi = poiResult.rows[0];
         const mapLevel = parseInt(poi.level_gap || poi.min_player_lv || 1);
+        const playerLevel = parseInt(player.player_level) || 1;
+        if (mapLevel > playerLevel + 10) {
+            await client.query('ROLLBACK');
+            return res.status(403).json({
+                success: false,
+                message: 'Zone is locked because it is more than 10 levels above your character.'
+            });
+        }
+
         const actionType = poi.action_type || activity.fallbackAction;
         const baseDuration = Math.max(30, parseInt(poi.base_duration_s) || 60);
         const durationSeconds = mode === 'hard' && actionType === 'DUNGEON'

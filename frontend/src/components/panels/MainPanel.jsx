@@ -169,6 +169,17 @@ function getZoneLevel(zone) {
     return parseInt(zone?.level_gap || zone?.min_player_lv || 1);
 }
 
+function isZoneLockedForPlayer(zone, playerLevel) {
+    return getZoneLevel(zone) > (parseInt(playerLevel) || 1) + 10;
+}
+
+function getPoiTagLabels(poi) {
+    return (poi?.gameplay_tags || [])
+        .map(tag => tag.tag_type)
+        .filter(Boolean)
+        .join(' / ');
+}
+
 function ResourceMeter({ label, current, max }) {
     const safeMax = Math.max(1, parseInt(max) || 1);
     const safeCurrent = Math.max(0, parseInt(current) || 0);
@@ -454,6 +465,13 @@ function formatActionResult(result) {
     return `Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
 }
 
+function formatDropTable(dropTable) {
+    if (!Array.isArray(dropTable) || dropTable.length === 0) return 'Không có dữ liệu rơi đồ';
+    return dropTable
+        .map(drop => `${drop.tag_query} ${Math.round((drop.chance || 0) * 100)}%`)
+        .join(' | ');
+}
+
 function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onExecute, executingId }) {
     if (!activityType) return null;
 
@@ -491,11 +509,25 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-semibold truncate">{item.name}</p>
-                                    <p className="text-xs text-textMuted truncate">
-                                        {activityType === 'enemy'
-                                            ? `Lv.${item.level} | ${item.reward_hint}`
-                                            : `Item Lv.${item.item_level} | ${item.rarity_hint}`}
-                                    </p>
+                                    {activityType === 'enemy' ? (
+                                        <>
+                                            <p className="text-xs text-textMuted truncate">
+                                                Lv.{item.level} | HP {item.health} | ATK {item.attack} | DEF {item.defense}
+                                            </p>
+                                            <p className="text-[11px] text-textMuted truncate">
+                                                Rơi: {formatDropTable(item.drop_table)}
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p className="text-xs text-textMuted truncate">
+                                                Cấp zone {item.item_level} | {item.category}
+                                            </p>
+                                            <p className="text-[11px] text-textMuted truncate">
+                                                Tag: {item.reward_hint}
+                                            </p>
+                                        </>
+                                    )}
                                 </div>
                                 <button
                                     type="button"
@@ -519,6 +551,11 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                             <div className="card p-4">
                                 <p className="font-semibold">{dungeon.name}</p>
                                 <p className="text-xs text-textMuted mt-1">Map Level {dungeon.map_level}</p>
+                                {dungeon.monsters?.length > 0 && (
+                                    <p className="text-[11px] text-textMuted mt-1 truncate">
+                                        Quái: {dungeon.monsters.map(monster => monster.name).join(' | ')}
+                                    </p>
+                                )}
                             </div>
                             <div className="w-full card p-3 text-left">
                                 <p className="text-sm font-semibold">Normal</p>
@@ -965,9 +1002,8 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     const currentZone = currentExpeditionZone || safeZone;
     const banner = isChoosingRoute ? ZONE_BANNERS.urban : (ZONE_BANNERS[currentZone?.zone_type] || ZONE_BANNERS.safe);
     const playerLevel = character?.player_level || 1;
-    const accessibleLevel = Math.max(5, playerLevel);
     const expeditionZones = zones
-        .filter(zone => zone.zone_type !== 'safe' && (zone.min_player_lv || 1) <= accessibleLevel)
+        .filter(zone => zone.zone_type !== 'safe')
         .sort((a, b) => getZoneLevel(a) - getZoneLevel(b) || a.display_name.localeCompare(b.display_name));
     const explorationGroups = EXPLORATION_RINGS.map(ring => ({
         ...ring,
@@ -1081,26 +1117,39 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                 <p className="text-xs text-textMuted mt-1">{group.helper}</p>
                             </div>
                             <div className="space-y-2">
-                                {group.zones.map(zone => (
-                                    <button
-                                        key={zone.id}
-                                        onClick={() => setCurrentExpeditionZone(zone)}
-                                        className="w-full card card-hover p-3 text-left"
-                                        type="button"
-                                    >
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="min-w-0">
-                                                <p className="text-sm font-medium truncate mb-1">{zone.display_name}</p>
-                                                <p className="text-xs text-textMuted">
-                                                    Lv.{zone.level_gap || zone.min_player_lv} | {zone.biome || zone.zone_type} | {zone.pois?.length || 0} POIs
-                                                </p>
+                                {group.zones.map(zone => {
+                                    const isLocked = isZoneLockedForPlayer(zone, playerLevel);
+                                    return (
+                                        <button
+                                            key={zone.id}
+                                            onClick={() => !isLocked && setCurrentExpeditionZone(zone)}
+                                            disabled={isLocked}
+                                            className={`w-full card p-3 text-left transition-colors ${
+                                                isLocked
+                                                    ? 'opacity-45 cursor-not-allowed'
+                                                    : 'card-hover'
+                                            }`}
+                                            type="button"
+                                        >
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="min-w-0">
+                                                    <p className="text-sm font-medium truncate mb-1">{zone.display_name}</p>
+                                                    <p className="text-xs text-textMuted">
+                                                        Lv.{zone.level_gap || zone.min_player_lv} | {zone.biome || zone.zone_type} | {zone.pois?.length || 0} POIs
+                                                    </p>
+                                                    {isLocked && (
+                                                        <p className="text-[11px] text-danger mt-1">
+                                                            Khóa: cần trong phạm vi +10 cấp.
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <span className="text-[10px] font-bold text-accent flex-shrink-0">
+                                                    {isLocked ? 'LOCK' : (ZONE_BANNERS[zone.biome || zone.zone_type]?.mark || 'EX')}
+                                                </span>
                                             </div>
-                                            <span className="text-[10px] font-bold text-accent flex-shrink-0">
-                                                {ZONE_BANNERS[zone.biome || zone.zone_type]?.mark || 'EX'}
-                                            </span>
-                                        </div>
-                                    </button>
-                                ))}
+                                        </button>
+                                    );
+                                })}
                                 {group.zones.length === 0 && (
                                     <p className="text-sm text-textMuted">No available areas in this route yet.</p>
                                 )}
@@ -1128,7 +1177,9 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                     <div className="flex items-start justify-between gap-3 mb-3">
                                         <div className="min-w-0">
                                             <p className="font-semibold truncate">{poi.display_name}</p>
-                                            <p className="text-xs text-textMuted mt-1">{poi.poi_type}{poi.is_dungeon ? ' | Dungeon access' : ''}</p>
+                                            <p className="text-xs text-textMuted mt-1">
+                                                {getPoiTagLabels(poi) || poi.poi_type}
+                                            </p>
                                         </div>
                                         <span className="text-[10px] font-bold text-accent">{poi.is_dungeon ? 'DG' : 'POI'}</span>
                                     </div>
