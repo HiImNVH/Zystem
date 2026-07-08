@@ -26,6 +26,23 @@ function formatPointList(points) {
     return points.map(point => `${point.x.toFixed(2)},${point.y.toFixed(2)}`).join(' ');
 }
 
+function buildAxisHitArea(centerX, centerY, radius, index) {
+    const halfStep = 30 * (Math.PI / 180);
+    const angle = (-90 + 60 * index) * (Math.PI / 180);
+
+    return formatPointList([
+        { x: centerX, y: centerY },
+        {
+            x: centerX + Math.cos(angle - halfStep) * radius,
+            y: centerY + Math.sin(angle - halfStep) * radius,
+        },
+        {
+            x: centerX + Math.cos(angle + halfStep) * radius,
+            y: centerY + Math.sin(angle + halfStep) * radius,
+        },
+    ]);
+}
+
 function StatHexGrid({ stats }) {
     const [selectedStat, setSelectedStat] = useState('str');
     const totalStats = stats?.total || {};
@@ -42,6 +59,7 @@ function StatHexGrid({ stats }) {
     const centerY = chartHeight / 2;
     const radius = 86;
     const labelRadius = 140;
+    const hitRadius = 150;
     const gridRadii = [radius / 3, (radius / 3) * 2, radius];
     const axisPoints = statEntries.map((stat, index) => ({
         ...stat,
@@ -93,7 +111,7 @@ function StatHexGrid({ stats }) {
                     />
                     {axisPoints.map(axis => (
                         <g
-                            key={axis.key}
+                            key={`${axis.key}-hit-area`}
                             onMouseEnter={() => setSelectedStat(axis.key)}
                             onFocus={() => setSelectedStat(axis.key)}
                             onClick={() => setSelectedStat(axis.key)}
@@ -102,28 +120,7 @@ function StatHexGrid({ stats }) {
                             aria-label={`${axis.label}: ${axis.value.toFixed(1)}`}
                             className="cursor-pointer outline-none"
                         >
-                            <circle
-                                cx={axis.point.x}
-                                cy={axis.point.y}
-                                r={selectedStat === axis.key ? 15 : 13}
-                                fill="#15171d"
-                                stroke={selectedStat === axis.key ? '#fbbf24' : '#22d3ee'}
-                                strokeWidth={selectedStat === axis.key ? 4 : 3}
-                            />
-                            <circle
-                                cx={axis.point.x}
-                                cy={axis.point.y}
-                                r={selectedStat === axis.key ? 6 : 5}
-                                fill={selectedStat === axis.key ? '#fbbf24' : '#22d3ee'}
-                                stroke="#0d0e12"
-                                strokeWidth="2"
-                            />
-                            <circle
-                                cx={axis.point.x}
-                                cy={axis.point.y}
-                                r="28"
-                                fill="transparent"
-                            />
+                            <polygon points={buildAxisHitArea(centerX, centerY, hitRadius, HEX_STAT_ORDER.indexOf(axis.key))} fill="transparent" />
                         </g>
                     ))}
                     {axisPoints.map(axis => {
@@ -153,7 +150,7 @@ function StatHexGrid({ stats }) {
                                     fontSize="13"
                                     fontWeight="700"
                                 >
-                                    {axis.label}
+                                    {axis.shortLabel}
                                 </text>
                                 <circle cx={labelPoint.x} cy={labelPoint.y} r="22" fill="transparent" />
                             </g>
