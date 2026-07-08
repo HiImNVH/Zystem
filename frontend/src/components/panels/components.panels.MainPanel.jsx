@@ -238,7 +238,7 @@ function getRotatingPois(zone, rotationSlot) {
         .slice(0, visibleCount);
 }
 
-function getPoiActionOptions(poi) {
+function getPoiActionOptions() {
     const actionOptions = [
         { type: 'enemy', label: 'Find enemies', mark: 'QM', tags: ['BATTLE', 'SKIRMISH'] },
         { type: 'gather', label: 'Scavenge supplies', mark: 'TL', tags: ['EXPLORATION'] },
@@ -247,7 +247,7 @@ function getPoiActionOptions(poi) {
 
     return actionOptions.map(option => ({
         ...option,
-        isAvailable: (poi?.gameplay_tags || []).some(tag => option.tags.includes(tag.tag_type)),
+        isAvailable: true,
     }));
 }
 
@@ -546,8 +546,23 @@ function formatDropTable(dropTable) {
         .join(' | ');
 }
 
+function getActivityEnergyCost(activityData, activityType) {
+    const cost = activityData?.resource_costs?.[activityType === 'dungeon' ? 'sweep' : activityType];
+    return parseInt(cost?.energyCost || cost?.energy_cost || cost?.energy) || 0;
+}
+
+function canSpendEnergy(character, energyCost) {
+    return (parseInt(character?.current_energy) || 0) >= energyCost;
+}
+
+function getEnergyErrorMessage(character, energyCost) {
+    const currentEnergy = parseInt(character?.current_energy) || 0;
+    return `Not enough energy. Need ${energyCost}, current ${currentEnergy}.`;
+}
+
 function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, executingId }) {
     const [combatEnemy, setCombatEnemy] = useState(null);
+    const [sheetError, setSheetError] = useState('');
     if (!activityType) return null;
 
     const titleMap = {
@@ -560,6 +575,23 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
         ? (activityData?.enemies || [])
         : (activityType === 'gather' ? (activityData?.gatherables || []) : []);
     const sweep = activityData?.sweep || activityData?.dungeon;
+    const energyCost = getActivityEnergyCost(activityData, activityType);
+
+    function startActivity(options) {
+        const { item, mode } = options;
+        if (energyCost > 0 && !canSpendEnergy(character, energyCost)) {
+            setSheetError(getEnergyErrorMessage(character, energyCost));
+            return;
+        }
+
+        setSheetError('');
+        if (activityType === 'enemy') {
+            setCombatEnemy(item);
+            return;
+        }
+
+        onExecute?.(item, mode ? { mode } : undefined);
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
@@ -575,7 +607,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                 </div>
 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
-                {error && <p className="text-sm text-danger mb-3">{error}</p>}
+                {(error || sheetError) && <p className="text-sm text-danger mb-3">{error || sheetError}</p>}
                 {!isLoading && activityType === 'enemy' && combatEnemy && (
                     <CombatMiniGame
                         enemy={combatEnemy}
@@ -618,7 +650,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                                 </div>
                                 <button
                                     type="button"
-                                    onClick={() => activityType === 'enemy' ? setCombatEnemy(item) : onExecute?.(item)}
+                                    onClick={() => startActivity({ item })}
                                     disabled={Boolean(executingId)}
                                     className="btn-primary px-3 py-2 text-xs flex-shrink-0"
                                 >
@@ -649,7 +681,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                                 <p className="text-xs text-textMuted mt-1">{sweep.normal.reward_hint}</p>
                                 <button
                                     type="button"
-                                    onClick={() => onExecute?.(sweep, { mode: 'normal' })}
+                                    onClick={() => startActivity({ item: sweep, mode: 'normal' })}
                                     disabled={Boolean(executingId)}
                                     className="btn-primary mt-3 px-3 py-2 text-xs"
                                 >
@@ -661,7 +693,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                                 <p className="text-xs text-textMuted mt-1">{sweep.hard.monster_level_rule} | {sweep.hard.reward_hint}</p>
                                 <button
                                     type="button"
-                                    onClick={() => onExecute?.(sweep, { mode: 'retreat' })}
+                                    onClick={() => startActivity({ item: sweep, mode: 'retreat' })}
                                     disabled={Boolean(executingId)}
                                     className="btn-secondary mt-3 px-3 py-2 text-xs"
                                 >
@@ -693,7 +725,7 @@ function PoiActionSheet({ poi, onClose, onOpenActivity }) {
                 </div>
 
                 <div className="space-y-2">
-                    {getPoiActionOptions(poi).map(option => (
+                    {getPoiActionOptions().map(option => (
                         <button
                             key={option.type}
                             type="button"

@@ -12,6 +12,7 @@ const playerEventsService = require('../services/services.playerEvents');
 const ACTION_RESOURCE_RULES = {
     EXPLORE: { energyPerUnit: 8 },
     BATTLE:  { energyPerUnit: 10 },
+    SKIRMISH: { energyPerUnit: 10 },
     SWEEP:   { energyPerUnit: 14 },
     DUNGEON: { energyPerUnit: 14 },
     MINE:    { energyPerUnit: 7 },
@@ -22,6 +23,7 @@ const ACTION_RESOURCE_RULES = {
 
 const ACTION_JOB_CODE = {
     BATTLE: 'fighting',
+    SKIRMISH: 'fighting',
     HUNT: 'fighting',
     SWEEP: 'fighting',
     DUNGEON: 'fighting',
@@ -33,6 +35,43 @@ const ACTION_JOB_CODE = {
 
 function pickActivityTag(poi, tagTypes) {
     return (poi.gameplay_tags || []).find(tag => tagTypes.includes(tag.tag_type));
+}
+
+function buildFallbackActivityTag(config) {
+    const { tagType, actionType, lootFocus, monsterProfile } = config;
+    return {
+        id: null,
+        tag_type: tagType,
+        action_type: actionType,
+        energy_cost_mult: 1,
+        loot_focus: lootFocus,
+        monster_profile: monsterProfile,
+        dungeon_rank_rewards: {},
+        is_fallback: true,
+    };
+}
+
+function resolvePoiActivityTags(poi) {
+    return {
+        enemy: pickActivityTag(poi, ['BATTLE', 'SKIRMISH']) || buildFallbackActivityTag({
+            tagType: 'BATTLE',
+            actionType: 'BATTLE',
+            lootFocus: ['gear', 'salvage'],
+            monsterProfile: null,
+        }),
+        gather: pickActivityTag(poi, ['EXPLORATION']) || buildFallbackActivityTag({
+            tagType: 'EXPLORATION',
+            actionType: 'EXPLORE',
+            lootFocus: ['salvage', 'food'],
+            monsterProfile: null,
+        }),
+        sweep: pickActivityTag(poi, ['SWEEP', 'DUNGEON']) || buildFallbackActivityTag({
+            tagType: 'SWEEP',
+            actionType: 'SWEEP',
+            lootFocus: ['salvage', 'gear'],
+            monsterProfile: null,
+        }),
+    };
 }
 
 function normalizeActivityType(activityType) {
@@ -70,6 +109,15 @@ function calculateActionResourceCost(actionType, durationSeconds, tag) {
     };
 }
 
+function buildActivityResourceCosts(config) {
+    const { durationSeconds, tags } = config;
+    return {
+        enemy: calculateActionResourceCost(tags.enemy.action_type || 'BATTLE', durationSeconds, tags.enemy),
+        gather: calculateActionResourceCost(tags.gather.action_type || 'EXPLORE', durationSeconds, tags.gather),
+        sweep: calculateActionResourceCost(tags.sweep.action_type === 'DUNGEON' ? 'SWEEP' : (tags.sweep.action_type || 'SWEEP'), durationSeconds, tags.sweep),
+    };
+}
+
 function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
     const baseRates = {
         EXPLORE: { player: 0.56, job: 0.24 },
@@ -78,6 +126,7 @@ function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
         CHOP: { player: 0.46, job: 0.34 },
         HUNT: { player: 0.70, job: 0.34 },
         BATTLE: { player: 0.80, job: 0.36 },
+        SKIRMISH: { player: 0.80, job: 0.36 },
         SWEEP: { player: 1.05, job: 0.48 },
         DUNGEON: { player: 1.05, job: 0.48 },
     };
@@ -123,9 +172,7 @@ function getGatherCategories(lootFocus) {
 
 async function findGatherItems(config) {
     const { tag, zoneLevel } = config;
-    if (!tag) return [];
-
-    const categories = getGatherCategories(tag.loot_focus);
+    const categories = getGatherCategories(tag?.loot_focus);
     const result = await dbPool.query(`
         SELECT id, code, display_name, category, tags, item_level
         FROM item_templates
@@ -183,7 +230,6 @@ function scaleMonsterStats(monster, monsterLevel) {
 
 function buildEnemyList(config) {
     const { zone, poi, tag, monsters } = config;
-    if (!tag) return [];
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
     const minLevel = Math.max(1, baseLevel - 5);
     const maxLevel = baseLevel + 4;
@@ -211,7 +257,7 @@ function buildEnemyList(config) {
                 .map(drop => drop.tag_query)
                 .join(', '),
             drop_table: monster.drop_table || [],
-            action_type: tag.action_type,
+            action_type: tag?.action_type || 'BATTLE',
             gameplay_tag: tag,
         };
     });
@@ -219,8 +265,24 @@ function buildEnemyList(config) {
 
 function buildGatherList(config) {
     const { zone, tag, items } = config;
-    if (!tag) return [];
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
+    if (items.length === 0) {
+        return [{
+            id: `material_gather_pool_${baseLevel}`,
+            code: 'MATERIAL_GATHER_POOL',
+            name: getGenericGatherName('MATERIAL'),
+            category: 'MATERIAL',
+            category_label: getGenericGatherName('MATERIAL'),
+            tags: [],
+            pool_size: 0,
+            item_level: baseLevel,
+            rarity_hint: 'Random drop by POI',
+            reward_hint: 'Searches the POI for useful materials',
+            action_type: tag?.action_type || 'EXPLORE',
+            gameplay_tag: tag,
+        }];
+    }
+
     const itemGroups = items.reduce((groups, item) => {
         const category = item.category || 'MATERIAL';
         if (!groups[category]) groups[category] = [];
@@ -239,14 +301,13 @@ function buildGatherList(config) {
         item_level: baseLevel,
         rarity_hint: 'Random drop by POI',
         reward_hint: `Randomly finds one of ${groupItems.length} matching items`,
-        action_type: tag.action_type,
+        action_type: tag?.action_type || 'EXPLORE',
         gameplay_tag: tag,
     }));
 }
 
 function buildSweepInfo(config) {
     const { zone, poi, tag, monsters } = config;
-    if (!tag) return null;
     const mapLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
     const bossLevel = mapLevel + 4;
     return {
@@ -276,7 +337,7 @@ function buildSweepInfo(config) {
             threat: monster.threat_rank,
             drop_table: monster.drop_table || [],
         })),
-        action_type: tag.action_type,
+        action_type: tag?.action_type || 'SWEEP',
         gameplay_tag: tag,
     };
 }
@@ -422,7 +483,8 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
     try {
         const poiResult = await dbPool.query(`
             SELECT wp.*, z.code as zone_code, z.display_name as zone_name, z.zone_type,
-                   z.biome, z.zone_tags, z.level_gap, z.min_player_lv, z.infection_risk, z.radiation_risk,
+                   z.biome, z.zone_tags, z.level_gap, z.min_player_lv, z.base_duration_s,
+                   z.infection_risk, z.radiation_risk,
                    COALESCE(
                        JSON_AGG(
                            JSON_BUILD_OBJECT(
@@ -458,17 +520,17 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
             zone_tags: poi.zone_tags,
             level_gap: poi.level_gap,
             min_player_lv: poi.min_player_lv,
+            base_duration_s: poi.base_duration_s,
             infection_risk: poi.infection_risk,
             radiation_risk: poi.radiation_risk,
         };
 
-        const enemyTag = pickActivityTag(poi, ['BATTLE', 'SKIRMISH']);
-        const gatherTag = pickActivityTag(poi, ['EXPLORATION']);
-        const sweepTag = pickActivityTag(poi, ['SWEEP', 'DUNGEON']);
+        const activityTags = resolvePoiActivityTags(poi);
+        const baseDuration = Math.max(30, parseInt(poi.base_duration_s || zone.base_duration_s) || 60);
         const zoneLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
-        const enemyMonsters = await findMonstersByProfile(enemyTag?.monster_profile);
-        const gatherItems = await findGatherItems({ tag: gatherTag, zoneLevel });
-        const sweepMonsters = await findMonstersByProfile(sweepTag?.monster_profile);
+        const enemyMonsters = await findMonstersByProfile(activityTags.enemy.monster_profile);
+        const gatherItems = await findGatherItems({ tag: activityTags.gather, zoneLevel });
+        const sweepMonsters = await findMonstersByProfile(activityTags.sweep.monster_profile);
         const payload = {
             poi: {
                 id: poi.id,
@@ -479,9 +541,13 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
                 entry_requirement: poi.entry_requirement,
             },
             zone,
-            enemies: buildEnemyList({ zone, poi, tag: enemyTag, monsters: enemyMonsters }),
-            gatherables: buildGatherList({ zone, tag: gatherTag, items: gatherItems }),
-            sweep: buildSweepInfo({ zone, poi, tag: sweepTag, monsters: sweepMonsters }),
+            resource_costs: buildActivityResourceCosts({
+                durationSeconds: baseDuration,
+                tags: activityTags,
+            }),
+            enemies: buildEnemyList({ zone, poi, tag: activityTags.enemy, monsters: enemyMonsters }),
+            gatherables: buildGatherList({ zone, tag: activityTags.gather, items: gatherItems }),
+            sweep: buildSweepInfo({ zone, poi, tag: activityTags.sweep, monsters: sweepMonsters }),
         };
 
         if (type === 'enemy') return res.json({ success: true, data: { ...payload, gatherables: [], sweep: null } });
@@ -548,8 +614,10 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
                    pgt.monster_profile, pgt.dungeon_rank_rewards
             FROM world_pois wp
             JOIN zones z ON z.id = wp.zone_id
-            JOIN poi_gameplay_tags pgt ON pgt.poi_id = wp.id
-            WHERE wp.id = $1 AND pgt.tag_type = ANY($2::VARCHAR[])
+            LEFT JOIN poi_gameplay_tags pgt
+                ON pgt.poi_id = wp.id
+               AND pgt.tag_type = ANY($2::VARCHAR[])
+            WHERE wp.id = $1
             ORDER BY
                 CASE pgt.tag_type
                     WHEN 'SWEEP' THEN 1
@@ -564,7 +632,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
 
         if (poiResult.rows.length === 0) {
             await client.query('ROLLBACK');
-            return res.status(404).json({ success: false, message: 'This POI does not support that activity.' });
+            return res.status(404).json({ success: false, message: 'POI not found.' });
         }
 
         const poi = poiResult.rows[0];
