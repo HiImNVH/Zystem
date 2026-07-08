@@ -66,14 +66,6 @@ const ZONE_TAG_LABELS = {
     geological_mine: 'Geological Mine',
 };
 
-const POI_TAG_LABELS = {
-    EXPLORATION: 'Scavenge',
-    SKIRMISH: 'Enemy',
-    BATTLE: 'Enemy',
-    SWEEP: 'Sweep',
-    DUNGEON: 'Sweep',
-};
-
 const RESOURCE_METER_FILL_CLASSES = {
     EXP: 'bg-accent',
     HP: 'bg-danger',
@@ -200,13 +192,6 @@ function isZoneLockedForPlayer(zone, playerLevel) {
     return getZoneLevel(zone) > (parseInt(playerLevel) || 1) + 10;
 }
 
-function getPoiTagLabels(poi) {
-    return (poi?.gameplay_tags || [])
-        .map(tag => POI_TAG_LABELS[tag.tag_type] || tag.tag_type)
-        .filter(Boolean)
-        .join(' / ');
-}
-
 function getZoneTagLabels(zone) {
     const tags = zone?.zone_tags || [];
     if (tags.length === 0) return zone?.biome || zone?.zone_type || '';
@@ -240,9 +225,9 @@ function getRotatingPois(zone, rotationSlot) {
 
 function getPoiActionOptions() {
     const actionOptions = [
-        { type: 'enemy', label: 'Find enemies', mark: 'QM', tags: ['BATTLE', 'SKIRMISH'] },
-        { type: 'gather', label: 'Scavenge supplies', mark: 'TL', tags: ['EXPLORATION'] },
-        { type: 'sweep', label: 'Sweep', mark: 'CQ', tags: ['SWEEP', 'DUNGEON'] },
+        { type: 'enemy', label: 'Find enemies' },
+        { type: 'gather', label: 'Scavenge supplies' },
+        { type: 'sweep', label: 'Sweep' },
     ];
 
     return actionOptions.map(option => ({
@@ -719,7 +704,6 @@ function PoiActionSheet({ poi, onClose, onOpenActivity }) {
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="min-w-0">
                         <h3 className="font-semibold truncate">{poi.display_name}</h3>
-                        <p className="text-xs text-textMuted mt-1 truncate">{getPoiTagLabels(poi) || poi.poi_type}</p>
                     </div>
                     <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
                 </div>
@@ -739,7 +723,6 @@ function PoiActionSheet({ poi, onClose, onOpenActivity }) {
                         >
                             <div className="flex items-center justify-between gap-3">
                                 <span className="text-sm font-semibold">{option.label}</span>
-                                <span className="text-[10px] font-bold text-accent">{option.mark}</span>
                             </div>
                         </button>
                     ))}
@@ -1351,11 +1334,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
                                             <p className="font-semibold truncate">{poi.display_name}</p>
-                                            <p className="text-xs text-textMuted mt-1">
-                                                {getPoiTagLabels(poi) || poi.poi_type}
-                                            </p>
                                         </div>
-                                        <span className="text-[10px] font-bold text-accent">{poi.is_dungeon ? 'CQ' : 'POI'}</span>
                                     </div>
                                 </button>
                             ))}
