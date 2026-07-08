@@ -1,0 +1,185 @@
+// frontend/src/components/panels/components.panels.CombatMiniGame.jsx
+
+import { useEffect, useMemo, useState } from 'react';
+
+const ACCURACY_ZONES = [
+    { label: 'Graze', min: 0, max: 25, className: 'bg-danger/55', multiplier: 0.45 },
+    { label: 'Hit', min: 25, max: 43, className: 'bg-cyan/45', multiplier: 1 },
+    { label: 'Critical', min: 43, max: 57, className: 'bg-accent/80', multiplier: 1.75 },
+    { label: 'Hit', min: 57, max: 75, className: 'bg-cyan/45', multiplier: 1 },
+    { label: 'Graze', min: 75, max: 100, className: 'bg-danger/55', multiplier: 0.45 },
+];
+
+const WEAPON_SKILL_SETS = {
+    ranged: [
+        { code: 'aimed_shot', label: 'Aimed Shot', shortLabel: 'S1', damageMultiplier: 1.35 },
+        { code: 'rapid_fire', label: 'Rapid Fire', shortLabel: 'S2', damageMultiplier: 1.1 },
+    ],
+    blade: [
+        { code: 'deep_cut', label: 'Deep Cut', shortLabel: 'S1', damageMultiplier: 1.3 },
+        { code: 'guard_break', label: 'Guard Break', shortLabel: 'S2', damageMultiplier: 1.15 },
+    ],
+    blunt: [
+        { code: 'heavy_crush', label: 'Heavy Crush', shortLabel: 'S1', damageMultiplier: 1.4 },
+        { code: 'stagger_blow', label: 'Stagger Blow', shortLabel: 'S2', damageMultiplier: 1.2 },
+    ],
+    improvised: [
+        { code: 'quick_strike', label: 'Quick Strike', shortLabel: 'S1', damageMultiplier: 1.15 },
+        { code: 'low_sweep', label: 'Low Sweep', shortLabel: 'S2', damageMultiplier: 1.05 },
+    ],
+};
+
+function getWeaponProfile(weapon) {
+    const weaponText = [
+        weapon?.display_name,
+        weapon?.category,
+        ...(Array.isArray(weapon?.tags) ? weapon.tags : []),
+    ].join(' ').toLowerCase();
+
+    if (!weapon) return { type: 'improvised', label: 'Unarmed' };
+    if (/(gun|rifle|pistol|bow|crossbow|ranged|firearm)/.test(weaponText)) return { type: 'ranged', label: weapon.display_name };
+    if (/(knife|blade|sword|axe|machete|spear|slash)/.test(weaponText)) return { type: 'blade', label: weapon.display_name };
+    if (/(club|bat|hammer|mace|blunt|crush)/.test(weaponText)) return { type: 'blunt', label: weapon.display_name };
+    return { type: 'improvised', label: weapon.display_name || 'Improvised Weapon' };
+}
+
+function getEquippedWeapon(inventory) {
+    return (inventory || []).find(item => (
+        item.is_equipped &&
+        (item.equip_slot === 'weapon' || String(item.category || '').toUpperCase() === 'WEAPON')
+    ));
+}
+
+function getAccuracyResult(score) {
+    const zone = ACCURACY_ZONES.find(item => score >= item.min && score <= item.max) || ACCURACY_ZONES[0];
+    return {
+        score,
+        outcome: zone.label.toLowerCase(),
+        label: zone.label,
+        multiplier: zone.multiplier,
+    };
+}
+
+function getBaseDamage(enemy) {
+    const attack = parseInt(enemy?.attack) || 10;
+    const level = parseInt(enemy?.level) || 1;
+    return Math.max(8, Math.round(attack * 2 + level * 3));
+}
+
+export default function CombatMiniGame({ enemy, inventory, isExecuting, onBack, onAttack }) {
+    const [accuracyMarker, setAccuracyMarker] = useState(50);
+    const [markerDirection, setMarkerDirection] = useState(1);
+    const [lastAccuracyResult, setLastAccuracyResult] = useState(null);
+    const weapon = useMemo(() => getEquippedWeapon(inventory), [inventory]);
+    const weaponProfile = useMemo(() => getWeaponProfile(weapon), [weapon]);
+    const baseDamage = useMemo(() => getBaseDamage(enemy), [enemy]);
+    const skills = WEAPON_SKILL_SETS[weaponProfile.type] || WEAPON_SKILL_SETS.improvised;
+    const actions = [
+        { code: 'normal_attack', label: 'Attack', shortLabel: 'ATK', damageMultiplier: 1 },
+        ...skills,
+    ];
+
+    useEffect(() => {
+        const timerId = setInterval(() => {
+            setAccuracyMarker(current => {
+                const next = current + markerDirection * 3.5;
+                if (next >= 100) {
+                    setMarkerDirection(-1);
+                    return 100;
+                }
+                if (next <= 0) {
+                    setMarkerDirection(1);
+                    return 0;
+                }
+                return next;
+            });
+        }, 30);
+        return () => clearInterval(timerId);
+    }, [markerDirection]);
+
+    function handleAction(action) {
+        if (!enemy || isExecuting) return;
+        const accuracyResult = getAccuracyResult(Math.round(accuracyMarker));
+        const damage = Math.max(1, Math.round(baseDamage * action.damageMultiplier * accuracyResult.multiplier));
+        const combatAction = {
+            code: action.code,
+            label: action.label,
+            weaponType: weaponProfile.type,
+            weaponName: weaponProfile.label,
+            baseDamage,
+            damageMultiplier: action.damageMultiplier,
+            calculatedDamage: damage,
+        };
+        setLastAccuracyResult({ ...accuracyResult, damage, actionLabel: action.label });
+        onAttack?.({ combatAction, accuracyResult: { ...accuracyResult, damage } });
+    }
+
+    return (
+        <div className="space-y-4">
+            <button type="button" onClick={onBack} className="btn-secondary px-3 py-2 text-xs">
+                Back to enemy list
+            </button>
+
+            <div className="rounded-lg border border-border bg-base p-4 space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-semibold text-textMuted">TARGET</p>
+                        <h3 className="text-lg font-bold truncate">{enemy?.name || 'Unknown Enemy'}</h3>
+                        <p className="text-xs text-textMuted mt-1">
+                            Lv.{enemy?.level || 1} | HP {enemy?.health || 0} | DEF {enemy?.defense || 0}
+                        </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                        <p className="text-[10px] font-semibold text-textMuted">WEAPON</p>
+                        <p className="text-xs font-semibold text-accent max-w-32 truncate">{weaponProfile.label}</p>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-semibold text-textMuted">
+                        <span>ACCURACY</span>
+                        <span>{lastAccuracyResult ? `${lastAccuracyResult.label} | DMG ${lastAccuracyResult.damage}` : 'Time the strike'}</span>
+                    </div>
+                    <div className="relative h-5 overflow-hidden rounded border border-border bg-surface">
+                        <div className="absolute inset-0 flex">
+                            {ACCURACY_ZONES.map(zone => (
+                                <div
+                                    key={`${zone.label}-${zone.min}`}
+                                    className={zone.className}
+                                    style={{ width: `${zone.max - zone.min}%` }}
+                                />
+                            ))}
+                        </div>
+                        <div
+                            className="absolute top-0 h-full w-0.5 bg-textPrimary shadow-[0_0_10px_rgba(232,233,237,0.85)]"
+                            style={{ left: `${accuracyMarker}%` }}
+                        />
+                    </div>
+                    <div className="grid grid-cols-3 text-[10px] font-semibold text-textMuted">
+                        <span>Graze</span>
+                        <span className="text-center text-accent">Critical</span>
+                        <span className="text-right">Graze</span>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                    {actions.map(action => (
+                        <button
+                            key={action.code}
+                            type="button"
+                            onClick={() => handleAction(action)}
+                            disabled={isExecuting}
+                            className="card card-hover p-3 text-left disabled:opacity-50"
+                        >
+                            <span className="text-[10px] font-bold text-accent block">{action.shortLabel}</span>
+                            <span className="text-sm font-semibold block mt-1">{isExecuting ? 'Resolving...' : action.label}</span>
+                            <span className="text-[10px] text-textMuted block mt-2">
+                                Base DMG {Math.round(baseDamage * action.damageMultiplier)}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}

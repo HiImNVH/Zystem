@@ -43,6 +43,23 @@ function normalizeActivityType(activityType) {
     return null;
 }
 
+function normalizeCombatResult(payload) {
+    const accuracy = payload?.accuracyResult || {};
+    const action = payload?.combatAction || {};
+    if (!accuracy.outcome && !action.code) return null;
+
+    return {
+        action_code: String(action.code || 'normal_attack'),
+        action_label: String(action.label || 'Attack'),
+        weapon_type: String(action.weaponType || 'improvised'),
+        weapon_name: String(action.weaponName || 'Unarmed'),
+        accuracy_score: Math.max(0, Math.min(100, parseInt(accuracy.score) || 0)),
+        accuracy_outcome: String(accuracy.outcome || 'graze'),
+        accuracy_multiplier: parseFloat(accuracy.multiplier) || 1,
+        calculated_damage: Math.max(0, parseInt(accuracy.damage || action.calculatedDamage) || 0),
+    };
+}
+
 function calculateActionResourceCost(actionType, durationSeconds, tag) {
     const rule = ACTION_RESOURCE_RULES[actionType] || ACTION_RESOURCE_RULES.EXPLORE;
     const actionUnits = Math.max(1, Math.ceil((parseInt(durationSeconds) || 0) / 1800));
@@ -129,16 +146,16 @@ async function findGatherItems(config) {
 }
 
 const GATHER_CATEGORY_LABELS = {
-    FOOD: 'Nguồn thực phẩm',
-    MATERIAL: 'Vật liệu thu nhặt',
-    RUBBISH: 'Phế liệu tái chế',
-    TOOL: 'Dụng cụ còn dùng được',
-    WEAPON: 'Vũ khí sót lại',
-    EQUIPMENT: 'Trang bị sót lại',
+    FOOD: 'Food Supplies',
+    MATERIAL: 'Scavenged Materials',
+    RUBBISH: 'Recyclable Scrap',
+    TOOL: 'Usable Tools',
+    WEAPON: 'Recovered Weapons',
+    EQUIPMENT: 'Recovered Gear',
 };
 
 function getGenericGatherName(category) {
-    return GATHER_CATEGORY_LABELS[category] || 'Vật tư ngẫu nhiên';
+    return GATHER_CATEGORY_LABELS[category] || 'Random Supplies';
 }
 
 function getGenericGatherTags(items) {
@@ -220,8 +237,8 @@ function buildGatherList(config) {
         tags: getGenericGatherTags(groupItems),
         pool_size: groupItems.length,
         item_level: baseLevel,
-        rarity_hint: 'Rơi ngẫu nhiên theo POI',
-        reward_hint: `Ngẫu nhiên trong ${groupItems.length} vật phẩm phù hợp`,
+        rarity_hint: 'Random drop by POI',
+        reward_hint: `Randomly finds one of ${groupItems.length} matching items`,
         action_type: tag.action_type,
         gameplay_tag: tag,
     }));
@@ -234,22 +251,22 @@ function buildSweepInfo(config) {
     const bossLevel = mapLevel + 4;
     return {
         id: `${poi.code}_sweep`,
-        name: `Càn quét ${poi.display_name}`,
+        name: `Sweep ${poi.display_name}`,
         map_level: mapLevel,
         boss_level: bossLevel,
         event_pool: [
-            { type: 'combat', label: 'Chiến đấu', hint: 'Gặp quái trong POI.' },
-            { type: 'search', label: 'Tìm kiếm', hint: 'Thấy vật tư hoặc dấu vết hữu ích.' },
-            { type: 'retreat', label: 'Rút lui', hint: 'Chủ động rời khỏi POI để giảm rủi ro.' },
+            { type: 'combat', label: 'Combat', hint: 'Encounter a hostile inside the POI.' },
+            { type: 'search', label: 'Search', hint: 'Find supplies or useful traces.' },
+            { type: 'retreat', label: 'Retreat', hint: 'Leave the POI to reduce risk.' },
         ],
         normal: {
             monster_level: mapLevel,
-            reward_hint: 'Có thể gặp chiến đấu, tìm kiếm hoặc rút lui.',
+            reward_hint: 'May trigger combat, search, or retreat.',
         },
         hard: {
-            monster_level_rule: `Boss luôn Lv.${bossLevel}`,
-            new_player_aura: 'Boss xuất hiện ở lượt càn quét cố định.',
-            reward_hint: 'Boss có tỉ lệ rơi đồ tốt hơn.',
+            monster_level_rule: `Boss is always Lv.${bossLevel}`,
+            new_player_aura: 'Boss appears on fixed sweep turns.',
+            reward_hint: 'Boss has better drop odds.',
         },
         monsters: monsters.map(monster => ({
             id: monster.id,
@@ -284,7 +301,7 @@ function rollSweepEvent(turnNumber, mapLevel) {
             type: 'boss',
             label: 'Boss',
             monsterLevel: bossLevel,
-            message: `Gặp boss Lv.${bossLevel}.`,
+            message: `Encountered a Lv.${bossLevel} boss.`,
         };
     }
 
@@ -292,34 +309,34 @@ function rollSweepEvent(turnNumber, mapLevel) {
     if (roll < 0.45) {
         return {
             type: 'combat',
-            label: 'Chiến đấu',
+            label: 'Combat',
             monsterLevel: Math.max(1, mapLevel - 5 + Math.floor(Math.random() * 10)),
-            message: 'Gặp quái trong khu vực.',
+            message: 'Encountered a hostile in the area.',
         };
     }
     if (roll < 0.80) {
         return {
             type: 'search',
-            label: 'Tìm kiếm',
+            label: 'Search',
             monsterLevel: null,
-            message: 'Tìm thấy dấu vết vật tư.',
+            message: 'Found traces of supplies.',
         };
     }
 
     return {
         type: 'retreat',
-        label: 'Rút lui',
+        label: 'Retreat',
         monsterLevel: null,
-        message: 'Rút lui khỏi POI.',
+        message: 'Retreated from the POI.',
     };
 }
 
 function buildRetreatSweepEvent() {
     return {
         type: 'retreat',
-        label: 'Rút lui',
+        label: 'Retreat',
         monsterLevel: null,
-        message: 'Rút lui khỏi POI.',
+        message: 'Retreated from the POI.',
     };
 }
 
@@ -484,8 +501,9 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
  */
 zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
     const { poiId } = req.params;
-    const { playerId, activityType, targetId, mode } = req.body;
+    const { playerId, activityType, targetId, mode, combatAction, accuracyResult } = req.body;
     const activity = normalizeActivityType(activityType);
+    const combatResult = normalizeCombatResult({ combatAction, accuracyResult });
 
     if (!playerId || !activity) {
         return res.status(400).json({
@@ -634,6 +652,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             target_id: targetId || null,
             mode: mode || 'normal',
             action_type: actionType,
+            combat_result: activityType === 'enemy' ? combatResult : null,
             sweep_event: sweepEvent,
             duration_seconds: durationSeconds,
             energy_cost: cost.energyCost,

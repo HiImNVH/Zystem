@@ -8,6 +8,7 @@ import {
     restAtSafeHouse
 } from '../../api/api.game';
 import { getFactions, getMyFaction, createFaction, joinFaction, leaveFaction } from '../../api/api.faction';
+import CombatMiniGame from './components.panels.CombatMiniGame';
 
 const DESTINATIONS = {
     EXPEDITION: {
@@ -545,7 +546,8 @@ function formatDropTable(dropTable) {
         .join(' | ');
 }
 
-function ActivityListSheet({ activityType, activityData, isLoading, error, onClose, onExecute, executingId }) {
+function ActivityListSheet({ activityType, activityData, inventory, isLoading, error, onClose, onExecute, executingId }) {
+    const [combatEnemy, setCombatEnemy] = useState(null);
     if (!activityType) return null;
 
     const titleMap = {
@@ -574,7 +576,17 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
-                {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && (
+                {!isLoading && activityType === 'enemy' && combatEnemy && (
+                    <CombatMiniGame
+                        enemy={combatEnemy}
+                        inventory={inventory}
+                        isExecuting={Boolean(executingId)}
+                        onBack={() => setCombatEnemy(null)}
+                        onAttack={options => onExecute?.(combatEnemy, options)}
+                    />
+                )}
+
+                {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && !(activityType === 'enemy' && combatEnemy) && (
                     <div className="space-y-2">
                         {list.map(item => (
                             <div key={item.id} className="card p-3 flex items-center gap-3">
@@ -605,11 +617,11 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                 </div>
                                 <button
                                     type="button"
-                                    onClick={() => onExecute?.(item)}
+                                    onClick={() => activityType === 'enemy' ? setCombatEnemy(item) : onExecute?.(item)}
                                     disabled={Boolean(executingId)}
                                     className="btn-primary px-3 py-2 text-xs flex-shrink-0"
                                 >
-                                    {executingId === item.id ? 'Working...' : (activityType === 'enemy' ? 'Fight' : 'Search')}
+                                    {executingId === item.id ? 'Working...' : (activityType === 'enemy' ? 'Engage' : 'Search')}
                                 </button>
                             </div>
                         ))}
@@ -1332,6 +1344,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 <ActivityListSheet
                     activityType={activitySheet.type}
                     activityData={activitySheet.data}
+                    inventory={inventory}
                     isLoading={activitySheet.isLoading}
                     error={activitySheet.error}
                     executingId={executingActivityId}
