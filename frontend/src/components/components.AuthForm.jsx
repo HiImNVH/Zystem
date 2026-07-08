@@ -1,4 +1,4 @@
-﻿// frontend/src/components/AuthForm.jsx
+// frontend/src/components/components.AuthForm.jsx
 
 import { useState } from 'react';
 import { loginAccount, registerAccount } from '../api/api.auth';

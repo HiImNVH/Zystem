@@ -1,4 +1,4 @@
-﻿// frontend/src/components/panels/ChatPanel.jsx
+// frontend/src/components/panels/components.panels.ChatPanel.jsx
 
 import { useEffect, useRef, useState } from 'react';
 import { getChatMessages, getPlayerEvents, markPlayerEventsRead, sendChatMessage } from '../../api/api.game';
@@ -196,7 +196,7 @@ export default function ChatPanel({ character, initialChannel = 'GLOBAL' }) {
                         className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent text-black text-xs font-semibold shadow-lg hover:opacity-90 transition"
                     >
                         {hasNewContent ? 'New messages' : 'Back to bottom'}
-                        <span aria-hidden="true">↓</span>
+                        <span aria-hidden="true">?</span>
                     </button>
                 )}
             </div>

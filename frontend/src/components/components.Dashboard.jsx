@@ -1,12 +1,12 @@
-﻿// frontend/src/components/Dashboard.jsx
+// frontend/src/components/components.Dashboard.jsx
 
 import { useState, useEffect, useCallback } from 'react';
-import BottomNav from './layout/BottomNav';
-import MainPanel from './panels/MainPanel';
-import InventoryPanel from './panels/InventoryPanel';
-import ChatPanel from './panels/ChatPanel';
-import ProfilePanel from './panels/ProfilePanel';
-import QuestPanel from './panels/QuestPanel';
+import BottomNav from './layout/components.layout.BottomNav';
+import MainPanel from './panels/components.panels.MainPanel';
+import InventoryPanel from './panels/components.panels.InventoryPanel';
+import ChatPanel from './panels/components.panels.ChatPanel';
+import ProfilePanel from './panels/components.panels.ProfilePanel';
+import QuestPanel from './panels/components.panels.QuestPanel';
 import {
     getCharacterStats, getZones,
     getInventory, getPlayerJobs,

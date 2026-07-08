@@ -1,4 +1,4 @@
-﻿// frontend/src/components/panels/InventoryPanel.jsx
+// frontend/src/components/panels/components.panels.InventoryPanel.jsx
 
 import { useState } from 'react';
 import { equipItem, useFoodItem } from '../../api/api.game';
@@ -12,32 +12,32 @@ const RARITY_COLORS = {
 };
 
 const TAG_MARKS = [
-    { tokens: ['medicine', 'medical', 'first aid', 'bandage'], mark: '💊' },
-    { tokens: ['electronics', 'electronic', 'circuit', 'battery', 'wire'], mark: '🔋' },
-    { tokens: ['plastic'], mark: '🧴' },
-    { tokens: ['metal', 'scrap metal', 'steel', 'iron'], mark: '🔩' },
-    { tokens: ['wood', 'timber', 'branch'], mark: '🪵' },
-    { tokens: ['stone', 'rock', 'ore', 'mineral'], mark: '🪨' },
-    { tokens: ['cloth', 'fabric', 'leather'], mark: '🧵' },
-    { tokens: ['food', 'meat', 'edible', 'canned', 'grain'], mark: '🍖' },
-    { tokens: ['water', 'salt'], mark: '💧' },
-    { tokens: ['chemical', 'fuel', 'acid'], mark: '🧪' },
-    { tokens: ['glass'], mark: '🔹' },
-    { tokens: ['tool'], mark: '🔧' },
-    { tokens: ['weapon'], mark: '🗡️' },
-    { tokens: ['armor', 'gear', 'equipment'], mark: '🛡️' },
-    { tokens: ['building', 'container'], mark: '📦' },
-    { tokens: ['rubbish', 'junk', 'recyclable'], mark: '♻️' },
+    { tokens: ['medicine', 'medical', 'first aid', 'bandage'], mark: '??' },
+    { tokens: ['electronics', 'electronic', 'circuit', 'battery', 'wire'], mark: '??' },
+    { tokens: ['plastic'], mark: '??' },
+    { tokens: ['metal', 'scrap metal', 'steel', 'iron'], mark: '??' },
+    { tokens: ['wood', 'timber', 'branch'], mark: '??' },
+    { tokens: ['stone', 'rock', 'ore', 'mineral'], mark: '??' },
+    { tokens: ['cloth', 'fabric', 'leather'], mark: '??' },
+    { tokens: ['food', 'meat', 'edible', 'canned', 'grain'], mark: '??' },
+    { tokens: ['water', 'salt'], mark: '??' },
+    { tokens: ['chemical', 'fuel', 'acid'], mark: '??' },
+    { tokens: ['glass'], mark: '??' },
+    { tokens: ['tool'], mark: '??' },
+    { tokens: ['weapon'], mark: '???' },
+    { tokens: ['armor', 'gear', 'equipment'], mark: '???' },
+    { tokens: ['building', 'container'], mark: '??' },
+    { tokens: ['rubbish', 'junk', 'recyclable'], mark: '??' },
 ];
 
 const CATEGORY_MARKS = {
-    RUBBISH: '♻️',
-    MATERIAL: '⚙️',
-    WEAPON: '🗡️',
-    EQUIPMENT: '🛡️',
-    TOOL: '🔧',
-    BUILDING: '📦',
-    FOOD: '🍖',
+    RUBBISH: '??',
+    MATERIAL: '??',
+    WEAPON: '???',
+    EQUIPMENT: '???',
+    TOOL: '??',
+    BUILDING: '??',
+    FOOD: '??',
 };
 
 const FILTERS = [

@@ -1,4 +1,4 @@
-﻿// frontend/src/components/panels/QuestPanel.jsx
+// frontend/src/components/panels/components.panels.QuestPanel.jsx
 
 import { useState, useEffect, useRef } from 'react';
 import { getPlayerSkills, getRefundStatus, unlockSkill, refundSkill } from '../../api/api.game';

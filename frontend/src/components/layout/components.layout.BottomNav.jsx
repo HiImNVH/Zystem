@@ -1,4 +1,4 @@
-﻿// frontend/src/components/layout/BottomNav.jsx
+// frontend/src/components/layout/components.layout.BottomNav.jsx
 
 const NAV_ITEMS = [
     { key: 'MAIN',      label: 'Map', mark: 'MAP' },

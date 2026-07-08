@@ -1,4 +1,4 @@
-﻿// frontend/src/components/panels/EquipmentTab.jsx
+// frontend/src/components/panels/components.panels.EquipmentTab.jsx
 
 import { useState, useEffect } from 'react';
 import { getEquippedItems, unequipItem } from '../../api/api.game';

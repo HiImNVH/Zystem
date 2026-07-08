@@ -1,9 +1,9 @@
-﻿// frontend/src/App.jsx
+// frontend/src/App.jsx
 
 import { useState, useEffect } from 'react';
-import AuthForm from './components/AuthForm';
-import CreateCharacter from './components/CreateCharacter';
-import Dashboard from './components/Dashboard';
+import AuthForm from './components/components.AuthForm';
+import CreateCharacter from './components/components.CreateCharacter';
+import Dashboard from './components/components.Dashboard';
 import { getMyCharacter } from './api/api.character';
 import { disconnectSocket } from './api/api.socket';
 

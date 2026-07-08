@@ -1,4 +1,4 @@
-﻿// frontend/src/components/panels/MainPanel.jsx
+// frontend/src/components/panels/components.panels.MainPanel.jsx
 
 import { useState, useEffect } from 'react';
 import {
@@ -57,18 +57,18 @@ const ZONE_BANNERS = {
 
 const ZONE_TAG_LABELS = {
     rural: 'Nông thôn',
-    town: 'Thị trấn',
-    city: 'Thành phố',
-    forest: 'Rừng',
-    coast: 'Biển',
-    industrial: 'Khu công nghiệp',
-    geological_mine: 'Mỏ địa chất',
+    town: 'Th? tr?n',
+    city: 'Thành ph?',
+    forest: 'R?ng',
+    coast: 'Bi?n',
+    industrial: 'Khu công nghi?p',
+    geological_mine: 'M? d?a ch?t',
 };
 
 const POI_TAG_LABELS = {
-    EXPLORATION: 'Thu lượm',
-    SKIRMISH: 'Quái vật',
-    BATTLE: 'Quái vật',
+    EXPLORATION: 'Thu lu?m',
+    SKIRMISH: 'Quái v?t',
+    BATTLE: 'Quái v?t',
     SWEEP: 'Càn quét',
     DUNGEON: 'Càn quét',
 };
@@ -113,32 +113,32 @@ const SAFE_HOUSE_INFO = {
 };
 
 const ITEM_TAG_MARKS = [
-    { tokens: ['medicine', 'medical', 'first aid', 'bandage'], mark: '💊' },
-    { tokens: ['electronics', 'electronic', 'circuit', 'battery', 'wire'], mark: '🔋' },
-    { tokens: ['plastic'], mark: '🧴' },
-    { tokens: ['metal', 'scrap metal', 'steel', 'iron'], mark: '🔩' },
-    { tokens: ['wood', 'timber', 'branch'], mark: '🪵' },
-    { tokens: ['stone', 'rock', 'ore', 'mineral'], mark: '🪨' },
-    { tokens: ['cloth', 'fabric', 'leather'], mark: '🧵' },
-    { tokens: ['food', 'meat', 'edible', 'canned', 'grain'], mark: '🍖' },
-    { tokens: ['water', 'salt'], mark: '💧' },
-    { tokens: ['chemical', 'fuel', 'acid'], mark: '🧪' },
-    { tokens: ['glass'], mark: '🔹' },
-    { tokens: ['tool'], mark: '🔧' },
-    { tokens: ['weapon'], mark: '🗡️' },
-    { tokens: ['armor', 'gear', 'equipment'], mark: '🛡️' },
-    { tokens: ['building', 'container'], mark: '📦' },
-    { tokens: ['rubbish', 'junk', 'recyclable'], mark: '♻️' },
+    { tokens: ['medicine', 'medical', 'first aid', 'bandage'], mark: '??' },
+    { tokens: ['electronics', 'electronic', 'circuit', 'battery', 'wire'], mark: '??' },
+    { tokens: ['plastic'], mark: '??' },
+    { tokens: ['metal', 'scrap metal', 'steel', 'iron'], mark: '??' },
+    { tokens: ['wood', 'timber', 'branch'], mark: '??' },
+    { tokens: ['stone', 'rock', 'ore', 'mineral'], mark: '??' },
+    { tokens: ['cloth', 'fabric', 'leather'], mark: '??' },
+    { tokens: ['food', 'meat', 'edible', 'canned', 'grain'], mark: '??' },
+    { tokens: ['water', 'salt'], mark: '??' },
+    { tokens: ['chemical', 'fuel', 'acid'], mark: '??' },
+    { tokens: ['glass'], mark: '??' },
+    { tokens: ['tool'], mark: '??' },
+    { tokens: ['weapon'], mark: '???' },
+    { tokens: ['armor', 'gear', 'equipment'], mark: '???' },
+    { tokens: ['building', 'container'], mark: '??' },
+    { tokens: ['rubbish', 'junk', 'recyclable'], mark: '??' },
 ];
 
 const ITEM_CATEGORY_MARKS = {
-    RUBBISH: '♻️',
-    MATERIAL: '⚙️',
-    WEAPON: '🗡️',
-    EQUIPMENT: '🛡️',
-    TOOL: '🔧',
-    BUILDING: '📦',
-    FOOD: '🍖',
+    RUBBISH: '??',
+    MATERIAL: '??',
+    WEAPON: '???',
+    EQUIPMENT: '???',
+    TOOL: '??',
+    BUILDING: '??',
+    FOOD: '??',
 };
 
 const ITEM_RARITY_TEXT = {
@@ -239,8 +239,8 @@ function getRotatingPois(zone, rotationSlot) {
 
 function getPoiActionOptions(poi) {
     const actionOptions = [
-        { type: 'enemy', label: 'Tìm kiếm quái vật', mark: 'QM', tags: ['BATTLE', 'SKIRMISH'] },
-        { type: 'gather', label: 'Thu lượm vật tư', mark: 'TL', tags: ['EXPLORATION'] },
+        { type: 'enemy', label: 'Tìm ki?m quái v?t', mark: 'QM', tags: ['BATTLE', 'SKIRMISH'] },
+        { type: 'gather', label: 'Thu lu?m v?t tu', mark: 'TL', tags: ['EXPLORATION'] },
         { type: 'sweep', label: 'Càn quét', mark: 'CQ', tags: ['SWEEP', 'DUNGEON'] },
     ];
 
@@ -539,7 +539,7 @@ function formatActionResult(result) {
 }
 
 function formatDropTable(dropTable) {
-    if (!Array.isArray(dropTable) || dropTable.length === 0) return 'Không có dữ liệu rơi đồ';
+    if (!Array.isArray(dropTable) || dropTable.length === 0) return 'Không có d? li?u roi d?';
     return dropTable
         .map(drop => `${drop.tag_query} ${Math.round((drop.chance || 0) * 100)}%`)
         .join(' | ');
@@ -549,8 +549,8 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
     if (!activityType) return null;
 
     const titleMap = {
-        enemy: 'Tìm kiếm quái vật',
-        gather: 'Thu lượm',
+        enemy: 'Tìm ki?m quái v?t',
+        gather: 'Thu lu?m',
         sweep: 'Càn quét',
         dungeon: 'Càn quét',
     };
@@ -589,13 +589,13 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                                 Lv.{item.level} | HP {item.health} | ATK {item.attack} | DEF {item.defense}
                                             </p>
                                             <p className="text-[11px] text-textMuted truncate">
-                                                Rơi: {formatDropTable(item.drop_table)}
+                                                Roi: {formatDropTable(item.drop_table)}
                                             </p>
                                         </>
                                     ) : (
                                         <>
                                             <p className="text-xs text-textMuted truncate">
-                                                Cấp zone {item.item_level} | {item.category_label || item.category}
+                                                C?p zone {item.item_level} | {item.category_label || item.category}
                                             </p>
                                             <p className="text-[11px] text-textMuted truncate">
                                                 {item.reward_hint}
@@ -609,7 +609,7 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     disabled={Boolean(executingId)}
                                     className="btn-primary px-3 py-2 text-xs flex-shrink-0"
                                 >
-                                    {executingId === item.id ? 'Đang làm...' : (activityType === 'enemy' ? 'Đánh' : 'Tìm')}
+                                    {executingId === item.id ? 'Ðang làm...' : (activityType === 'enemy' ? 'Ðánh' : 'Tìm')}
                                 </button>
                             </div>
                         ))}
@@ -627,12 +627,12 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                 <p className="text-xs text-textMuted mt-1">Map Lv.{sweep.map_level} | Boss Lv.{sweep.boss_level}</p>
                                 {sweep.event_pool?.length > 0 && (
                                     <p className="text-[11px] text-textMuted mt-1 truncate">
-                                        Sự kiện: {sweep.event_pool.map(event => event.label).join(' | ')}
+                                        S? ki?n: {sweep.event_pool.map(event => event.label).join(' | ')}
                                     </p>
                                 )}
                             </div>
                             <div className="w-full card p-3 text-left">
-                                <p className="text-sm font-semibold">Càn quét lượt tiếp theo</p>
+                                <p className="text-sm font-semibold">Càn quét lu?t ti?p theo</p>
                                 <p className="text-xs text-textMuted mt-1">{sweep.normal.reward_hint}</p>
                                 <button
                                     type="button"
@@ -640,7 +640,7 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     disabled={Boolean(executingId)}
                                     className="btn-primary mt-3 px-3 py-2 text-xs"
                                 >
-                                    {executingId === `${sweep.id}:normal` ? 'Đang càn quét...' : 'Càn quét'}
+                                    {executingId === `${sweep.id}:normal` ? 'Ðang càn quét...' : 'Càn quét'}
                                 </button>
                             </div>
                             <div className="w-full card p-3 text-left">
@@ -652,12 +652,12 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     disabled={Boolean(executingId)}
                                     className="btn-secondary mt-3 px-3 py-2 text-xs"
                                 >
-                                    {executingId === `${sweep.id}:retreat` ? 'Đang rút...' : 'Rút lui'}
+                                    {executingId === `${sweep.id}:retreat` ? 'Ðang rút...' : 'Rút lui'}
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <p className="text-sm text-textMuted py-6 text-center">POI này chưa có lượt càn quét.</p>
+                        <p className="text-sm text-textMuted py-6 text-center">POI này chua có lu?t càn quét.</p>
                     )
                 )}
             </div>
@@ -1260,7 +1260,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                                     </p>
                                                     {isLocked && (
                                                         <p className="text-[11px] text-danger mt-1">
-                                                            Khóa: cần trong phạm vi +10 cấp.
+                                                            Khóa: c?n trong ph?m vi +10 c?p.
                                                         </p>
                                                     )}
                                                 </div>

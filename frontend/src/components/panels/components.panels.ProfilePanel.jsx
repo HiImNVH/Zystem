@@ -1,7 +1,7 @@
-﻿// frontend/src/components/panels/ProfilePanel.jsx
+// frontend/src/components/panels/components.panels.ProfilePanel.jsx
 
 import { useState } from 'react';
-import EquipmentTab from './EquipmentTab';
+import EquipmentTab from './components.panels.EquipmentTab';
 
 const STAT_INFO = {
     str: { label: 'Strength', shortLabel: 'STR', desc: 'Physical damage and carry capacity' },

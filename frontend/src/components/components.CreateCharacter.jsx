@@ -1,8 +1,8 @@
-﻿// frontend/src/components/CreateCharacter.jsx
+// frontend/src/components/components.CreateCharacter.jsx
 
 import { useState, useEffect } from 'react';
 import { getJobs, createCharacter } from '../api/api.character';
-import JobCard from './JobCard';
+import JobCard from './components.JobCard';
 
 const CATEGORY_ORDER = ['combat', 'survival', 'production'];
 const CATEGORY_LABELS = {
@@ -80,7 +80,7 @@ export default function CreateCharacter({ account, onCharacterCreated, onLogout 
                             <div key={item} className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
                                 item === step ? 'bg-accent text-base' : item < step ? 'bg-success/20 text-success' : 'bg-elevated text-textMuted'
                             }`}>
-                                {item < step ? '✓' : item}
+                                {item < step ? '?' : item}
                             </div>
                         ))}
                     </div>

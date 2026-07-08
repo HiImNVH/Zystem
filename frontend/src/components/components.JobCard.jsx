@@ -1,4 +1,4 @@
-﻿// frontend/src/components/JobCard.jsx
+// frontend/src/components/components.JobCard.jsx
 
 const CATEGORY_LABELS = {
     combat: 'Combat',
@@ -52,7 +52,7 @@ export default function JobCard({ job, isSelected, onClick }) {
                         <p className="text-xs text-textMuted">{display.sub}</p>
                     </div>
                 </div>
-                {isSelected && <span className="text-accent text-sm">✓</span>}
+                {isSelected && <span className="text-accent text-sm">?</span>}
             </div>
 
             <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated mb-3 ${CATEGORY_COLORS[job.category] || 'text-textMuted'}`}>

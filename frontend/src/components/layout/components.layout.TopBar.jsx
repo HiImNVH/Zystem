@@ -1,4 +1,4 @@
-﻿// frontend/src/components/layout/TopBar.jsx
+// frontend/src/components/layout/components.layout.TopBar.jsx
 
 const DESKTOP_NAV = [
     { key: 'CHAT', label: 'Chat' },
