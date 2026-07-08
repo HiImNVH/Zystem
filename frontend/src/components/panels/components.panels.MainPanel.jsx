@@ -236,6 +236,31 @@ function CurrencyBadge({ label, value, colorClassName }) {
     );
 }
 
+function ExpStatusMeter({ level, current, max }) {
+    const safeLevel = Math.max(1, parseInt(level) || 1);
+    const safeMax = Math.max(1, parseInt(max) || 1);
+    const safeCurrent = Math.max(0, parseInt(current) || 0);
+    const pct = Math.min(100, Math.round((safeCurrent / safeMax) * 100));
+
+    return (
+        <div className="flex items-start gap-2">
+            <div className="w-11 h-9 border border-textSecondary bg-base flex items-center justify-center flex-shrink-0">
+                <span className="text-sm font-bold text-textPrimary">{safeLevel}</span>
+            </div>
+            <div className="flex-1 min-w-0 pt-1">
+                <div className="relative h-3 bg-elevated overflow-hidden">
+                    <div className="absolute inset-y-0 left-0 bg-success/40" style={{ width: `${pct}%` }} />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-[11px] leading-none font-mono font-bold text-textPrimary">
+                            {safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function calculateExpRequiredForLevel(level) {
     const safeLevel = Math.max(1, parseInt(level) || 1);
     return Math.floor(0.7 * Math.pow(safeLevel, 3) + 20 * Math.pow(safeLevel, 2) + 100 * safeLevel + 50);
@@ -253,11 +278,7 @@ function PlayerStatusBar({ character }) {
     return (
         <div className="sticky top-0 z-20 bg-base px-3 pt-3 pb-2">
             <div className="card p-2.5 space-y-2">
-                <ResourceMeter label="EXP" current={character?.current_exp} max={expRequired} />
-                <div className="flex items-center justify-between gap-3">
-                    <p className="font-semibold truncate">{character?.character_name || 'Survivor'}</p>
-                    <span className="text-xs font-semibold text-accent flex-shrink-0">Level {playerLevel}</span>
-                </div>
+                <ExpStatusMeter level={playerLevel} current={character?.current_exp} max={expRequired} />
                 <ResourceMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
                 <div className="grid grid-cols-3 gap-2">
                     <CurrencyBadge label="Money" value={money} colorClassName="bg-accent" />
