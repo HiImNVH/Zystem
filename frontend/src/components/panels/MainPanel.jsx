@@ -276,7 +276,7 @@ function PlayerStatusBar({ character }) {
     const expRequired = calculateExpRequiredForLevel(playerLevel);
 
     return (
-        <div className="px-4 pt-4">
+        <div className="sticky top-0 z-20 bg-base px-4 pt-4 pb-3">
             <div className="card p-3 space-y-3">
                 <div className="flex items-center justify-between gap-3">
                     <p className="font-semibold truncate">{character?.character_name || 'Survivor'}</p>
