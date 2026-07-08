@@ -226,7 +226,7 @@ function CurrencyBadge({ label, value, colorClassName }) {
     const safeValue = Math.max(0, parseInt(value) || 0);
 
     return (
-        <div className="flex items-center justify-between gap-2 rounded-md bg-elevated/60 border border-border px-2 py-1.5 min-w-0">
+        <div className="flex items-center justify-between gap-2 rounded-md bg-elevated/60 border border-border px-2 py-1 min-w-0">
             <div className="flex items-center gap-1.5 min-w-0">
                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${colorClassName}`} />
                 <span className="text-[10px] uppercase font-semibold text-textMuted truncate">{label}</span>
@@ -236,34 +236,22 @@ function CurrencyBadge({ label, value, colorClassName }) {
     );
 }
 
-// Cong thuc EXP can de len cap tiep theo - PHAI dong bo voi backend:
-// backend/src/services/services.progression.js -> calculateExpRequired()
-function calculateExpRequiredForLevel(level) {
-    const L = Math.max(1, parseInt(level) || 1);
-    return Math.floor(0.7 * Math.pow(L, 3) + 20 * Math.pow(L, 2) + 100 * L + 50);
-}
-
 // Thanh trang thai nhan vat: luon hien thi o tren cung, khong bien mat khi
 // chuyen giua man Refugee Camp / chon route / dang kham pha
 function PlayerStatusBar({ character }) {
     const playerLevel = character?.player_level || 1;
-    const expRequired = calculateExpRequiredForLevel(playerLevel);
     const money = character?.money ?? character?.copper ?? 0;
     const silverCoin = character?.silver_coin ?? character?.silver ?? 0;
     const goldCoin = character?.gold_coin ?? character?.gold ?? 0;
 
     return (
-        <div className="sticky top-0 z-20 bg-base px-4 pt-4 pb-3">
-            <div className="card p-3 space-y-3">
+        <div className="sticky top-0 z-20 bg-base px-3 pt-3 pb-2">
+            <div className="card p-2.5 space-y-2">
                 <div className="flex items-center justify-between gap-3">
                     <p className="font-semibold truncate">{character?.character_name || 'Survivor'}</p>
                     <span className="text-xs font-semibold text-accent flex-shrink-0">Level {playerLevel}</span>
                 </div>
-                <ResourceMeter label="EXP" current={character?.current_exp} max={expRequired} />
-                <div className="grid grid-cols-2 gap-3">
-                    <ResourceMeter label="HP" current={character?.current_hp} max={character?.max_hp} />
-                    <ResourceMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
-                </div>
+                <ResourceMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
                 <div className="grid grid-cols-3 gap-2">
                     <CurrencyBadge label="Money" value={money} colorClassName="bg-accent" />
                     <CurrencyBadge label="Silver" value={silverCoin} colorClassName="bg-cyan" />
