@@ -73,6 +73,12 @@ const POI_TAG_LABELS = {
     DUNGEON: 'Càn quét',
 };
 
+const RESOURCE_METER_FILL_CLASSES = {
+    EXP: 'bg-accent',
+    HP: 'bg-danger',
+    Energy: 'bg-cyan',
+};
+
 const EXPLORATION_RINGS = [
     {
         id: 'near_city',
@@ -248,6 +254,7 @@ function ResourceMeter({ label, current, max }) {
     const safeMax = Math.max(1, parseInt(max) || 1);
     const safeCurrent = Math.max(0, parseInt(current) || 0);
     const pct = Math.min(100, Math.round((safeCurrent / safeMax) * 100));
+    const fillClassName = RESOURCE_METER_FILL_CLASSES[label] || 'bg-success';
 
     return (
         <div>
@@ -256,7 +263,7 @@ function ResourceMeter({ label, current, max }) {
                 <span className="font-mono text-textSecondary">{safeCurrent}/{safeMax}</span>
             </div>
             <div className="progress-track">
-                <div className="progress-fill bg-success" style={{ width: `${pct}%` }} />
+                <div className={`progress-fill ${fillClassName}`} style={{ width: `${pct}%` }} />
             </div>
         </div>
     );
@@ -283,7 +290,8 @@ function PlayerStatusBar({ character }) {
                     <span className="text-xs font-semibold text-accent flex-shrink-0">Level {playerLevel}</span>
                 </div>
                 <ResourceMeter label="EXP" current={character?.current_exp} max={expRequired} />
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-2 gap-3">
+                    <ResourceMeter label="HP" current={character?.current_hp} max={character?.max_hp} />
                     <ResourceMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
                 </div>
             </div>
