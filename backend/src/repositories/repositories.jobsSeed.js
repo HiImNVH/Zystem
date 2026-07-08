@@ -96,12 +96,80 @@ const poiSeedList = [
     { zone: 'ZONE_OFFSHORE_TERMINAL_LV40', code: 'POI_LV40_TERMINAL_CORE', name: 'Terminal Core', type: 'dungeon', dungeon: true, tags: ['DUNGEON'] },
 ];
 
+const poiBlueprintsByBiome = {
+    urban: [
+        { code: 'ALLEY_BLOCK', name: 'Blocked Alley', type: 'residential', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'OPEN_MARKET', name: 'Open-air Market', type: 'market', tags: ['EXPLORATION'] },
+        { code: 'MAINTENANCE_HUB', name: 'Maintenance Hub', type: 'utility', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'SERVICE_BASEMENT', name: 'Service Basement', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
+        { code: 'STORAGE_ROW', name: 'Storage Row', type: 'warehouse', tags: ['EXPLORATION'] },
+        { code: 'FIELD_CLINIC', name: 'Field Clinic', type: 'medical', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'SECURITY_POST', name: 'Security Post', type: 'military', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'HIGHRISE_LOBBY', name: 'Highrise Lobby', type: 'highrise', tags: ['EXPLORATION', 'BATTLE'] },
+    ],
+    rural: [
+        { code: 'FARM_STORAGE', name: 'Farm Storage', type: 'farm', tags: ['EXPLORATION'] },
+        { code: 'DRY_WELL', name: 'Dry Well', type: 'utility', tags: ['EXPLORATION'] },
+        { code: 'ROADSIDE_CAMP', name: 'Roadside Camp', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'SMALL_QUARRY', name: 'Small Quarry', type: 'mine', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'RANCH_GATE', name: 'Ranch Gate', type: 'ranch', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'SUPPLY_BARN', name: 'Supply Barn', type: 'warehouse', tags: ['EXPLORATION'] },
+        { code: 'OLD_WATCHPOINT', name: 'Old Watchpoint', type: 'landmark', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'FIELD_BUNKER', name: 'Field Bunker', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
+    ],
+    forest: [
+        { code: 'MOSSY_TRAIL', name: 'Mossy Trail', type: 'forest', tags: ['EXPLORATION'] },
+        { code: 'RANGER_CACHE', name: 'Ranger Cache', type: 'camp', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'FALLEN_LOG_SITE', name: 'Fallen Log Site', type: 'landmark', tags: ['EXPLORATION'] },
+        { code: 'ROOT_TUNNEL', name: 'Root Tunnel', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
+        { code: 'WILD_ORCHARD', name: 'Wild Orchard', type: 'farm', tags: ['EXPLORATION'] },
+        { code: 'HIDDEN_CAMP', name: 'Hidden Camp', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'STONE_OUTCROP', name: 'Stone Outcrop', type: 'mine', tags: ['EXPLORATION'] },
+        { code: 'LOOKOUT_RUIN', name: 'Lookout Ruin', type: 'landmark', tags: ['EXPLORATION', 'BATTLE'] },
+    ],
+    coast: [
+        { code: 'TIDE_POOLS', name: 'Tide Pools', type: 'pier', tags: ['EXPLORATION'] },
+        { code: 'NET_SHED', name: 'Net Shed', type: 'warehouse', tags: ['EXPLORATION'] },
+        { code: 'WRECK_DECK', name: 'Wreck Deck', type: 'shipwreck', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'PUMP_ROOM', name: 'Pump Room', type: 'utility', tags: ['EXPLORATION'] },
+        { code: 'DOCK_CAMP', name: 'Dock Camp', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'FLOODED_HOLD', name: 'Flooded Hold', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
+        { code: 'OFFSHORE_CRANE', name: 'Offshore Crane', type: 'offshore', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'LIGHT_MARKER', name: 'Light Marker', type: 'landmark', tags: ['EXPLORATION'] },
+    ],
+    desert: [
+        { code: 'GLASS_FIELD', name: 'Glass Field', type: 'desert_ruin', tags: ['EXPLORATION'] },
+        { code: 'SOLAR_SHED', name: 'Solar Shed', type: 'utility', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'DUST_DEPOT', name: 'Dust Depot', type: 'warehouse', tags: ['EXPLORATION'] },
+        { code: 'DRY_OUTPOST', name: 'Dry Outpost', type: 'military', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'RESEARCH_CELLAR', name: 'Research Cellar', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
+        { code: 'SUN_TRACKER', name: 'Sun Tracker', type: 'landmark', tags: ['EXPLORATION'] },
+        { code: 'BATTERY_FIELD', name: 'Battery Field', type: 'desert_ruin', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'PIPELINE_BREAK', name: 'Pipeline Break', type: 'utility', tags: ['EXPLORATION'] },
+    ],
+};
+
 const TAG_ACTION_TYPE = {
     EXPLORATION: 'EXPLORE',
     SKIRMISH: 'HUNT',
     BATTLE: 'BATTLE',
     DUNGEON: 'DUNGEON',
 };
+
+function buildPoiSeedPool() {
+    const generatedPois = zonesList
+        .filter(zone => zone.type !== 'safe')
+        .flatMap(zone => (poiBlueprintsByBiome[zone.biome] || []).map(blueprint => ({
+            zone: zone.code,
+            code: `${zone.code.replace('ZONE_', 'POI_')}_${blueprint.code}`,
+            name: blueprint.name,
+            type: blueprint.type,
+            dungeon: blueprint.dungeon,
+            tags: blueprint.tags,
+        })));
+
+    return [...poiSeedList, ...generatedPois];
+}
 
 const monsterProfileSeeds = [
     { profile: 'residential_threats', theme: 'Suburb', drops: ['Rubbish, Recyclable', 'Food, Canned', 'Material, Fabric'] },
@@ -258,7 +326,7 @@ async function seedJobsSeedTable() {
                 dungeon_rank_rewards = EXCLUDED.dungeon_rank_rewards;
         `;
 
-        for (const poi of poiSeedList) {
+        for (const poi of buildPoiSeedPool()) {
             const zoneResult = await dbPool.query('SELECT id FROM zones WHERE code = $1;', [poi.zone]);
             if (zoneResult.rows.length === 0) continue;
 

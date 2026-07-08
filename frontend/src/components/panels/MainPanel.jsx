@@ -44,6 +44,8 @@ const DURATION_OPTIONS = [
     { label: '8 hours', value: 28800 },
 ];
 
+const POI_ROTATION_MS = 15 * 60 * 1000;
+
 const ZONE_BANNERS = {
     urban:   { gradient: 'from-zinc-700/40 to-base', mark: 'UR' },
     rural:   { gradient: 'from-lime-900/35 to-base', mark: 'RU' },
@@ -178,6 +180,44 @@ function getPoiTagLabels(poi) {
         .map(tag => tag.tag_type)
         .filter(Boolean)
         .join(' / ');
+}
+
+function getPoiRotationSlot() {
+    return Math.floor(Date.now() / POI_ROTATION_MS);
+}
+
+function createStableHash(value) {
+    return String(value || '').split('').reduce((hash, char) => (
+        ((hash << 5) - hash + char.charCodeAt(0)) >>> 0
+    ), 2166136261);
+}
+
+function getRotatingPois(zone, rotationSlot) {
+    const pois = zone?.pois || [];
+    if (pois.length <= 5) return pois;
+
+    const maxVisible = Math.min(10, pois.length);
+    const visibleCount = 5 + (createStableHash(`${zone.code}:${rotationSlot}:count`) % (maxVisible - 4));
+
+    return [...pois]
+        .sort((left, right) => (
+            createStableHash(`${zone.code}:${rotationSlot}:${left.code || left.id}`) -
+            createStableHash(`${zone.code}:${rotationSlot}:${right.code || right.id}`)
+        ))
+        .slice(0, visibleCount);
+}
+
+function getPoiActionOptions(poi) {
+    const actionOptions = [
+        { type: 'enemy', label: 'Danh sách quái', mark: 'EN', tags: ['BATTLE', 'SKIRMISH'] },
+        { type: 'gather', label: 'Vật phẩm có thể kiếm', mark: 'GA', tags: ['EXPLORATION'] },
+        { type: 'dungeon', label: 'Dungeon', mark: 'DG', tags: ['DUNGEON'] },
+    ];
+
+    return actionOptions.map(option => ({
+        ...option,
+        isAvailable: (poi?.gameplay_tags || []).some(tag => option.tags.includes(tag.tag_type)),
+    }));
 }
 
 function ResourceMeter({ label, current, max }) {
@@ -591,6 +631,45 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
     );
 }
 
+function PoiActionSheet({ poi, onClose, onOpenActivity }) {
+    if (!poi) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
+            <div className="card w-full sm:max-w-lg max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="min-w-0">
+                        <h3 className="font-semibold truncate">{poi.display_name}</h3>
+                        <p className="text-xs text-textMuted mt-1 truncate">{getPoiTagLabels(poi) || poi.poi_type}</p>
+                    </div>
+                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
+                </div>
+
+                <div className="space-y-2">
+                    {getPoiActionOptions(poi).map(option => (
+                        <button
+                            key={option.type}
+                            type="button"
+                            disabled={!option.isAvailable}
+                            onClick={() => option.isAvailable && onOpenActivity?.(poi, option.type)}
+                            className={`w-full p-3 rounded-lg border text-left transition-colors ${
+                                option.isAvailable
+                                    ? 'border-border hover:border-accent/50'
+                                    : 'border-border/50 opacity-40 cursor-not-allowed'
+                            }`}
+                        >
+                            <div className="flex items-center justify-between gap-3">
+                                <span className="text-sm font-semibold">{option.label}</span>
+                                <span className="text-[10px] font-bold text-accent">{option.mark}</span>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function FactionSheet({ playerId, onClose, onNotify }) {
     const [faction, setFaction] = useState(null);
     const [allFactions, setAllFactions] = useState([]);
@@ -949,9 +1028,16 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     const [showFaction, setShowFaction] = useState(false);
     const [showSafeHouse, setShowSafeHouse] = useState(false);
     const [currentExpeditionZone, setCurrentExpeditionZone] = useState(null);
+    const [selectedPoi, setSelectedPoi] = useState(null);
     const [activitySheet, setActivitySheet] = useState(null);
     const [executingActivityId, setExecutingActivityId] = useState('');
     const [notification, setNotification] = useState(null);
+    const [poiRotationSlot, setPoiRotationSlot] = useState(getPoiRotationSlot);
+
+    useEffect(() => {
+        const timerId = setInterval(() => setPoiRotationSlot(getPoiRotationSlot()), 60000);
+        return () => clearInterval(timerId);
+    }, []);
 
     function notify(message, type) {
         setNotification({ message, type });
@@ -959,6 +1045,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     }
 
     async function openPoiActivity(poi, type) {
+        setSelectedPoi(null);
         setExecutingActivityId('');
         setActivitySheet({ type, poi, data: null, isLoading: true, error: '' });
         try {
@@ -1012,7 +1099,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
             return level >= ring.minLevel && level <= ring.maxLevel;
         }),
     }));
-    const currentPois = currentExpeditionZone?.pois || [];
+    const currentPois = getRotatingPois(currentExpeditionZone, poiRotationSlot);
 
     return (
         <div className="h-full overflow-y-auto">
@@ -1029,7 +1116,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     </h1>
                     <p className="text-sm text-textSecondary mt-1">
                         {isExploring
-                            ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${currentZone.biome || currentZone.zone_type} | ${currentZone.pois?.length || 0} POIs`
+                            ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${currentZone.biome || currentZone.zone_type} | ${currentPois.length} POIs`
                             : (showSafeHouse
                                 ? 'Rest, cook, craft, and manage the first version of your safe shelter.'
                                 : (isChoosingRoute
@@ -1162,6 +1249,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     <button
                         onClick={() => {
                             setCurrentExpeditionZone(null);
+                            setSelectedPoi(null);
                             setShowZonePicker(true);
                         }}
                         className="w-full btn-secondary text-left"
@@ -1173,8 +1261,13 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                         <h2 className="text-sm font-semibold mb-3">POIs</h2>
                         <div className="space-y-3">
                             {currentPois.map(poi => (
-                                <div key={poi.id} className="card p-4">
-                                    <div className="flex items-start justify-between gap-3 mb-3">
+                                <button
+                                    key={poi.id}
+                                    type="button"
+                                    onClick={() => setSelectedPoi(poi)}
+                                    className="w-full card card-hover p-4 text-left"
+                                >
+                                    <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0">
                                             <p className="font-semibold truncate">{poi.display_name}</p>
                                             <p className="text-xs text-textMuted mt-1">
@@ -1183,33 +1276,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                         </div>
                                         <span className="text-[10px] font-bold text-accent">{poi.is_dungeon ? 'DG' : 'POI'}</span>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {[
-                                            { type: 'enemy', label: 'Enemy List', tags: ['BATTLE', 'SKIRMISH'] },
-                                            { type: 'gather', label: 'Gather List', tags: ['EXPLORATION'] },
-                                            { type: 'dungeon', label: 'Dungeon', tags: ['DUNGEON'] },
-                                        ].map(item => {
-                                            const isAvailable = (poi.gameplay_tags || []).some(tag => item.tags.includes(tag.tag_type));
-                                            return (
-                                                <button
-                                                    key={item.type}
-                                                    onClick={() => isAvailable && openPoiActivity(poi, item.type)}
-                                                    disabled={!isAvailable}
-                                                    className={`p-2.5 rounded-lg border text-left transition-colors ${
-                                                        isAvailable
-                                                            ? 'border-border hover:border-accent/50'
-                                                            : 'border-border/50 opacity-40 cursor-not-allowed'
-                                                    }`}
-                                                >
-                                                    <span className="text-[10px] font-bold text-accent block mb-1">
-                                                        {item.type === 'enemy' ? 'EN' : item.type === 'gather' ? 'GA' : 'DG'}
-                                                    </span>
-                                                    <span className="text-xs font-semibold block">{item.label}</span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
+                                </button>
                             ))}
                             {currentPois.length === 0 && (
                                 <p className="text-sm text-textMuted">No POIs have been mapped here yet.</p>
@@ -1217,6 +1284,14 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                         </div>
                     </div>
                 </div>
+            )}
+
+            {selectedPoi && (
+                <PoiActionSheet
+                    poi={selectedPoi}
+                    onClose={() => setSelectedPoi(null)}
+                    onOpenActivity={openPoiActivity}
+                />
             )}
 
             {activitySheet && (
