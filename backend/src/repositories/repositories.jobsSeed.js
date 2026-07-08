@@ -36,25 +36,25 @@ const achievementsList = [
 ];
 
 const zonesList = [
-    { code: 'ZONE_SAFE_CAMP', name: 'Refugee Camp', type: 'safe', biome: 'safe', level_gap: 1, stage: 'home', role: 'home_base', min_lv: 1, duration: 0, inf: 0.00, rad: 0.00 },
-    { code: 'ZONE_RIVERSIDE_SUBURB_LV5', name: 'Camp Perimeter Suburb', type: 'urban', biome: 'urban', level_gap: 5, stage: 'early', role: 'suburb', min_lv: 5, duration: 90, inf: 0.60, rad: 0.00 },
-    { code: 'ZONE_BROKEN_MARKET_LV10', name: 'Outer Market District', type: 'urban', biome: 'urban', level_gap: 10, stage: 'early', role: 'market', min_lv: 10, duration: 120, inf: 1.20, rad: 0.10 },
-    { code: 'ZONE_SOUTH_FACTORY_LV15', name: 'South Industrial Fringe', type: 'urban', biome: 'urban', level_gap: 15, stage: 'mid', role: 'industrial', min_lv: 15, duration: 180, inf: 1.80, rad: 0.30 },
-    { code: 'ZONE_OUTER_GREENBELT_LV15', name: 'Greenbelt Checkpoint', type: 'forest', biome: 'forest', level_gap: 15, stage: 'mid', role: 'woodland', min_lv: 15, duration: 180, inf: 1.40, rad: 0.10 },
-    { code: 'ZONE_FISHING_PIER_LV20', name: 'Coastal Pier Outskirts', type: 'coast', biome: 'coast', level_gap: 20, stage: 'mid', role: 'pier', min_lv: 20, duration: 240, inf: 1.70, rad: 0.20 },
-    { code: 'ZONE_OLD_FARMLAND_LV20', name: 'Old Farmland Belt', type: 'rural', biome: 'rural', level_gap: 20, stage: 'mid', role: 'farm', min_lv: 20, duration: 240, inf: 1.50, rad: 0.10 },
-    { code: 'ZONE_EASTERN_QUARRY_LV25', name: 'Eastern Quarry Road', type: 'rural', biome: 'rural', level_gap: 25, stage: 'mid', role: 'mine', min_lv: 25, duration: 300, inf: 2.00, rad: 0.60 },
-    { code: 'ZONE_LOGISTICS_WAREHOUSE_LV25', name: 'Logistics Warehouse Belt', type: 'urban', biome: 'urban', level_gap: 25, stage: 'mid', role: 'warehouse', min_lv: 25, duration: 300, inf: 2.30, rad: 0.40 },
-    { code: 'ZONE_DOWNTOWN_RUINS_LV30', name: 'Downtown Ruins Approach', type: 'urban', biome: 'urban', level_gap: 30, stage: 'end', role: 'city_core', min_lv: 30, duration: 420, inf: 3.20, rad: 1.00 },
-    { code: 'ZONE_DEEP_REDWOOD_LV30', name: 'Deep Redwood Border', type: 'forest', biome: 'forest', level_gap: 30, stage: 'end', role: 'deep_forest', min_lv: 30, duration: 420, inf: 2.80, rad: 0.60 },
-    { code: 'ZONE_FLOODED_CARGO_PORT_LV30', name: 'Flooded Cargo Port', type: 'coast', biome: 'coast', level_gap: 30, stage: 'end', role: 'port', min_lv: 30, duration: 420, inf: 2.60, rad: 0.80 },
-    { code: 'ZONE_SOLAR_WASTELAND_LV35', name: 'Solar Wasteland Expanse', type: 'desert', biome: 'desert', level_gap: 35, stage: 'end', role: 'energy_ruins', min_lv: 35, duration: 540, inf: 2.20, rad: 1.80 },
-    { code: 'ZONE_DEEP_IRON_MINE_LV35', name: 'Deep Iron Mine', type: 'rural', biome: 'rural', level_gap: 35, stage: 'end', role: 'deep_mine', min_lv: 35, duration: 540, inf: 2.80, rad: 1.20 },
-    { code: 'ZONE_CONTAMINATED_RANCH_LV35', name: 'Contaminated Ranchland', type: 'rural', biome: 'rural', level_gap: 35, stage: 'end', role: 'ranch', min_lv: 35, duration: 540, inf: 4.00, rad: 1.00 },
-    { code: 'ZONE_MEGA_CITY_CORE_LV40', name: 'Mega City Core', type: 'urban', biome: 'urban', level_gap: 40, stage: 'end', role: 'mega_city', min_lv: 40, duration: 720, inf: 4.50, rad: 1.50 },
-    { code: 'ZONE_NUCLEAR_PERIMETER_LV40', name: 'Nuclear Plant Perimeter', type: 'urban', biome: 'urban', level_gap: 40, stage: 'end', role: 'nuclear_industrial', min_lv: 40, duration: 720, inf: 5.00, rad: 4.00 },
-    { code: 'ZONE_FALLEN_BASE_LV40', name: 'Fallen Forward Base', type: 'rural', biome: 'rural', level_gap: 40, stage: 'end', role: 'military', min_lv: 40, duration: 720, inf: 4.20, rad: 2.00 },
-    { code: 'ZONE_OFFSHORE_TERMINAL_LV40', name: 'Offshore Terminal', type: 'coast', biome: 'coast', level_gap: 40, stage: 'end', role: 'offshore', min_lv: 40, duration: 720, inf: 3.60, rad: 2.50 },
+    { code: 'ZONE_SAFE_CAMP', name: 'Refugee Camp', type: 'safe', biome: 'safe', tags: [], level_gap: 1, stage: 'home', role: 'home_base', min_lv: 1, duration: 0, inf: 0.00, rad: 0.00 },
+    { code: 'ZONE_RIVERSIDE_SUBURB_LV5', name: 'Camp Perimeter Suburb', type: 'urban', biome: 'urban', tags: ['town'], level_gap: 5, stage: 'early', role: 'suburb', min_lv: 5, duration: 90, inf: 0.60, rad: 0.00 },
+    { code: 'ZONE_BROKEN_MARKET_LV10', name: 'Outer Market District', type: 'urban', biome: 'urban', tags: ['town', 'city'], level_gap: 10, stage: 'early', role: 'market', min_lv: 10, duration: 120, inf: 1.20, rad: 0.10 },
+    { code: 'ZONE_SOUTH_FACTORY_LV15', name: 'South Industrial Fringe', type: 'urban', biome: 'urban', tags: ['industrial', 'city'], level_gap: 15, stage: 'mid', role: 'industrial', min_lv: 15, duration: 180, inf: 1.80, rad: 0.30 },
+    { code: 'ZONE_OUTER_GREENBELT_LV15', name: 'Greenbelt Checkpoint', type: 'forest', biome: 'forest', tags: ['forest'], level_gap: 15, stage: 'mid', role: 'woodland', min_lv: 15, duration: 180, inf: 1.40, rad: 0.10 },
+    { code: 'ZONE_FISHING_PIER_LV20', name: 'Coastal Pier Outskirts', type: 'coast', biome: 'coast', tags: ['coast', 'town'], level_gap: 20, stage: 'mid', role: 'pier', min_lv: 20, duration: 240, inf: 1.70, rad: 0.20 },
+    { code: 'ZONE_OLD_FARMLAND_LV20', name: 'Old Farmland Belt', type: 'rural', biome: 'rural', tags: ['rural'], level_gap: 20, stage: 'mid', role: 'farm', min_lv: 20, duration: 240, inf: 1.50, rad: 0.10 },
+    { code: 'ZONE_EASTERN_QUARRY_LV25', name: 'Eastern Quarry Road', type: 'rural', biome: 'rural', tags: ['geological_mine', 'rural'], level_gap: 25, stage: 'mid', role: 'mine', min_lv: 25, duration: 300, inf: 2.00, rad: 0.60 },
+    { code: 'ZONE_LOGISTICS_WAREHOUSE_LV25', name: 'Logistics Warehouse Belt', type: 'urban', biome: 'urban', tags: ['industrial', 'city'], level_gap: 25, stage: 'mid', role: 'warehouse', min_lv: 25, duration: 300, inf: 2.30, rad: 0.40 },
+    { code: 'ZONE_DOWNTOWN_RUINS_LV30', name: 'Downtown Ruins Approach', type: 'urban', biome: 'urban', tags: ['city'], level_gap: 30, stage: 'end', role: 'city_core', min_lv: 30, duration: 420, inf: 3.20, rad: 1.00 },
+    { code: 'ZONE_DEEP_REDWOOD_LV30', name: 'Deep Redwood Border', type: 'forest', biome: 'forest', tags: ['forest'], level_gap: 30, stage: 'end', role: 'deep_forest', min_lv: 30, duration: 420, inf: 2.80, rad: 0.60 },
+    { code: 'ZONE_FLOODED_CARGO_PORT_LV30', name: 'Flooded Cargo Port', type: 'coast', biome: 'coast', tags: ['coast', 'industrial'], level_gap: 30, stage: 'end', role: 'port', min_lv: 30, duration: 420, inf: 2.60, rad: 0.80 },
+    { code: 'ZONE_SOLAR_WASTELAND_LV35', name: 'Solar Wasteland Expanse', type: 'desert', biome: 'desert', tags: ['industrial', 'geological_mine'], level_gap: 35, stage: 'end', role: 'energy_ruins', min_lv: 35, duration: 540, inf: 2.20, rad: 1.80 },
+    { code: 'ZONE_DEEP_IRON_MINE_LV35', name: 'Deep Iron Mine', type: 'rural', biome: 'rural', tags: ['geological_mine'], level_gap: 35, stage: 'end', role: 'deep_mine', min_lv: 35, duration: 540, inf: 2.80, rad: 1.20 },
+    { code: 'ZONE_CONTAMINATED_RANCH_LV35', name: 'Contaminated Ranchland', type: 'rural', biome: 'rural', tags: ['rural'], level_gap: 35, stage: 'end', role: 'ranch', min_lv: 35, duration: 540, inf: 4.00, rad: 1.00 },
+    { code: 'ZONE_MEGA_CITY_CORE_LV40', name: 'Mega City Core', type: 'urban', biome: 'urban', tags: ['city'], level_gap: 40, stage: 'end', role: 'mega_city', min_lv: 40, duration: 720, inf: 4.50, rad: 1.50 },
+    { code: 'ZONE_NUCLEAR_PERIMETER_LV40', name: 'Nuclear Plant Perimeter', type: 'urban', biome: 'urban', tags: ['industrial'], level_gap: 40, stage: 'end', role: 'nuclear_industrial', min_lv: 40, duration: 720, inf: 5.00, rad: 4.00 },
+    { code: 'ZONE_FALLEN_BASE_LV40', name: 'Fallen Forward Base', type: 'rural', biome: 'rural', tags: ['rural', 'industrial'], level_gap: 40, stage: 'end', role: 'military', min_lv: 40, duration: 720, inf: 4.20, rad: 2.00 },
+    { code: 'ZONE_OFFSHORE_TERMINAL_LV40', name: 'Offshore Terminal', type: 'coast', biome: 'coast', tags: ['coast', 'industrial'], level_gap: 40, stage: 'end', role: 'offshore', min_lv: 40, duration: 720, inf: 3.60, rad: 2.50 },
 ];
 
 const poiSeedList = [
@@ -96,56 +96,62 @@ const poiSeedList = [
     { zone: 'ZONE_OFFSHORE_TERMINAL_LV40', code: 'POI_LV40_TERMINAL_CORE', name: 'Terminal Core', type: 'dungeon', dungeon: true, tags: ['DUNGEON'] },
 ];
 
-const poiBlueprintsByBiome = {
-    urban: [
-        { code: 'ALLEY_BLOCK', name: 'Blocked Alley', type: 'residential', tags: ['EXPLORATION', 'SKIRMISH'] },
-        { code: 'OPEN_MARKET', name: 'Open-air Market', type: 'market', tags: ['EXPLORATION'] },
-        { code: 'MAINTENANCE_HUB', name: 'Maintenance Hub', type: 'utility', tags: ['EXPLORATION', 'BATTLE'] },
-        { code: 'SERVICE_BASEMENT', name: 'Service Basement', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
-        { code: 'STORAGE_ROW', name: 'Storage Row', type: 'warehouse', tags: ['EXPLORATION'] },
-        { code: 'FIELD_CLINIC', name: 'Field Clinic', type: 'medical', tags: ['EXPLORATION', 'BATTLE'] },
-        { code: 'SECURITY_POST', name: 'Security Post', type: 'military', tags: ['SKIRMISH', 'EXPLORATION'] },
-        { code: 'HIGHRISE_LOBBY', name: 'Highrise Lobby', type: 'highrise', tags: ['EXPLORATION', 'BATTLE'] },
+const poiBlueprintsByZoneTag = {
+    town: [
+        { code: 'TWO_STORY_HOUSE', name: 'Two-story House', type: 'residential', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'BACKYARD_SHED', name: 'Backyard Shed', type: 'utility', tags: ['EXPLORATION'] },
+        { code: 'SMALL_GROCERY', name: 'Small Grocery', type: 'market', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'TOWN_CLINIC_ROOM', name: 'Town Clinic Room', type: 'medical', tags: ['EXPLORATION'] },
+        { code: 'BUS_STOP_KIOSK', name: 'Bus Stop Kiosk', type: 'landmark', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'DRAIN_TUNNEL', name: 'Drain Tunnel', type: 'dungeon', dungeon: true, tags: ['SWEEP', 'BATTLE'] },
+    ],
+    city: [
+        { code: 'APARTMENT_301', name: 'Apartment 301', type: 'residential', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'PHARMACY_COUNTER', name: 'Pharmacy Counter', type: 'medical', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'OFFICE_FLOOR', name: 'Office Floor', type: 'highrise', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'PARKING_RAMP', name: 'Parking Ramp', type: 'warehouse', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'SUBWAY_PLATFORM', name: 'Subway Platform', type: 'dungeon', dungeon: true, tags: ['SWEEP', 'BATTLE'] },
+        { code: 'MARKET_STALL_ROW', name: 'Market Stall Row', type: 'market', tags: ['EXPLORATION'] },
     ],
     rural: [
-        { code: 'FARM_STORAGE', name: 'Farm Storage', type: 'farm', tags: ['EXPLORATION'] },
-        { code: 'DRY_WELL', name: 'Dry Well', type: 'utility', tags: ['EXPLORATION'] },
-        { code: 'ROADSIDE_CAMP', name: 'Roadside Camp', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
-        { code: 'SMALL_QUARRY', name: 'Small Quarry', type: 'mine', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'FARMHOUSE_KITCHEN', name: 'Farmhouse Kitchen', type: 'farm', tags: ['EXPLORATION'] },
+        { code: 'SUPPLY_BARN', name: 'Supply Barn', type: 'warehouse', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'IRRIGATION_DITCH', name: 'Irrigation Ditch', type: 'utility', tags: ['EXPLORATION'] },
         { code: 'RANCH_GATE', name: 'Ranch Gate', type: 'ranch', tags: ['SKIRMISH', 'EXPLORATION'] },
-        { code: 'SUPPLY_BARN', name: 'Supply Barn', type: 'warehouse', tags: ['EXPLORATION'] },
-        { code: 'OLD_WATCHPOINT', name: 'Old Watchpoint', type: 'landmark', tags: ['EXPLORATION', 'SKIRMISH'] },
-        { code: 'FIELD_BUNKER', name: 'Field Bunker', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
+        { code: 'ROADSIDE_CAMP', name: 'Roadside Camp', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'FIELD_BUNKER', name: 'Field Bunker', type: 'dungeon', dungeon: true, tags: ['SWEEP', 'BATTLE'] },
     ],
     forest: [
-        { code: 'MOSSY_TRAIL', name: 'Mossy Trail', type: 'forest', tags: ['EXPLORATION'] },
+        { code: 'MOSSY_CLEARING', name: 'Mossy Clearing', type: 'forest', tags: ['EXPLORATION'] },
+        { code: 'FALLEN_LOG_CLUSTER', name: 'Fallen Log Cluster', type: 'forest', tags: ['EXPLORATION'] },
         { code: 'RANGER_CACHE', name: 'Ranger Cache', type: 'camp', tags: ['EXPLORATION', 'SKIRMISH'] },
-        { code: 'FALLEN_LOG_SITE', name: 'Fallen Log Site', type: 'landmark', tags: ['EXPLORATION'] },
-        { code: 'ROOT_TUNNEL', name: 'Root Tunnel', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
-        { code: 'WILD_ORCHARD', name: 'Wild Orchard', type: 'farm', tags: ['EXPLORATION'] },
-        { code: 'HIDDEN_CAMP', name: 'Hidden Camp', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
-        { code: 'STONE_OUTCROP', name: 'Stone Outcrop', type: 'mine', tags: ['EXPLORATION'] },
+        { code: 'HIDDEN_CAMPFIRE', name: 'Hidden Campfire', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'ROOT_TUNNEL', name: 'Root Tunnel', type: 'dungeon', dungeon: true, tags: ['SWEEP', 'BATTLE'] },
         { code: 'LOOKOUT_RUIN', name: 'Lookout Ruin', type: 'landmark', tags: ['EXPLORATION', 'BATTLE'] },
     ],
     coast: [
-        { code: 'TIDE_POOLS', name: 'Tide Pools', type: 'pier', tags: ['EXPLORATION'] },
+        { code: 'TIDE_POOL_EDGE', name: 'Tide Pool Edge', type: 'pier', tags: ['EXPLORATION'] },
         { code: 'NET_SHED', name: 'Net Shed', type: 'warehouse', tags: ['EXPLORATION'] },
-        { code: 'WRECK_DECK', name: 'Wreck Deck', type: 'shipwreck', tags: ['EXPLORATION', 'BATTLE'] },
-        { code: 'PUMP_ROOM', name: 'Pump Room', type: 'utility', tags: ['EXPLORATION'] },
-        { code: 'DOCK_CAMP', name: 'Dock Camp', type: 'camp', tags: ['SKIRMISH', 'EXPLORATION'] },
-        { code: 'FLOODED_HOLD', name: 'Flooded Hold', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
-        { code: 'OFFSHORE_CRANE', name: 'Offshore Crane', type: 'offshore', tags: ['EXPLORATION', 'BATTLE'] },
-        { code: 'LIGHT_MARKER', name: 'Light Marker', type: 'landmark', tags: ['EXPLORATION'] },
+        { code: 'WRECKED_CABIN', name: 'Wrecked Cabin', type: 'shipwreck', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'PIER_END', name: 'Pier End', type: 'pier', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'FLOODED_HOLD', name: 'Flooded Hold', type: 'dungeon', dungeon: true, tags: ['SWEEP', 'BATTLE'] },
+        { code: 'LIGHTHOUSE_STAIRS', name: 'Lighthouse Stairs', type: 'landmark', tags: ['EXPLORATION', 'BATTLE'] },
     ],
-    desert: [
-        { code: 'GLASS_FIELD', name: 'Glass Field', type: 'desert_ruin', tags: ['EXPLORATION'] },
-        { code: 'SOLAR_SHED', name: 'Solar Shed', type: 'utility', tags: ['EXPLORATION', 'BATTLE'] },
-        { code: 'DUST_DEPOT', name: 'Dust Depot', type: 'warehouse', tags: ['EXPLORATION'] },
-        { code: 'DRY_OUTPOST', name: 'Dry Outpost', type: 'military', tags: ['SKIRMISH', 'EXPLORATION'] },
-        { code: 'RESEARCH_CELLAR', name: 'Research Cellar', type: 'dungeon', dungeon: true, tags: ['DUNGEON', 'BATTLE'] },
-        { code: 'SUN_TRACKER', name: 'Sun Tracker', type: 'landmark', tags: ['EXPLORATION'] },
-        { code: 'BATTERY_FIELD', name: 'Battery Field', type: 'desert_ruin', tags: ['EXPLORATION', 'BATTLE'] },
-        { code: 'PIPELINE_BREAK', name: 'Pipeline Break', type: 'utility', tags: ['EXPLORATION'] },
+    industrial: [
+        { code: 'WELDING_BAY', name: 'Welding Bay', type: 'industrial', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'GENERATOR_ROOM', name: 'Generator Room', type: 'utility', tags: ['EXPLORATION', 'SKIRMISH'] },
+        { code: 'LOADING_DOCK', name: 'Loading Dock', type: 'warehouse', tags: ['EXPLORATION'] },
+        { code: 'CONTROL_OFFICE', name: 'Control Office', type: 'industrial', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'PIPE_TUNNEL', name: 'Pipe Tunnel', type: 'dungeon', dungeon: true, tags: ['SWEEP', 'BATTLE'] },
+        { code: 'SCRAP_YARD_CORNER', name: 'Scrap Yard Corner', type: 'industrial', tags: ['EXPLORATION'] },
+    ],
+    geological_mine: [
+        { code: 'ORE_FACE', name: 'Ore Face', type: 'mine', tags: ['EXPLORATION', 'BATTLE'] },
+        { code: 'DRILL_PLATFORM', name: 'Drill Platform', type: 'mine', tags: ['EXPLORATION'] },
+        { code: 'SAMPLE_TABLE', name: 'Sample Table', type: 'mine', tags: ['EXPLORATION'] },
+        { code: 'CART_TRACK', name: 'Cart Track', type: 'mine', tags: ['SKIRMISH', 'EXPLORATION'] },
+        { code: 'LOWER_SHAFT', name: 'Lower Shaft', type: 'dungeon', dungeon: true, tags: ['SWEEP', 'BATTLE'] },
+        { code: 'STONE_OUTCROP', name: 'Stone Outcrop', type: 'mine', tags: ['EXPLORATION'] },
     ],
 };
 
@@ -153,22 +159,29 @@ const TAG_ACTION_TYPE = {
     EXPLORATION: 'EXPLORE',
     SKIRMISH: 'HUNT',
     BATTLE: 'BATTLE',
-    DUNGEON: 'DUNGEON',
+    SWEEP: 'SWEEP',
+    DUNGEON: 'SWEEP',
 };
+
+function normalizePoiTags(tags) {
+    return (tags || []).map(tag => tag === 'DUNGEON' ? 'SWEEP' : tag);
+}
 
 function buildPoiSeedPool() {
     const generatedPois = zonesList
         .filter(zone => zone.type !== 'safe')
-        .flatMap(zone => (poiBlueprintsByBiome[zone.biome] || []).map(blueprint => ({
+        .flatMap(zone => (zone.tags || []).flatMap(zoneTag => (
+            poiBlueprintsByZoneTag[zoneTag] || []
+        ).map(blueprint => ({
             zone: zone.code,
             code: `${zone.code.replace('ZONE_', 'POI_')}_${blueprint.code}`,
             name: blueprint.name,
             type: blueprint.type,
             dungeon: blueprint.dungeon,
-            tags: blueprint.tags,
-        })));
+            tags: normalizePoiTags(blueprint.tags),
+        }))));
 
-    return [...poiSeedList, ...generatedPois];
+    return [...poiSeedList.map(poi => ({ ...poi, tags: normalizePoiTags(poi.tags) })), ...generatedPois];
 }
 
 const monsterProfileSeeds = [
@@ -269,13 +282,14 @@ async function seedJobsSeedTable() {
 
         const insertZoneQuery = `
             INSERT INTO zones
-                (code, display_name, zone_type, biome, level_gap, world_stage, map_role,
+                (code, display_name, zone_type, biome, zone_tags, level_gap, world_stage, map_role,
                  min_player_lv, base_duration_s, infection_risk, radiation_risk)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
             ON CONFLICT (code) DO UPDATE SET
                 display_name = EXCLUDED.display_name,
                 zone_type = EXCLUDED.zone_type,
                 biome = EXCLUDED.biome,
+                zone_tags = EXCLUDED.zone_tags,
                 level_gap = EXCLUDED.level_gap,
                 world_stage = EXCLUDED.world_stage,
                 map_role = EXCLUDED.map_role,
@@ -289,7 +303,7 @@ async function seedJobsSeedTable() {
             await dbPool.query(
                 insertZoneQuery,
                 [
-                    zone.code, zone.name, zone.type, zone.biome, zone.level_gap, zone.stage, zone.role,
+                    zone.code, zone.name, zone.type, zone.biome, zone.tags, zone.level_gap, zone.stage, zone.role,
                     zone.min_lv, zone.duration, zone.inf, zone.rad
                 ]
             );
@@ -337,23 +351,24 @@ async function seedJobsSeedTable() {
                 poi.type,
                 `${poi.name} inside ${poi.zone}.`,
                 Boolean(poi.dungeon),
-                poi.dungeon ? 'Dungeon key or hard-mode stamina budget.' : null,
+                poi.dungeon ? 'Sweep route with boss pressure after repeated clears.' : null,
             ]);
 
             for (const tag of poi.tags) {
-                const isDungeon = tag === 'DUNGEON';
+                const isSweep = tag === 'SWEEP' || tag === 'DUNGEON';
                 const isBattle = tag === 'BATTLE' || tag === 'SKIRMISH';
                 await dbPool.query(insertTagQuery, [
                     insertedPoi.rows[0].id,
                     tag,
                     TAG_ACTION_TYPE[tag],
-                    isDungeon ? 1.35 : (isBattle ? 1.15 : 1.00),
+                    isSweep ? 1.35 : (isBattle ? 1.15 : 1.00),
                     tag === 'EXPLORATION' ? ['materials', 'food', 'salvage'] : ['combat', 'gear', 'materials'],
-                    isBattle || isDungeon ? `${poi.type}_threats` : null,
-                    isDungeon,
+                    isBattle || isSweep ? `${poi.type}_threats` : null,
+                    isSweep,
                 ]);
             }
         }
+        await dbPool.query(`DELETE FROM poi_gameplay_tags WHERE tag_type = 'DUNGEON';`);
         console.log('[SUCCESS] Da nap/cap nhat POI va gameplay tags thanh cong!');
 
         const insertMonsterQuery = `

@@ -145,6 +145,7 @@ async function initializeDatabaseSchema() {
                 display_name VARCHAR(128) NOT NULL,
                 zone_type VARCHAR(32) NOT NULL DEFAULT 'overworld',
                 biome VARCHAR(32) NOT NULL DEFAULT 'urban',
+                zone_tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
                 level_gap SMALLINT NOT NULL DEFAULT 5,
                 world_stage VARCHAR(20) NOT NULL DEFAULT 'early',
                 map_role VARCHAR(40),
@@ -157,6 +158,7 @@ async function initializeDatabaseSchema() {
             );
         `);
         await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS biome VARCHAR(32) NOT NULL DEFAULT 'urban';`);
+        await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS zone_tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[];`);
         await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS level_gap SMALLINT NOT NULL DEFAULT 5;`);
         await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS world_stage VARCHAR(20) NOT NULL DEFAULT 'early';`);
         await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS map_role VARCHAR(40);`);

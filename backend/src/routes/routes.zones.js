@@ -12,6 +12,7 @@ const playerEventsService = require('../services/services.playerEvents');
 const ACTION_RESOURCE_RULES = {
     EXPLORE: { energyPerUnit: 8 },
     BATTLE:  { energyPerUnit: 10 },
+    SWEEP:   { energyPerUnit: 14 },
     DUNGEON: { energyPerUnit: 14 },
     MINE:    { energyPerUnit: 7 },
     CHOP:    { energyPerUnit: 6 },
@@ -22,6 +23,7 @@ const ACTION_RESOURCE_RULES = {
 const ACTION_JOB_CODE = {
     BATTLE: 'fighting',
     HUNT: 'fighting',
+    SWEEP: 'fighting',
     DUNGEON: 'fighting',
     EXPLORE: 'scavenging',
     FORAGE: 'gathering',
@@ -37,7 +39,7 @@ function normalizeActivityType(activityType) {
     const value = String(activityType || '').toLowerCase();
     if (value === 'enemy') return { tagTypes: ['BATTLE', 'SKIRMISH'], label: 'Enemy', fallbackAction: 'BATTLE' };
     if (value === 'gather') return { tagTypes: ['EXPLORATION'], label: 'Gather', fallbackAction: 'EXPLORE' };
-    if (value === 'dungeon') return { tagTypes: ['DUNGEON'], label: 'Dungeon', fallbackAction: 'DUNGEON' };
+    if (value === 'sweep' || value === 'dungeon') return { tagTypes: ['SWEEP', 'DUNGEON'], label: 'Sweep', fallbackAction: 'SWEEP' };
     return null;
 }
 
@@ -59,6 +61,7 @@ function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
         CHOP: { player: 0.46, job: 0.34 },
         HUNT: { player: 0.70, job: 0.34 },
         BATTLE: { player: 0.80, job: 0.36 },
+        SWEEP: { player: 1.05, job: 0.48 },
         DUNGEON: { player: 1.05, job: 0.48 },
     };
     const rate = baseRates[actionType] || baseRates.EXPLORE;
@@ -125,8 +128,8 @@ async function findGatherItems(config) {
     return result.rows;
 }
 
-function scaleMonsterStats(monster, zoneLevel) {
-    const level = zoneLevel + (parseInt(monster.base_level_offset) || 0);
+function scaleMonsterStats(monster, monsterLevel) {
+    const level = Math.max(1, parseInt(monsterLevel) || 1);
     const growth = Math.max(0, level - 1);
     return {
         level,
@@ -140,20 +143,36 @@ function buildEnemyList(config) {
     const { zone, poi, tag, monsters } = config;
     if (!tag) return [];
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
+    const minLevel = Math.max(1, baseLevel - 5);
+    const maxLevel = baseLevel + 4;
+    const monsterPool = monsters.length > 0 ? monsters : [{
+        id: `${poi.code}_unknown`,
+        code: `${poi.code}_unknown`,
+        display_name: 'Unknown Threat',
+        health: 80,
+        attack: 10,
+        defense: 4,
+        threat_rank: 'Common',
+        drop_table: [],
+    }];
 
-    return monsters.map(monster => ({
-        id: monster.id,
-        code: monster.code,
-        name: monster.display_name,
-        ...scaleMonsterStats(monster, baseLevel),
-        threat: monster.threat_rank,
-        reward_hint: (monster.drop_table || [])
-            .map(drop => drop.tag_query)
-            .join(', '),
-        drop_table: monster.drop_table || [],
-        action_type: tag.action_type,
-        gameplay_tag: tag,
-    }));
+    return Array.from({ length: maxLevel - minLevel + 1 }, (_, index) => {
+        const level = minLevel + index;
+        const monster = monsterPool[index % monsterPool.length];
+        return {
+            id: `${monster.id}_${level}`,
+            code: monster.code,
+            name: monster.display_name,
+            ...scaleMonsterStats(monster, level),
+            threat: level >= maxLevel ? 'Elite' : monster.threat_rank,
+            reward_hint: (monster.drop_table || [])
+                .map(drop => drop.tag_query)
+                .join(', '),
+            drop_table: monster.drop_table || [],
+            action_type: tag.action_type,
+            gameplay_tag: tag,
+        };
+    });
 }
 
 function buildGatherList(config) {
@@ -175,33 +194,99 @@ function buildGatherList(config) {
     }));
 }
 
-function buildDungeonInfo(config) {
+function buildSweepInfo(config) {
     const { zone, poi, tag, monsters } = config;
     if (!tag) return null;
     const mapLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
+    const bossLevel = mapLevel + 4;
     return {
-        id: `${poi.code}_dungeon`,
-        name: `${poi.display_name} Instance`,
+        id: `${poi.code}_sweep`,
+        name: `Càn quét ${poi.display_name}`,
         map_level: mapLevel,
+        boss_level: bossLevel,
+        event_pool: [
+            { type: 'combat', label: 'Chiến đấu', hint: 'Gặp quái trong POI.' },
+            { type: 'search', label: 'Tìm kiếm', hint: 'Thấy vật tư hoặc dấu vết hữu ích.' },
+            { type: 'retreat', label: 'Rút lui', hint: 'Chủ động rời khỏi POI để giảm rủi ro.' },
+        ],
         normal: {
             monster_level: mapLevel,
-            reward_hint: 'Map-level gear and materials',
+            reward_hint: 'Có thể gặp chiến đấu, tìm kiếm hoặc rút lui.',
         },
         hard: {
-            monster_level_rule: 'Highest party member level',
-            new_player_aura: 'HP and armor boosted, damage unchanged',
-            reward_hint: 'Low-level players get better rarity; high-level players get upgrade materials',
+            monster_level_rule: `Boss luôn Lv.${bossLevel}`,
+            new_player_aura: 'Boss xuất hiện ở lượt càn quét cố định.',
+            reward_hint: 'Boss có tỉ lệ rơi đồ tốt hơn.',
         },
         monsters: monsters.map(monster => ({
             id: monster.id,
             code: monster.code,
             name: monster.display_name,
-            ...scaleMonsterStats(monster, mapLevel),
+            ...scaleMonsterStats(monster, bossLevel),
             threat: monster.threat_rank,
             drop_table: monster.drop_table || [],
         })),
         action_type: tag.action_type,
         gameplay_tag: tag,
+    };
+}
+
+async function countSweepTurns(client, playerId, poiId) {
+    const result = await client.query(`
+        SELECT COUNT(*)::INT AS turn_count
+        FROM player_events
+        WHERE player_id = $1
+          AND event_type = 'POI_ACTIVITY'
+          AND payload->>'poi_id' = $2
+          AND payload->>'activity_type' = 'sweep';
+    `, [playerId, poiId]);
+
+    return parseInt(result.rows[0]?.turn_count) || 0;
+}
+
+function rollSweepEvent(turnNumber, mapLevel) {
+    const bossLevel = mapLevel + 4;
+    if (turnNumber % 5 === 0) {
+        return {
+            type: 'boss',
+            label: 'Boss',
+            monsterLevel: bossLevel,
+            message: `Gặp boss Lv.${bossLevel}.`,
+        };
+    }
+
+    const roll = Math.random();
+    if (roll < 0.45) {
+        return {
+            type: 'combat',
+            label: 'Chiến đấu',
+            monsterLevel: Math.max(1, mapLevel - 5 + Math.floor(Math.random() * 10)),
+            message: 'Gặp quái trong khu vực.',
+        };
+    }
+    if (roll < 0.80) {
+        return {
+            type: 'search',
+            label: 'Tìm kiếm',
+            monsterLevel: null,
+            message: 'Tìm thấy dấu vết vật tư.',
+        };
+    }
+
+    return {
+        type: 'retreat',
+        label: 'Rút lui',
+        monsterLevel: null,
+        message: 'Rút lui khỏi POI.',
+    };
+}
+
+function buildRetreatSweepEvent() {
+    return {
+        type: 'retreat',
+        label: 'Rút lui',
+        monsterLevel: null,
+        message: 'Rút lui khỏi POI.',
     };
 }
 
@@ -287,7 +372,7 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
     try {
         const poiResult = await dbPool.query(`
             SELECT wp.*, z.code as zone_code, z.display_name as zone_name, z.zone_type,
-                   z.biome, z.level_gap, z.min_player_lv, z.infection_risk, z.radiation_risk,
+                   z.biome, z.zone_tags, z.level_gap, z.min_player_lv, z.infection_risk, z.radiation_risk,
                    COALESCE(
                        JSON_AGG(
                            JSON_BUILD_OBJECT(
@@ -320,6 +405,7 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
             display_name: poi.zone_name,
             zone_type: poi.zone_type,
             biome: poi.biome,
+            zone_tags: poi.zone_tags,
             level_gap: poi.level_gap,
             min_player_lv: poi.min_player_lv,
             infection_risk: poi.infection_risk,
@@ -328,11 +414,11 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
 
         const enemyTag = pickActivityTag(poi, ['BATTLE', 'SKIRMISH']);
         const gatherTag = pickActivityTag(poi, ['EXPLORATION']);
-        const dungeonTag = pickActivityTag(poi, ['DUNGEON']);
+        const sweepTag = pickActivityTag(poi, ['SWEEP', 'DUNGEON']);
         const zoneLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
         const enemyMonsters = await findMonstersByProfile(enemyTag?.monster_profile);
         const gatherItems = await findGatherItems({ tag: gatherTag, zoneLevel });
-        const dungeonMonsters = await findMonstersByProfile(dungeonTag?.monster_profile);
+        const sweepMonsters = await findMonstersByProfile(sweepTag?.monster_profile);
         const payload = {
             poi: {
                 id: poi.id,
@@ -345,12 +431,12 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
             zone,
             enemies: buildEnemyList({ zone, poi, tag: enemyTag, monsters: enemyMonsters }),
             gatherables: buildGatherList({ zone, tag: gatherTag, items: gatherItems }),
-            dungeon: buildDungeonInfo({ zone, poi, tag: dungeonTag, monsters: dungeonMonsters }),
+            sweep: buildSweepInfo({ zone, poi, tag: sweepTag, monsters: sweepMonsters }),
         };
 
-        if (type === 'enemy') return res.json({ success: true, data: { ...payload, gatherables: [], dungeon: null } });
-        if (type === 'gather') return res.json({ success: true, data: { ...payload, enemies: [], dungeon: null } });
-        if (type === 'dungeon') return res.json({ success: true, data: { ...payload, enemies: [], gatherables: [] } });
+        if (type === 'enemy') return res.json({ success: true, data: { ...payload, gatherables: [], sweep: null } });
+        if (type === 'gather') return res.json({ success: true, data: { ...payload, enemies: [], sweep: null } });
+        if (type === 'sweep' || type === 'dungeon') return res.json({ success: true, data: { ...payload, enemies: [], gatherables: [] } });
 
         return res.json({ success: true, data: payload });
     } catch (error) {
@@ -404,7 +490,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             SELECT wp.id AS poi_id, wp.code AS poi_code, wp.display_name AS poi_name,
                    wp.poi_type, wp.is_dungeon,
                    z.id AS zone_id, z.code AS zone_code, z.display_name AS zone_name,
-                   z.zone_type, z.biome, z.level_gap, z.min_player_lv,
+                   z.zone_type, z.biome, z.zone_tags, z.level_gap, z.min_player_lv,
                    z.base_duration_s, z.infection_risk, z.radiation_risk,
                    pgt.id AS tag_id, pgt.tag_type, pgt.action_type,
                    pgt.energy_cost_mult, pgt.loot_focus,
@@ -415,6 +501,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             WHERE wp.id = $1 AND pgt.tag_type = ANY($2::VARCHAR[])
             ORDER BY
                 CASE pgt.tag_type
+                    WHEN 'SWEEP' THEN 1
                     WHEN 'DUNGEON' THEN 1
                     WHEN 'BATTLE' THEN 2
                     WHEN 'SKIRMISH' THEN 3
@@ -440,11 +527,17 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             });
         }
 
-        const actionType = poi.action_type || activity.fallbackAction;
+        const actionType = poi.action_type === 'DUNGEON'
+            ? 'SWEEP'
+            : (poi.action_type || activity.fallbackAction);
+        const isSweepAction = actionType === 'SWEEP';
+        const sweepEvent = isSweepAction
+            ? (mode === 'retreat'
+                ? buildRetreatSweepEvent()
+                : rollSweepEvent((await countSweepTurns(client, playerId, poi.poi_id)) + 1, mapLevel))
+            : null;
         const baseDuration = Math.max(30, parseInt(poi.base_duration_s) || 60);
-        const durationSeconds = mode === 'hard' && actionType === 'DUNGEON'
-            ? Math.ceil(baseDuration * 1.5)
-            : baseDuration;
+        const durationSeconds = baseDuration;
         const tag = {
             energy_cost_mult: poi.energy_cost_mult,
         };
@@ -476,17 +569,28 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
 
         await client.query('COMMIT');
 
-        const expReward = calculateExpReward(actionType, durationSeconds, mapLevel);
+        const rewardActionType = sweepEvent?.type === 'search'
+            ? 'EXPLORE'
+            : (sweepEvent?.type === 'retreat' ? 'EXPLORE' : actionType);
+        const baseExpReward = calculateExpReward(rewardActionType, durationSeconds, mapLevel);
+        const expReward = sweepEvent?.type === 'retreat'
+            ? {
+                playerExp: Math.max(1, Math.floor(baseExpReward.playerExp * 0.35)),
+                jobExp: Math.max(1, Math.floor(baseExpReward.jobExp * 0.35)),
+            }
+            : baseExpReward;
         const playerExpResult = await progressionService.processPlayerExpGain(playerId, expReward.playerExp);
-        const jobId = await findJobIdByCode(ACTION_JOB_CODE[actionType]);
+        const jobId = await findJobIdByCode(ACTION_JOB_CODE[rewardActionType]);
         const jobExpResult = jobId
             ? await progressionService.processJobExpGain(playerId, jobId, expReward.jobExp)
             : null;
-        const lootResult = await lootService.processLootDrop(playerId, {
-            action_type: actionType,
-            actual_duration_s: durationSeconds,
-            zone_min_level: mapLevel,
-        });
+        const lootResult = sweepEvent?.type === 'retreat'
+            ? { items_dropped: [] }
+            : await lootService.processLootDrop(playerId, {
+                action_type: rewardActionType,
+                actual_duration_s: durationSeconds,
+                zone_min_level: mapLevel,
+            });
 
         executionSummary = {
             poi_id: poi.poi_id,
@@ -497,6 +601,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             target_id: targetId || null,
             mode: mode || 'normal',
             action_type: actionType,
+            sweep_event: sweepEvent,
             duration_seconds: durationSeconds,
             energy_cost: cost.energyCost,
             infection_gained: hazard.infectionGain,
@@ -513,7 +618,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             eventType: 'POI_ACTIVITY',
             source: 'Zystem',
             title: `${activity.label} Completed`,
-            message: `${activity.label} at ${poi.poi_name}. Energy -${cost.energyCost}.`,
+            message: `${activity.label} at ${poi.poi_name}. ${sweepEvent?.message || ''} Energy -${cost.energyCost}.`,
             payload: executionSummary,
         });
 

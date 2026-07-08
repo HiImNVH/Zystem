@@ -25,7 +25,7 @@ const DESTINATIONS = {
 const ACTION_CONFIG = {
     BATTLE:  { label: 'Battle', mark: 'BT', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'High risk, high EXP, and a chance to find equipment.' },
     EXPLORE: { label: 'Explore', mark: 'EX', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Search POIs for supplies, crafting materials, and salvage.' },
-    DUNGEON: { label: 'Dungeon', mark: 'DG', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Instance run with boss pressure and rank-based chest rewards.' },
+    SWEEP:   { label: 'Càn quét', mark: 'CQ', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Clear a POI through combat, search, or retreat events.' },
     MINE:    { label: 'Mine', mark: 'MI', destination: 'EXPEDITION', zones: ['rural', 'desert'], helper: 'Gather stone, ore, and base materials.' },
     CHOP:    { label: 'Chop Wood', mark: 'CH', destination: 'EXPEDITION', zones: ['forest', 'rural'], helper: 'Gather wood, branches, and building materials.' },
     HUNT:    { label: 'Skirmish', mark: 'HU', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Hunt local threats for survival materials and combat EXP.' },
@@ -53,6 +53,24 @@ const ZONE_BANNERS = {
     forest:  { gradient: 'from-emerald-900/40 to-base', mark: 'FO' },
     desert:  { gradient: 'from-amber-900/40 to-base', mark: 'DE' },
     safe:    { gradient: 'from-cyan-900/30 to-base', mark: 'HM' },
+};
+
+const ZONE_TAG_LABELS = {
+    rural: 'Nông thôn',
+    town: 'Thị trấn',
+    city: 'Thành phố',
+    forest: 'Rừng',
+    coast: 'Biển',
+    industrial: 'Khu công nghiệp',
+    geological_mine: 'Mỏ địa chất',
+};
+
+const POI_TAG_LABELS = {
+    EXPLORATION: 'Thu lượm',
+    SKIRMISH: 'Quái vật',
+    BATTLE: 'Quái vật',
+    SWEEP: 'Càn quét',
+    DUNGEON: 'Càn quét',
 };
 
 const EXPLORATION_RINGS = [
@@ -177,9 +195,15 @@ function isZoneLockedForPlayer(zone, playerLevel) {
 
 function getPoiTagLabels(poi) {
     return (poi?.gameplay_tags || [])
-        .map(tag => tag.tag_type)
+        .map(tag => POI_TAG_LABELS[tag.tag_type] || tag.tag_type)
         .filter(Boolean)
         .join(' / ');
+}
+
+function getZoneTagLabels(zone) {
+    const tags = zone?.zone_tags || [];
+    if (tags.length === 0) return zone?.biome || zone?.zone_type || '';
+    return tags.map(tag => ZONE_TAG_LABELS[tag] || tag).join(' / ');
 }
 
 function getPoiRotationSlot() {
@@ -209,9 +233,9 @@ function getRotatingPois(zone, rotationSlot) {
 
 function getPoiActionOptions(poi) {
     const actionOptions = [
-        { type: 'enemy', label: 'Danh sách quái', mark: 'EN', tags: ['BATTLE', 'SKIRMISH'] },
-        { type: 'gather', label: 'Vật phẩm có thể kiếm', mark: 'GA', tags: ['EXPLORATION'] },
-        { type: 'dungeon', label: 'Dungeon', mark: 'DG', tags: ['DUNGEON'] },
+        { type: 'enemy', label: 'Tìm kiếm quái vật', mark: 'QM', tags: ['BATTLE', 'SKIRMISH'] },
+        { type: 'gather', label: 'Thu lượm vật tư', mark: 'TL', tags: ['EXPLORATION'] },
+        { type: 'sweep', label: 'Càn quét', mark: 'CQ', tags: ['SWEEP', 'DUNGEON'] },
     ];
 
     return actionOptions.map(option => ({
@@ -502,7 +526,8 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
 function formatActionResult(result) {
     if (!result) return '';
     const lootCount = result.items_dropped?.length || 0;
-    return `Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
+    const sweepText = result.sweep_event ? `${result.sweep_event.label}: ` : '';
+    return `${sweepText}Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
 }
 
 function formatDropTable(dropTable) {
@@ -516,14 +541,15 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
     if (!activityType) return null;
 
     const titleMap = {
-        enemy: 'Enemy List',
-        gather: 'Gather List',
-        dungeon: 'Dungeon',
+        enemy: 'Tìm kiếm quái vật',
+        gather: 'Thu lượm',
+        sweep: 'Càn quét',
+        dungeon: 'Càn quét',
     };
     const list = activityType === 'enemy'
         ? (activityData?.enemies || [])
         : (activityType === 'gather' ? (activityData?.gatherables || []) : []);
-    const dungeon = activityData?.dungeon;
+    const sweep = activityData?.sweep || activityData?.dungeon;
 
     return (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
@@ -540,7 +566,7 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
-                {!isLoading && activityType !== 'dungeon' && (
+                {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && (
                     <div className="space-y-2">
                         {list.map(item => (
                             <div key={item.id} className="card p-3 flex items-center gap-3">
@@ -575,7 +601,7 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                                     disabled={Boolean(executingId)}
                                     className="btn-primary px-3 py-2 text-xs flex-shrink-0"
                                 >
-                                    {executingId === item.id ? 'Doing...' : 'Do'}
+                                    {executingId === item.id ? 'Đang làm...' : (activityType === 'enemy' ? 'Đánh' : 'Tìm')}
                                 </button>
                             </div>
                         ))}
@@ -585,45 +611,45 @@ function ActivityListSheet({ activityType, activityData, isLoading, error, onClo
                     </div>
                 )}
 
-                {!isLoading && activityType === 'dungeon' && (
-                    dungeon ? (
+                {!isLoading && (activityType === 'sweep' || activityType === 'dungeon') && (
+                    sweep ? (
                         <div className="space-y-3">
                             <div className="card p-4">
-                                <p className="font-semibold">{dungeon.name}</p>
-                                <p className="text-xs text-textMuted mt-1">Map Level {dungeon.map_level}</p>
-                                {dungeon.monsters?.length > 0 && (
+                                <p className="font-semibold">{sweep.name}</p>
+                                <p className="text-xs text-textMuted mt-1">Map Lv.{sweep.map_level} | Boss Lv.{sweep.boss_level}</p>
+                                {sweep.event_pool?.length > 0 && (
                                     <p className="text-[11px] text-textMuted mt-1 truncate">
-                                        Quái: {dungeon.monsters.map(monster => monster.name).join(' | ')}
+                                        Sự kiện: {sweep.event_pool.map(event => event.label).join(' | ')}
                                     </p>
                                 )}
                             </div>
                             <div className="w-full card p-3 text-left">
-                                <p className="text-sm font-semibold">Normal</p>
-                                <p className="text-xs text-textMuted mt-1">Monster Lv.{dungeon.normal.monster_level} | {dungeon.normal.reward_hint}</p>
+                                <p className="text-sm font-semibold">Càn quét lượt tiếp theo</p>
+                                <p className="text-xs text-textMuted mt-1">{sweep.normal.reward_hint}</p>
                                 <button
                                     type="button"
-                                    onClick={() => onExecute?.(dungeon, { mode: 'normal' })}
+                                    onClick={() => onExecute?.(sweep, { mode: 'normal' })}
                                     disabled={Boolean(executingId)}
                                     className="btn-primary mt-3 px-3 py-2 text-xs"
                                 >
-                                    {executingId === `${dungeon.id}:normal` ? 'Running...' : 'Run Normal'}
+                                    {executingId === `${sweep.id}:normal` ? 'Đang càn quét...' : 'Càn quét'}
                                 </button>
                             </div>
                             <div className="w-full card p-3 text-left">
-                                <p className="text-sm font-semibold">Hard</p>
-                                <p className="text-xs text-textMuted mt-1">{dungeon.hard.monster_level_rule} | {dungeon.hard.reward_hint}</p>
+                                <p className="text-sm font-semibold">Boss</p>
+                                <p className="text-xs text-textMuted mt-1">{sweep.hard.monster_level_rule} | {sweep.hard.reward_hint}</p>
                                 <button
                                     type="button"
-                                    onClick={() => onExecute?.(dungeon, { mode: 'hard' })}
+                                    onClick={() => onExecute?.(sweep, { mode: 'retreat' })}
                                     disabled={Boolean(executingId)}
                                     className="btn-secondary mt-3 px-3 py-2 text-xs"
                                 >
-                                    {executingId === `${dungeon.id}:hard` ? 'Running...' : 'Run Hard'}
+                                    {executingId === `${sweep.id}:retreat` ? 'Đang rút...' : 'Rút lui'}
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <p className="text-sm text-textMuted py-6 text-center">No dungeon entrance here.</p>
+                        <p className="text-sm text-textMuted py-6 text-center">POI này chưa có lượt càn quét.</p>
                     )
                 )}
             </div>
@@ -1058,7 +1084,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
 
     async function executeActivity(target, options = {}) {
         if (!activitySheet?.poi || !activitySheet?.type) return;
-        const executionId = activitySheet.type === 'dungeon'
+        const executionId = activitySheet.type === 'sweep' || activitySheet.type === 'dungeon'
             ? `${target.id}:${options.mode || 'normal'}`
             : target.id;
         setExecutingActivityId(executionId);
@@ -1116,7 +1142,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     </h1>
                     <p className="text-sm text-textSecondary mt-1">
                         {isExploring
-                            ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${currentZone.biome || currentZone.zone_type} | ${currentPois.length} POIs`
+                            ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${getZoneTagLabels(currentZone)} | ${currentPois.length} POIs`
                             : (showSafeHouse
                                 ? 'Rest, cook, craft, and manage the first version of your safe shelter.'
                                 : (isChoosingRoute
@@ -1222,7 +1248,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                                 <div className="min-w-0">
                                                     <p className="text-sm font-medium truncate mb-1">{zone.display_name}</p>
                                                     <p className="text-xs text-textMuted">
-                                                        Lv.{zone.level_gap || zone.min_player_lv} | {zone.biome || zone.zone_type} | {zone.pois?.length || 0} POIs
+                                                        Lv.{zone.level_gap || zone.min_player_lv} | {getZoneTagLabels(zone)} | {zone.pois?.length || 0} POIs
                                                     </p>
                                                     {isLocked && (
                                                         <p className="text-[11px] text-danger mt-1">
@@ -1274,7 +1300,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                                 {getPoiTagLabels(poi) || poi.poi_type}
                                             </p>
                                         </div>
-                                        <span className="text-[10px] font-bold text-accent">{poi.is_dungeon ? 'DG' : 'POI'}</span>
+                                        <span className="text-[10px] font-bold text-accent">{poi.is_dungeon ? 'CQ' : 'POI'}</span>
                                     </div>
                                 </button>
                             ))}
