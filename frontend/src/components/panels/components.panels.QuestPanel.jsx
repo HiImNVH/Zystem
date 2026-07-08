@@ -259,7 +259,7 @@ function buildAlignedSkillColumns(branchSkills, levelGaps) {
     });
 }
 
-function SkillNode({ skill, jobLevel, canUnlock, isFirst, showLevel = true, isSelected, onSelect, onMeasure }) {
+function SkillNode({ skill, jobLevel, canUnlock, showLevel = true, isSelected, onSelect, onMeasure }) {
     const nodeRef = useRef(null);
     const isUnlocked = skill.is_unlocked;
     const meetsLevel = jobLevel >= skill.lv_required;
@@ -645,10 +645,9 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
         .filter(skill => (skill.branch || 'general') === selectedBranch)
         .sort((a, b) => a.lv_required - b.lv_required || a.tier - b.tier || a.skill_name.localeCompare(b.skill_name));
     const usedBranchLevels = [...new Set(currentBranchSkills.map(skill => skill.lv_required))].sort((a, b) => a - b);
-    const firstBranchLevel = usedBranchLevels[0] || 1;
     const lastBranchLevel = usedBranchLevels[usedBranchLevels.length - 1] || 40;
     const levelColumns = SKILL_LEVEL_GAPS
-        .filter(level => level >= firstBranchLevel && level <= lastBranchLevel);
+        .filter(level => level <= lastBranchLevel);
     const alignedLevelColumns = buildAlignedSkillColumns(currentBranchSkills, levelColumns);
     const selectedSkill = currentBranchSkills.find(skill => skill.skill_code === selectedSkillCode) || null;
     const selectedSkillHasUnlockedChild = selectedSkill
@@ -813,7 +812,6 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                                                                 skill={skill}
                                                                 jobLevel={currentJob?.job_level || 0}
                                                                 canUnlock={canUnlock(skill)}
-                                                                isFirst={true}
                                                                 showLevel={false}
                                                                 isSelected={selectedSkillCode === skill.skill_code}
                                                                 onSelect={openSkillPopover}
