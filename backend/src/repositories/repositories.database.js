@@ -262,12 +262,19 @@ async function initializeDatabaseSchema() {
             CREATE TABLE IF NOT EXISTS wallets (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 player_id UUID NOT NULL UNIQUE REFERENCES players(id) ON DELETE CASCADE,
+                money BIGINT DEFAULT 0 CHECK (money >= 0),
+                silver_coin BIGINT DEFAULT 0 CHECK (silver_coin >= 0),
+                gold_coin BIGINT DEFAULT 0 CHECK (gold_coin >= 0),
                 copper BIGINT DEFAULT 0 CHECK (copper >= 0),
                 silver BIGINT DEFAULT 0 CHECK (silver >= 0),
                 gold BIGINT DEFAULT 0 CHECK (gold >= 0),
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
+        await client.query(`ALTER TABLE wallets ADD COLUMN IF NOT EXISTS money BIGINT DEFAULT 0 CHECK (money >= 0);`);
+        await client.query(`ALTER TABLE wallets ADD COLUMN IF NOT EXISTS silver_coin BIGINT DEFAULT 0 CHECK (silver_coin >= 0);`);
+        await client.query(`ALTER TABLE wallets ADD COLUMN IF NOT EXISTS gold_coin BIGINT DEFAULT 0 CHECK (gold_coin >= 0);`);
+        await client.query(`UPDATE wallets SET money = copper WHERE money = 0 AND copper > 0;`);
 
         // ============================================================
         // BANG 8: WALLET TRANSACTIONS (audit trail)
@@ -276,7 +283,7 @@ async function initializeDatabaseSchema() {
             CREATE TABLE IF NOT EXISTS wallet_transactions (
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 wallet_id UUID NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
-                currency VARCHAR(10) NOT NULL,
+                currency VARCHAR(20) NOT NULL,
                 transaction_type VARCHAR(20) NOT NULL,
                 amount BIGINT NOT NULL,
                 balance_after BIGINT NOT NULL,
@@ -313,6 +320,7 @@ async function initializeDatabaseSchema() {
                     COALESCE(current_energy, GREATEST(1, FLOOR(100 + COALESCE(base_vit, 0) + COALESCE(base_str, 0) * 0.2))::INT)
                 );
         `);
+        await client.query(`ALTER TABLE wallet_transactions ALTER COLUMN currency TYPE VARCHAR(20);`);
 
         // ============================================================
         // BANG 10: CUREL ITEM POWER MATRIX

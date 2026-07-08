@@ -161,7 +161,8 @@ async function findCharacterById(characterId) {
                    p.max_hp, p.current_hp, p.max_energy, p.current_energy,
                    p.infection_pct, p.radiation_pct, p.infection_status, p.is_alive,
                    p.equipped_title_id, p.created_at, p.updated_at,
-                   w.copper, w.silver, w.gold
+                   w.money, w.silver_coin, w.gold_coin,
+                   w.money AS copper, w.silver_coin AS silver, w.gold_coin AS gold
             FROM players p
             LEFT JOIN wallets w ON p.id = w.player_id
             WHERE p.id = $1;
@@ -184,7 +185,8 @@ async function findCharacterByAccount(accountId) {
                    p.max_hp, p.current_hp, p.max_energy, p.current_energy,
                    p.infection_pct, p.radiation_pct,
                    p.infection_status, p.is_alive, p.created_at,
-                   w.copper, w.silver, w.gold
+                   w.money, w.silver_coin, w.gold_coin,
+                   w.money AS copper, w.silver_coin AS silver, w.gold_coin AS gold
             FROM players p
             LEFT JOIN wallets w ON p.id = w.player_id
             WHERE p.account_id = $1

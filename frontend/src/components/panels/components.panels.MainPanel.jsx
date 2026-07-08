@@ -5,45 +5,12 @@ import {
     getPoiActivities,
     executePoiActivity,
     getRecipes, getRecipe, craftItem,
-    restAtSafeHouse
+    restAtSafeHouse,
+    getCurrencyMarket,
+    exchangeCurrency
 } from '../../api/api.game';
 import { getFactions, getMyFaction, createFaction, joinFaction, leaveFaction } from '../../api/api.faction';
 import CombatMiniGame from './components.panels.CombatMiniGame';
-
-const DESTINATIONS = {
-    EXPEDITION: {
-        label: 'Go exploring',
-        mark: 'EX',
-        helper: 'Fight, explore, and gather resources outside the safe zone.',
-    },
-    HOME: {
-        label: 'Stay home',
-        mark: 'HM',
-        helper: 'Craft, trade, and turn resources into power.',
-    },
-};
-
-const ACTION_CONFIG = {
-    BATTLE:  { label: 'Battle', mark: 'BT', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'High risk, high EXP, and a chance to find equipment.' },
-    EXPLORE: { label: 'Explore', mark: 'EX', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Search POIs for supplies, crafting materials, and salvage.' },
-    SWEEP:   { label: 'Sweep', mark: 'CQ', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Clear a POI through combat, search, or retreat events.' },
-    MINE:    { label: 'Mine', mark: 'MI', destination: 'EXPEDITION', zones: ['rural', 'desert'], helper: 'Gather stone, ore, and base materials.' },
-    CHOP:    { label: 'Chop Wood', mark: 'CH', destination: 'EXPEDITION', zones: ['forest', 'rural'], helper: 'Gather wood, branches, and building materials.' },
-    HUNT:    { label: 'Skirmish', mark: 'HU', destination: 'EXPEDITION', zones: ['urban', 'rural', 'coast', 'forest', 'desert'], helper: 'Hunt local threats for survival materials and combat EXP.' },
-    FORAGE:  { label: 'Forage', mark: 'FO', destination: 'EXPEDITION', zones: ['forest', 'rural', 'coast'], helper: 'Gather food, herbs, and small materials.' },
-    CRAFT:   { label: 'Craft', mark: 'CR', destination: 'HOME', zones: ['safe'], helper: 'Use time at home to create craftable items.' },
-    TRADE:   { label: 'Trade', mark: 'TR', destination: 'HOME', zones: ['safe'], helper: 'Sell junk and common materials for copper.' },
-};
-
-const DURATION_OPTIONS = [
-    { label: '10 seconds', value: 10 },
-    { label: '5 minutes', value: 300 },
-    { label: '15 minutes', value: 900 },
-    { label: '30 minutes', value: 1800 },
-    { label: '1 hour', value: 3600 },
-    { label: '4 hours', value: 14400 },
-    { label: '8 hours', value: 28800 },
-];
 
 const POI_ROTATION_MS = 15 * 60 * 1000;
 
@@ -522,6 +489,127 @@ function formatActionResult(result) {
     const lootCount = result.items_dropped?.length || 0;
     const sweepText = result.sweep_event ? `${result.sweep_event.label}: ` : '';
     return `${sweepText}Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}.`;
+}
+
+function formatCurrencyName(value) {
+    return String(value || '')
+        .split('_')
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
+function CurrencyExchangeSheet({ playerId, character, onClose, onUpdate, onNotify }) {
+    const [market, setMarket] = useState([]);
+    const [quantities, setQuantities] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
+    const [executingKey, setExecutingKey] = useState('');
+    const [error, setError] = useState('');
+    const money = parseInt(character?.money ?? character?.copper ?? 0);
+
+    useEffect(() => {
+        let isMounted = true;
+        async function loadMarket() {
+            setIsLoading(true);
+            setError('');
+            try {
+                const result = await getCurrencyMarket();
+                if (isMounted) setMarket(result.data || []);
+            } catch (err) {
+                if (isMounted) setError(err.message);
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        }
+        loadMarket();
+        return () => { isMounted = false; };
+    }, []);
+
+    function updateQuantity(currency, value) {
+        setQuantities(current => ({
+            ...current,
+            [currency]: Math.max(1, parseInt(value) || 1),
+        }));
+    }
+
+    async function handleExchange(config) {
+        const { currency, side } = config;
+        const quantity = quantities[currency] || 1;
+        setExecutingKey(`${currency}:${side}`);
+        setError('');
+        try {
+            await exchangeCurrency(playerId, currency, quantity, side);
+            onNotify(`${side === 'buy' ? 'Bought' : 'Sold'} ${quantity} ${formatCurrencyName(currency)}.`, 'success');
+            await onUpdate?.();
+        } catch (err) {
+            setError(err.message);
+            onNotify(err.message, 'error');
+        } finally {
+            setExecutingKey('');
+        }
+    }
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
+            <div className="card w-full sm:max-w-xl max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+                <div className="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                        <h3 className="font-semibold">Currency Exchange</h3>
+                        <p className="text-xs text-textMuted mt-1">Money balance: {money.toLocaleString()}</p>
+                    </div>
+                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
+                </div>
+
+                {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading market...</p>}
+                {error && <p className="text-sm text-danger mb-3">{error}</p>}
+                {!isLoading && (
+                    <div className="space-y-3">
+                        {market.map(item => {
+                            const quantity = quantities[item.currency] || 1;
+                            const coinBalance = parseInt(character?.[item.currency] || 0);
+                            return (
+                                <div key={item.currency} className="card p-3">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div>
+                                            <p className="font-semibold">{item.label || formatCurrencyName(item.currency)}</p>
+                                            <p className="text-xs text-textMuted mt-1">
+                                                Buy {parseInt(item.buy_price).toLocaleString()} Money | Sell {parseInt(item.sell_price).toLocaleString()} Money
+                                            </p>
+                                            <p className="text-[11px] text-textMuted mt-1">Owned: {coinBalance.toLocaleString()}</p>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={quantity}
+                                            onChange={event => updateQuantity(item.currency, event.target.value)}
+                                            className="input-field w-20 text-center"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 mt-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleExchange({ currency: item.currency, side: 'buy' })}
+                                            disabled={Boolean(executingKey)}
+                                            className="btn-primary text-sm"
+                                        >
+                                            {executingKey === `${item.currency}:buy` ? 'Buying...' : 'Buy'}
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleExchange({ currency: item.currency, side: 'sell' })}
+                                            disabled={Boolean(executingKey)}
+                                            className="btn-secondary text-sm"
+                                        >
+                                            {executingKey === `${item.currency}:sell` ? 'Selling...' : 'Sell'}
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
 
 function formatDropTable(dropTable) {
@@ -1089,6 +1177,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     const [showCrafting, setShowCrafting] = useState(false);
     const [showFaction, setShowFaction] = useState(false);
     const [showSafeHouse, setShowSafeHouse] = useState(false);
+    const [showCurrencyExchange, setShowCurrencyExchange] = useState(false);
     const [currentExpeditionZone, setCurrentExpeditionZone] = useState(null);
     const [selectedPoi, setSelectedPoi] = useState(null);
     const [activitySheet, setActivitySheet] = useState(null);
@@ -1219,13 +1308,13 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                 <p className="text-xs text-textMuted leading-relaxed mt-1">Rest, cook, craft, and manage your safe house.</p>
                             </div>
                         </button>
-                        <button onClick={() => notify('Trade screen is not wired yet.', 'error')} className="w-full card card-hover p-4 text-left flex items-start gap-4">
+                        <button onClick={() => setShowCurrencyExchange(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">NPC</span>
                             </div>
                             <div className="min-w-0">
                                 <p className="font-semibold">Refugee Camp</p>
-                                <p className="text-xs text-textMuted leading-relaxed mt-1">Meet NPCs, trade items, and earn copper.</p>
+                                <p className="text-xs text-textMuted leading-relaxed mt-1">Exchange Money for silver and gold coins.</p>
                             </div>
                         </button>
                         <button onClick={() => setShowFaction(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
@@ -1382,6 +1471,16 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 <FactionSheet
                     playerId={playerId}
                     onClose={() => setShowFaction(false)}
+                    onNotify={notify}
+                />
+            )}
+
+            {showCurrencyExchange && (
+                <CurrencyExchangeSheet
+                    playerId={playerId}
+                    character={character}
+                    onClose={() => setShowCurrencyExchange(false)}
+                    onUpdate={onUpdate}
                     onNotify={notify}
                 />
             )}

@@ -9,8 +9,9 @@ const DESKTOP_NAV = [
 export default function TopBar({ character, activeDesktopTab, onChangeDesktopTab, onOpenSettings }) {
     const level = character?.player_level || 1;
     const exp = parseFloat(character?.current_exp || 0);
-    const copper = parseInt(character?.copper || 0);
-    const silver = parseInt(character?.silver || 0);
+    const money = parseInt(character?.money ?? character?.copper ?? 0);
+    const silverCoin = parseInt(character?.silver_coin ?? character?.silver ?? 0);
+    const goldCoin = parseInt(character?.gold_coin ?? character?.gold ?? 0);
 
     return (
         <div className="h-14 flex items-center gap-4 px-4 border-b border-border bg-panel flex-shrink-0">
@@ -29,11 +30,15 @@ export default function TopBar({ character, activeDesktopTab, onChangeDesktopTab
             <div className="flex items-center gap-3 text-sm font-mono flex-shrink-0">
                 <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-accent" />
-                    <span className="text-textSecondary">{copper.toLocaleString()}</span>
+                    <span className="text-textSecondary">{money.toLocaleString()}</span>
                 </div>
                 <div className="hidden sm:flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-cyan" />
-                    <span className="text-textSecondary">{silver.toLocaleString()}</span>
+                    <span className="text-textSecondary">{silverCoin.toLocaleString()}</span>
+                </div>
+                <div className="hidden md:flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400" />
+                    <span className="text-textSecondary">{goldCoin.toLocaleString()}</span>
                 </div>
             </div>
 

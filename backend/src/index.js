@@ -129,7 +129,7 @@ async function bootUpWebApplication() {
         console.log('  [PROTECTED] GET  /api/accounts/me');
         console.log('  [PROTECTED] POST /api/characters        | GET /api/characters/:id | GET /api/characters/:id/stats');
         console.log('  [PROTECTED] GET  /api/characters/account/me');
-        console.log('  [PROTECTED] GET  /api/wallets/:id       | GET /api/wallets/:id/history | POST /api/wallets/modify');
+        console.log('  [PROTECTED] GET  /api/wallets/:id       | GET /api/wallets/:id/history | POST /api/wallets/exchange');
         console.log('  [PROTECTED] GET  /api/zones             | GET /api/zones/:code');
         console.log('  [PROTECTED] GET  /api/achievements      | POST /claim-sp | POST /equip-title');
         console.log('  [PROTECTED] GET  /api/jobs              | POST /unlock   | POST /forget');

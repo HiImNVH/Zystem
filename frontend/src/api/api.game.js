@@ -63,6 +63,20 @@ export async function getWallet(playerId) {
     return handleResponse(res);
 }
 
+export async function getCurrencyMarket() {
+    const res = await fetch(`${BASE_URL}/api/wallets/exchange/market`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function exchangeCurrency(playerId, currency, quantity, side) {
+    const res = await fetch(`${BASE_URL}/api/wallets/exchange`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, currency, quantity, side })
+    });
+    return handleResponse(res);
+}
+
 export async function getPlayerJobs(playerId) {
     const res = await fetch(`${BASE_URL}/api/jobs/player/${playerId}`, { headers: getHeaders() });
     return handleResponse(res);
