@@ -534,6 +534,7 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
 
     function startTreePan(event) {
         if (event.button !== undefined && event.button !== 0) return;
+        if (event.target?.closest?.('button')) return;
         const element = skillScrollRef.current;
         if (!element) return;
 
@@ -850,10 +851,6 @@ export default function QuestPanel({ playerId, jobs, skillPoints }) {
                     </div>
                 )}
             </div>
-
-            {selectedSkill && (
-                <div className="fixed inset-0 z-20" onClick={closeSkillPopover} />
-            )}
         </div>
     );
 }
