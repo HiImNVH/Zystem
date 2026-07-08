@@ -229,6 +229,16 @@ const GATHER_CATEGORY_LABELS = {
     EQUIPMENT: 'Recovered Gear',
 };
 
+const GATHER_DROP_CATEGORIES = new Set(Object.keys(GATHER_CATEGORY_LABELS));
+
+function getGatherTargetCategories(targetId) {
+    const match = String(targetId || '').match(/^([a-z_]+)_gather_pool_\d+$/i);
+    if (!match) return null;
+
+    const category = match[1].toUpperCase();
+    return GATHER_DROP_CATEGORIES.has(category) ? [category] : null;
+}
+
 function getGenericGatherName(category) {
     return GATHER_CATEGORY_LABELS[category] || 'Random Supplies';
 }
@@ -720,6 +730,10 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
                 action_type: rewardActionType,
                 actual_duration_s: durationSeconds,
                 zone_min_level: mapLevel,
+                drop_item_level: mapLevel,
+                category_filter: activityType === 'gather' ? getGatherTargetCategories(targetId) : null,
+                allow_above_map_level: activityType !== 'gather',
+                max_level_offset: activityType === 'gather' ? 3 : 5,
             });
         const moneyDrop = shouldDropEnemyMoney({ activityType, sweepEvent })
             ? calculateEnemyMoneyDrop({ mapLevel, combatResult })

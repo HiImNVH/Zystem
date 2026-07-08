@@ -23,6 +23,8 @@ const ACTION_DROP_ORIGINS = {
     CRAFT: ['Craftable'],
 };
 
+const DEFAULT_DROP_ORIGINS = ['Gatherable', 'Loot-only'];
+
 function calculateDropCount(actionType, durationSeconds) {
     const baseCount = {
         MINE:    1,
@@ -41,11 +43,12 @@ function calculateDropCount(actionType, durationSeconds) {
     return Math.min(base + timeBonus, 5);
 }
 
-async function getCandidateTemplates(categories, zoneMinLevel, origins) {
+async function getCandidateTemplates(config) {
+    const { categories, zoneMinLevel, origins, maxLevelOffset = 5, allowAboveMapLevel = true } = config;
     if (!categories || categories.length === 0) return [];
 
     const mapLevel = Math.max(1, zoneMinLevel || 1);
-    const allowedOrigins = origins || ['Gatherable', 'Loot-only'];
+    const allowedOrigins = origins || DEFAULT_DROP_ORIGINS;
     const categoryPlaceholders = categories.map((_, index) => `$${index + 1}`).join(', ');
     const originOffset = categories.length;
     const originPlaceholders = allowedOrigins.map((_, index) => `$${originOffset + index + 1}`).join(', ');
@@ -72,8 +75,8 @@ async function getCandidateTemplates(categories, zoneMinLevel, origins) {
             ORDER BY ABS(item_level - $${categories.length + allowedOrigins.length + 3}) ASC
             LIMIT 50;
         `;
-        const minLevel = Math.max(1, mapLevel - 5);
-        const maxLevel = mapLevel + 5;
+        const minLevel = Math.max(1, mapLevel - maxLevelOffset);
+        const maxLevel = allowAboveMapLevel ? mapLevel + maxLevelOffset : mapLevel;
         const fallbackResult = await dbPool.query(fallbackQuery, [...categories, ...allowedOrigins, minLevel, maxLevel, mapLevel]);
         return fallbackResult.rows;
     } catch (error) {
@@ -82,18 +85,20 @@ async function getCandidateTemplates(categories, zoneMinLevel, origins) {
     }
 }
 
-function rollOneItem(candidates, curelPower) {
+function rollOneItem(config) {
+    const { candidates, curelPower, itemLevel } = config;
     if (!candidates || candidates.length === 0) return null;
 
     const template = candidates[Math.floor(Math.random() * candidates.length)];
     const rarity = craftingService.rollCurelRarity(curelPower);
-    const itemPower = craftingService.calculateItemPower(template.item_level, rarity);
+    const dropItemLevel = Math.max(1, parseInt(itemLevel || template.item_level) || 1);
+    const itemPower = craftingService.calculateItemPower(dropItemLevel, rarity);
     const rolledStats = itemStatsService.rollItemStats(template.category, itemPower, rarity);
     const expiresAt = itemLifecycleService.calculateExpiresAt(template.lifecycle_model, template.base_duration_hours);
 
     return {
         templateId: template.id,
-        itemLevel: template.item_level,
+        itemLevel: dropItemLevel,
         rarity,
         itemPower,
         expiresAt,
@@ -114,6 +119,7 @@ async function insertDroppedItems(playerId, droppedItems) {
                      stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
                 VALUES ($1, $2, $3, $4, $5, $6, 'drop', 1, $7, $8, $9, $10, $11, $12)
                 RETURNING id, template_id, rarity, item_power,
+                          item_level,
                           stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value;
             `, [
                 item.templateId, item.rarity, item.itemPower, item.itemLevel, item.expiresAt, playerId,
@@ -134,7 +140,9 @@ async function insertDroppedItems(playerId, droppedItems) {
 
 async function processLootDrop(playerId, claimedAction) {
     const actionType = claimedAction.action_type?.toUpperCase();
-    const categories = ACTION_DROP_POOL[actionType];
+    const categories = claimedAction.category_filter?.length
+        ? claimedAction.category_filter
+        : ACTION_DROP_POOL[actionType];
 
     if (!categories || categories.length === 0) {
         return { items_dropped: [] };
@@ -142,7 +150,14 @@ async function processLootDrop(playerId, claimedAction) {
 
     const zoneMinLevel = claimedAction.zone_min_level || 1;
     const dropCount = calculateDropCount(actionType, claimedAction.actual_duration_s);
-    const candidates = await getCandidateTemplates(categories, zoneMinLevel, ACTION_DROP_ORIGINS[actionType]);
+    const dropItemLevel = Math.max(1, parseInt(claimedAction.drop_item_level || zoneMinLevel) || 1);
+    const candidates = await getCandidateTemplates({
+        categories,
+        zoneMinLevel,
+        origins: ACTION_DROP_ORIGINS[actionType],
+        maxLevelOffset: claimedAction.max_level_offset ?? 5,
+        allowAboveMapLevel: claimedAction.allow_above_map_level !== false,
+    });
 
     if (candidates.length === 0) {
         return { items_dropped: [] };
@@ -153,7 +168,7 @@ async function processLootDrop(playerId, claimedAction) {
     const droppedItems = [];
     for (let index = 0; index < dropCount; index++) {
         if (Math.random() > 0.70) continue;
-        const item = rollOneItem(candidates, curelPower);
+        const item = rollOneItem({ candidates, curelPower, itemLevel: dropItemLevel });
         if (item) droppedItems.push(item);
     }
 
