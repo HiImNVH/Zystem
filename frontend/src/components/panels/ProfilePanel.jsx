@@ -51,8 +51,7 @@ function StatHexGrid({ stats }) {
         ...STAT_INFO[key],
         value: parseFloat(totalStats[key] || 0),
     }));
-    const highestStatValue = Math.max(...statEntries.map(stat => stat.value));
-    const maxValue = Math.max(20, highestStatValue * 1.25);
+    const maxValue = Math.max(1, ...statEntries.map(stat => stat.value));
     const chartWidth = 420;
     const chartHeight = 320;
     const centerX = chartWidth / 2;
