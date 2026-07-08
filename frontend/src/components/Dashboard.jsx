@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import BottomNav from './layout/BottomNav';
 import MainPanel from './panels/MainPanel';
 import InventoryPanel from './panels/InventoryPanel';
+import ChatPanel from './panels/ChatPanel';
 import ProfilePanel from './panels/ProfilePanel';
 import QuestPanel from './panels/QuestPanel';
 import {
@@ -13,11 +14,10 @@ import {
 import { getMyCharacter } from '../api/api.character';
 import { connectSocket } from '../api/api.socket';
 
-const TAB = { MAIN: 'MAIN', INVENTORY: 'INVENTORY', QUEST: 'QUEST', PROFILE: 'PROFILE' };
+const TAB = { MAIN: 'MAIN', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
 const SIDE_TABS = [
     { key: TAB.INVENTORY, label: 'Inventory' },
-    { key: TAB.QUEST, label: 'Skills' },
-    { key: TAB.PROFILE, label: 'Profile' },
+    { key: TAB.CHAT, label: 'Chat' },
 ];
 
 // Ham thuan render panel theo tab, tach ra module-level de khong bi tao lai
@@ -41,14 +41,14 @@ function renderPanel(tab, ctx) {
         return <ProfilePanel character={character} stats={stats} jobs={jobs} playerId={playerId} onUpdate={loadAll} onLogout={onLogout} />;
     }
 
-    return <MainPanel playerId={playerId} character={character} zones={zones} inventory={inventory} onUpdate={loadAll} />;
+    return <ChatPanel character={character} />;
 }
 
 // Cac Viewport duoc khai bao O NGOAI Dashboard (module-level) de giu nguyen
 // component reference giua cac lan render. Neu khai bao ben trong than ham
 // Dashboard, moi lan Dashboard re-render (vi du moi 30s do loadAll) React se
 // coi day la component MOI va unmount/remount toan bo panel con ben trong,
-// gay ra hien tuong giat/reload lien tuc (mat scroll panel con,
+// gay ra hien tuong giat/reload lien tuc (mat scroll, mat channel chat dang chon,
 // goi lai API va nhap nhay "Loading...").
 function SideTabs({ items, activeTab, onChangeTab }) {
     return (
@@ -84,6 +84,16 @@ function CenterViewport({ centerTab, onChangeCenterTab, ctx }) {
                 {renderPanel(centerTab, ctx)}
             </div>
             <BottomNav activeTab={centerTab} onChangeTab={onChangeCenterTab} />
+        </section>
+    );
+}
+
+function RightViewport({ character }) {
+    return (
+        <section className="workspace-pane workspace-pane-right">
+            <div className="workspace-pane-body">
+                <ChatPanel character={character} />
+            </div>
         </section>
     );
 }
@@ -133,6 +143,7 @@ export default function Dashboard({ initialCharacter, onLogout }) {
             <div className="workspace-shell">
                 <LeftViewport leftTab={leftTab} onChangeLeftTab={setLeftTab} ctx={ctx} />
                 <CenterViewport centerTab={centerTab} onChangeCenterTab={setCenterTab} ctx={ctx} />
+                <RightViewport character={character} />
             </div>
         </div>
     );

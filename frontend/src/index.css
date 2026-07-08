@@ -19,7 +19,7 @@ html, body, #root {
 
 .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-/* Responsive 1/2 tab workspace */
+/* Responsive 1/2/3 tab workspace */
 .workspace-shell {
   width: 100%;
   height: 100%;
@@ -40,7 +40,8 @@ html, body, #root {
   border-color: rgba(180, 220, 215, 0.13);
 }
 
-.workspace-pane-left {
+.workspace-pane-left,
+.workspace-pane-right {
   display: none;
 }
 
@@ -96,13 +97,21 @@ html, body, #root {
 
 @media (min-width: 1024px) {
   .workspace-shell {
-    grid-template-columns: minmax(400px, 1fr);
+    grid-template-columns: minmax(400px, 1fr) minmax(360px, 0.95fr);
+  }
+
+  .workspace-pane-center {
+    border-right-width: 1px;
+  }
+
+  .workspace-pane-right {
+    display: flex;
   }
 }
 
 @media (min-width: 1440px) {
   .workspace-shell {
-    grid-template-columns: minmax(320px, 28vw) minmax(500px, 1fr);
+    grid-template-columns: minmax(320px, 28vw) minmax(500px, 38vw) minmax(360px, 34vw);
   }
 
   .workspace-pane-left {
