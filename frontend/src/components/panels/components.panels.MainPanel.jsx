@@ -236,26 +236,20 @@ function CurrencyBadge({ label, value, colorClassName }) {
     );
 }
 
-function ExpStatusMeter({ level, current, max }) {
-    const safeLevel = Math.max(1, parseInt(level) || 1);
+function CompactStatusMeter({ label, current, max }) {
     const safeMax = Math.max(1, parseInt(max) || 1);
     const safeCurrent = Math.max(0, parseInt(current) || 0);
     const pct = Math.min(100, Math.round((safeCurrent / safeMax) * 100));
+    const fillClassName = RESOURCE_METER_FILL_CLASSES[label] || 'bg-success';
 
     return (
-        <div className="flex items-start gap-2">
-            <div className="w-11 h-9 border border-textSecondary bg-base flex items-center justify-center flex-shrink-0">
-                <span className="text-sm font-bold text-textPrimary">{safeLevel}</span>
+        <div>
+            <div className="flex items-center justify-between text-[11px] mb-1">
+                <span className="text-textMuted uppercase font-semibold">{label}</span>
+                <span className="font-mono text-textSecondary">{safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}</span>
             </div>
-            <div className="flex-1 min-w-0 pt-1">
-                <div className="relative h-3 bg-elevated overflow-hidden">
-                    <div className="absolute inset-y-0 left-0 bg-success/40" style={{ width: `${pct}%` }} />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-[11px] leading-none font-mono font-bold text-textPrimary">
-                            {safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}
-                        </span>
-                    </div>
-                </div>
+            <div className="progress-track">
+                <div className={`progress-fill ${fillClassName}`} style={{ width: `${pct}%` }} />
             </div>
         </div>
     );
@@ -278,8 +272,13 @@ function PlayerStatusBar({ character }) {
     return (
         <div className="sticky top-0 z-20 bg-base px-3 pt-3 pb-2">
             <div className="card p-2.5 space-y-2">
-                <ExpStatusMeter level={playerLevel} current={character?.current_exp} max={expRequired} />
-                <ResourceMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
+                <div className="grid grid-cols-[3rem_1fr] gap-2">
+                    <div className="row-span-2 min-h-16 border border-textSecondary bg-base flex items-center justify-center">
+                        <span className="text-lg font-bold text-textPrimary">{playerLevel}</span>
+                    </div>
+                    <CompactStatusMeter label="EXP" current={character?.current_exp} max={expRequired} />
+                    <CompactStatusMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
+                </div>
                 <div className="grid grid-cols-3 gap-2">
                     <CurrencyBadge label="Money" value={money} colorClassName="bg-accent" />
                     <CurrencyBadge label="Silver" value={silverCoin} colorClassName="bg-cyan" />
