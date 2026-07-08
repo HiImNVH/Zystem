@@ -34,7 +34,7 @@ const ZONE_TAG_LABELS = {
 };
 
 const RESOURCE_METER_FILL_CLASSES = {
-    EXP: 'bg-accent',
+    EXP: 'bg-success',
     HP: 'bg-danger',
     Energy: 'bg-cyan',
 };
@@ -244,13 +244,13 @@ function CompactStatusMeter({ label, current, max }) {
 
     return (
         <div className="contents">
-            <span className="text-[11px] text-textMuted uppercase font-semibold self-center">{label}</span>
-            <div className="self-center min-w-0">
-                <div className="flex items-center justify-end text-[11px] mb-1">
-                    <span className="font-mono text-textSecondary">{safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}</span>
-                </div>
-                <div className="progress-track">
-                    <div className={`progress-fill ${fillClassName}`} style={{ width: `${pct}%` }} />
+            <span className="text-[11px] text-textMuted uppercase font-semibold self-center leading-none">{label}</span>
+            <div className="relative h-4 self-center min-w-0 rounded bg-elevated overflow-hidden">
+                <div className={`absolute inset-y-0 left-0 rounded ${fillClassName}`} style={{ width: `${pct}%` }} />
+                <div className="absolute inset-0 flex items-center justify-end px-2">
+                    <span className="font-mono text-[11px] leading-none font-semibold text-textPrimary">
+                        {safeCurrent.toLocaleString()} / {safeMax.toLocaleString()}
+                    </span>
                 </div>
             </div>
         </div>
@@ -274,9 +274,9 @@ function PlayerStatusBar({ character }) {
     return (
         <div className="sticky top-0 z-20 bg-base px-3 pt-3 pb-2">
             <div className="card p-2.5 space-y-2">
-                <div className="grid grid-cols-[4rem_1fr_3rem] gap-x-2 gap-y-1">
+                <div className="grid grid-cols-[4.75rem_1fr_3rem] gap-x-2 gap-y-2 items-center">
                     <CompactStatusMeter label="EXP" current={character?.current_exp} max={expRequired} />
-                    <div className="row-span-2 col-start-3 row-start-1 min-h-16 border border-textSecondary bg-base flex items-center justify-center">
+                    <div className="row-span-2 col-start-3 row-start-1 min-h-12 border border-textSecondary bg-base flex items-center justify-center">
                         <span className="text-lg font-bold text-textPrimary">{playerLevel}</span>
                     </div>
                     <CompactStatusMeter label="Energy" current={character?.current_energy} max={character?.max_energy} />
