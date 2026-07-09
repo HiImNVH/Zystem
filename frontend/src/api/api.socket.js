@@ -26,11 +26,6 @@ export function connectSocket() {
     return socketInstance;
 }
 
-// Lay lai socket dang co (khong tao moi), dung cho cac component chi can lang nghe su kien
-export function getSocket() {
-    return socketInstance;
-}
-
 // Ngat ket noi khi logout de tranh nhan nham su kien realtime cua phien cu
 export function disconnectSocket() {
     socketInstance?.disconnect();

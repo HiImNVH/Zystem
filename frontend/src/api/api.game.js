@@ -58,11 +58,6 @@ export async function getInventory(playerId) {
     return handleResponse(res);
 }
 
-export async function getWallet(playerId) {
-    const res = await fetch(`${BASE_URL}/api/wallets/${playerId}`, { headers: getHeaders() });
-    return handleResponse(res);
-}
-
 export async function getCurrencyMarket() {
     const res = await fetch(`${BASE_URL}/api/wallets/exchange/market`, { headers: getHeaders() });
     return handleResponse(res);
@@ -79,33 +74,6 @@ export async function exchangeCurrency(playerId, currency, quantity, side) {
 
 export async function getPlayerJobs(playerId) {
     const res = await fetch(`${BASE_URL}/api/jobs/player/${playerId}`, { headers: getHeaders() });
-    return handleResponse(res);
-}
-
-export async function investSP(playerId, jobCode, spAmount) {
-    const res = await fetch(`${BASE_URL}/api/jobs/invest-sp`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ playerId, jobCode, spAmount })
-    });
-    return handleResponse(res);
-}
-
-export async function unlockJob(playerId, jobCode) {
-    const res = await fetch(`${BASE_URL}/api/jobs/unlock`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ playerId, jobCode })
-    });
-    return handleResponse(res);
-}
-
-export async function forgetJob(playerId, jobCode) {
-    const res = await fetch(`${BASE_URL}/api/jobs/forget`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ playerId, jobCode })
-    });
     return handleResponse(res);
 }
 
