@@ -159,7 +159,9 @@ function runPureLogicChecks(modulesByPath) {
     assertExportedFunction(playerEvents, 'markPlayerEventsRead');
 
     assert.equal(itemsSeed.ITEM_TEMPLATES.length, 391);
-    assert.equal(skillsSeed.ALL_SKILLS.length, 196);
+    assert.equal(skillsSeed.ALL_SKILLS.length, 239);
+    assert.ok(skillsSeed.ALL_SKILLS.every(skill => skill.desc && skill.effectType), 'Moi skill phai co mo ta va effect ro rang');
+    assert.equal(skillsSeed.ALL_SKILLS.reduce((total, skill) => total + skill.sp, 0), 422);
     assert.equal(designSeed.CRAFTING_RECIPES.length, 263);
     assert.equal(designSeed.LEVELING_RULES.length, 40);
     assert.equal(designSeed.CUREL_RARITY_WEIGHTS.length, 41);
