@@ -80,6 +80,37 @@ function getEquippedWeapon(inventory) {
     ));
 }
 
+function getNumber(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return 0;
+    return number;
+}
+
+function getWeaponStatPower(weapon) {
+    if (!weapon) return 0;
+    const itemPower = getNumber(weapon.item_power);
+    const itemLevelPower = getNumber(weapon.item_level) * 3;
+    const statPower = [1, 2, 3].reduce((total, index) => total + getNumber(weapon[`stat_${index}_value`]), 0);
+    return Math.max(itemPower, itemLevelPower, statPower);
+}
+
+function getPrimaryStatKey(weaponProfile) {
+    if (weaponProfile.type === 'ranged') return 'dex';
+    if (weaponProfile.type === 'blade') return 'str';
+    if (weaponProfile.type === 'blunt') return 'str';
+    return 'str';
+}
+
+function getPlayerPrimaryStat(config) {
+    const { character, weaponProfile } = config;
+    const statKey = getPrimaryStatKey(weaponProfile);
+    return Math.max(
+        getNumber(character?.[`base_${statKey}`]),
+        getNumber(character?.stats?.total?.[statKey]),
+        getNumber(character?.total_stats?.[statKey])
+    );
+}
+
 function getAccuracyResult(score) {
     const zone = ACCURACY_ZONES.find(item => score >= item.min && score <= item.max) || ACCURACY_ZONES[0];
     return {
@@ -90,10 +121,20 @@ function getAccuracyResult(score) {
     };
 }
 
-function getBaseDamage(enemy) {
-    const attack = parseInt(enemy?.attack) || 10;
-    const level = parseInt(enemy?.level) || 1;
-    return Math.max(8, Math.round(attack * 2 + level * 3));
+function getBaseDamage(config) {
+    const { character, enemy, weapon, weaponProfile } = config;
+    const playerLevel = Math.max(1, parseInt(character?.player_level) || 1);
+    const playerAttack = Math.max(
+        getNumber(character?.attack),
+        getNumber(character?.derived?.attack),
+        getPlayerPrimaryStat({ character, weaponProfile }) * 1.5
+    );
+    const weaponPower = getWeaponStatPower(weapon);
+    const enemyDefense = Math.max(0, parseInt(enemy?.defense) || 0);
+    const rawDamage = 10 + playerLevel * 2 + playerAttack + weaponPower * 1.15;
+    const defenseReduction = Math.min(0.45, enemyDefense / (enemyDefense + 140));
+
+    return Math.max(8, Math.round(rawDamage * (1 - defenseReduction)));
 }
 
 function calculateEnemyCounterDamage(enemy, accuracyResult) {
@@ -133,7 +174,7 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
     const playerMaxHealth = Math.max(1, parseInt(character?.max_hp) || playerHealth || 1);
     const weapon = useMemo(() => getEquippedWeapon(inventory), [inventory]);
     const weaponProfile = useMemo(() => getWeaponProfile(weapon), [weapon]);
-    const baseDamage = useMemo(() => getBaseDamage(enemy), [enemy]);
+    const baseDamage = useMemo(() => getBaseDamage({ character, enemy, weapon, weaponProfile }), [character, enemy, weapon, weaponProfile]);
     const skills = WEAPON_SKILL_SETS[weaponProfile.type] || WEAPON_SKILL_SETS.improvised;
     const actions = [
         { code: 'normal_attack', label: 'Attack', shortLabel: 'ATK', damageMultiplier: 1 },

@@ -34,6 +34,24 @@ const ACTION_JOB_CODE = {
     CHOP: 'gathering',
 };
 
+const MONSTER_LEVEL_RANGE = {
+    lowerOffset: 2,
+    upperOffset: 4,
+};
+
+const MONSTER_LEVEL_GROWTH = {
+    health: 12,
+    attack: 2.2,
+    defense: 1.7,
+};
+
+const MONSTER_THREAT_MULTIPLIERS = {
+    Common: { health: 1, attack: 1, defense: 1 },
+    Veteran: { health: 1.15, attack: 1.12, defense: 1.1 },
+    Elite: { health: 1.28, attack: 1.2, defense: 1.18 },
+    Boss: { health: 1.55, attack: 1.28, defense: 1.25 },
+};
+
 function buildFallbackActivityTag(config) {
     const { tagType, actionType, lootFocus, monsterProfile } = config;
     return {
@@ -412,26 +430,38 @@ async function getActivityLootFilters(config) {
     return { categories: null, tagFilters: [], actionType: null };
 }
 
-function scaleMonsterStats(monster, monsterLevel) {
-    const level = Math.max(1, parseInt(monsterLevel) || 1);
+function normalizeMonsterThreatRank(threatRank) {
+    const rank = String(threatRank || 'Common').trim();
+    if (MONSTER_THREAT_MULTIPLIERS[rank]) return rank;
+    return 'Common';
+}
+
+function scaleMonsterStats(monster, config) {
+    const monsterLevel = typeof config === 'object' ? config.monsterLevel : config;
+    const threatRank = normalizeMonsterThreatRank(typeof config === 'object' ? config.threatRank : monster.threat_rank);
+    const levelOffset = Math.max(0, parseInt(monster.base_level_offset) || 0);
+    const level = Math.max(1, (parseInt(monsterLevel) || 1) + levelOffset);
     const growth = Math.max(0, level - 1);
+    const multiplier = MONSTER_THREAT_MULTIPLIERS[threatRank];
+
     return {
         level,
-        health: Math.round((parseInt(monster.health) || 1) + growth * 7),
-        attack: Math.round((parseInt(monster.attack) || 0) + growth * 1.8),
-        defense: Math.round((parseInt(monster.defense) || 0) + growth * 1.2),
+        health: Math.round(((parseInt(monster.health) || 1) + growth * MONSTER_LEVEL_GROWTH.health) * multiplier.health),
+        attack: Math.round(((parseInt(monster.attack) || 0) + growth * MONSTER_LEVEL_GROWTH.attack) * multiplier.attack),
+        defense: Math.round(((parseInt(monster.defense) || 0) + growth * MONSTER_LEVEL_GROWTH.defense) * multiplier.defense),
     };
 }
 
 function buildEnemyList(config) {
     const { zone, poi, tag, monsters } = config;
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
-    const minLevel = Math.max(1, baseLevel - 5);
-    const maxLevel = baseLevel + 4;
+    const minLevel = Math.max(1, baseLevel - MONSTER_LEVEL_RANGE.lowerOffset);
+    const maxLevel = baseLevel + MONSTER_LEVEL_RANGE.upperOffset;
     const monsterPool = monsters.length > 0 ? monsters : [{
         id: `${poi.code}_unknown`,
         code: `${poi.code}_unknown`,
         display_name: 'Unknown Threat',
+        base_level_offset: 0,
         health: 80,
         attack: 10,
         defense: 4,
@@ -442,12 +472,13 @@ function buildEnemyList(config) {
     return Array.from({ length: maxLevel - minLevel + 1 }, (_, index) => {
         const level = minLevel + index;
         const monster = monsterPool[index % monsterPool.length];
+        const threatRank = level >= maxLevel ? 'Elite' : monster.threat_rank;
         return {
             id: `${monster.id}_${level}`,
             code: monster.code,
             name: monster.display_name,
-            ...scaleMonsterStats(monster, level),
-            threat: level >= maxLevel ? 'Elite' : monster.threat_rank,
+            ...scaleMonsterStats(monster, { monsterLevel: level, threatRank }),
+            threat: threatRank,
             reward_hint: (monster.drop_table || [])
                 .map(drop => drop.tag_query)
                 .join(', '),
@@ -523,8 +554,8 @@ function buildSweepInfo(config) {
             id: monster.id,
             code: monster.code,
             name: monster.display_name,
-            ...scaleMonsterStats(monster, bossLevel),
-            threat: monster.threat_rank,
+            ...scaleMonsterStats(monster, { monsterLevel: bossLevel, threatRank: 'Boss' }),
+            threat: 'Boss',
             drop_table: monster.drop_table || [],
         })),
         action_type: tag?.action_type || 'SWEEP',
@@ -561,7 +592,7 @@ function rollSweepEvent(turnNumber, mapLevel) {
         return {
             type: 'combat',
             label: 'Combat',
-            monsterLevel: Math.max(1, mapLevel - 5 + Math.floor(Math.random() * 10)),
+            monsterLevel: Math.max(1, mapLevel - MONSTER_LEVEL_RANGE.lowerOffset + Math.floor(Math.random() * (MONSTER_LEVEL_RANGE.lowerOffset + MONSTER_LEVEL_RANGE.upperOffset + 1))),
             message: 'Encountered a hostile in the area.',
         };
     }
