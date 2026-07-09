@@ -132,11 +132,11 @@ const defaultRoomBlueprints = [
 
 const roomBlueprintsByPoiType = {
     residential: [
-        { name: 'Front Yard', type: 'outdoor', lootFocus: ['food', 'seed', 'rubbish'] },
+        { name: 'Front Porch', type: 'outdoor', lootFocus: ['rubbish', 'material'] },
         { name: 'Main Living Room', type: 'living', lootFocus: ['rubbish', 'material'] },
         { name: 'Side Bedroom', type: 'living', lootFocus: ['equipment', 'rubbish'] },
         { name: 'Kitchen Area', type: 'kitchen', lootFocus: ['food', 'drink', 'tool'] },
-        { name: 'Back Garden', type: 'garden', lootFocus: ['food', 'seed', 'material'] },
+        { name: 'Garden Shed', type: 'storage', lootFocus: ['tool', 'material'] },
     ],
     medical: [
         { name: 'Reception Hall', type: 'office', lootFocus: ['rubbish', 'material'] },
@@ -170,13 +170,13 @@ const roomBlueprintsByPoiType = {
         { name: 'Main Barn', type: 'storage', lootFocus: ['food', 'seed', 'material'] },
         { name: 'Feed Storage', type: 'storage', lootFocus: ['food', 'seed'] },
         { name: 'Worker Quarters', type: 'living', lootFocus: ['food', 'rubbish'] },
-        { name: 'Compost Cellar', type: 'utility', lootFocus: ['seed', 'material'] },
+        { name: 'Compost Tool Corner', type: 'utility', lootFocus: ['tool', 'material'] },
         { name: 'Farm Tool Shed', type: 'workshop', lootFocus: ['tool', 'material'] },
     ],
     forest: [
-        { name: 'Trail Edge', type: 'outdoor', lootFocus: ['food', 'material'] },
-        { name: 'Dense Bushes', type: 'outdoor', lootFocus: ['food', 'medicine'] },
-        { name: 'Fallen Timber', type: 'outdoor', lootFocus: ['material'] },
+        { name: 'Trail Marker Cache', type: 'outdoor', lootFocus: ['rubbish', 'material'] },
+        { name: 'Abandoned Pack', type: 'storage', lootFocus: ['food', 'medicine'] },
+        { name: 'Old Camp Tools', type: 'camp', lootFocus: ['tool', 'material'] },
         { name: 'Hidden Cache', type: 'storage', lootFocus: ['tool', 'food'] },
         { name: 'Natural Shelter', type: 'camp', lootFocus: ['rubbish', 'material'] },
     ],
@@ -202,10 +202,10 @@ const roomBlueprintsByPoiType = {
         { name: 'Waste Collection Point', type: 'waste', lootFocus: ['rubbish', 'material'] },
     ],
     swamp: [
-        { name: 'Mud Bank', type: 'outdoor', lootFocus: ['material', 'medicine'] },
-        { name: 'Flooded Waterline', type: 'outdoor', lootFocus: ['food', 'rubbish'] },
+        { name: 'Flooded Tool Crate', type: 'storage', lootFocus: ['tool', 'material'] },
+        { name: 'Waterlogged Supply Bag', type: 'storage', lootFocus: ['food', 'rubbish'] },
         { name: 'Collapsed Wooden Platform', type: 'ruin', lootFocus: ['material', 'tool'] },
-        { name: 'Root Cluster', type: 'outdoor', lootFocus: ['food', 'medicine'] },
+        { name: 'Old Field Kit', type: 'camp', lootFocus: ['medicine', 'rubbish'] },
         { name: 'Old Boat Wreck', type: 'wreck', lootFocus: ['tool', 'material'] },
     ],
     dungeon: [

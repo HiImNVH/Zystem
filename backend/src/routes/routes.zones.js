@@ -74,7 +74,8 @@ function resolvePoiActivityTags() {
 function normalizeActivityType(activityType) {
     const value = String(activityType || '').toLowerCase();
     if (value === 'enemy') return { tagTypes: ['BATTLE', 'SKIRMISH'], label: 'Enemy', fallbackAction: 'BATTLE' };
-    if (value === 'gather') return { tagTypes: ['EXPLORATION'], label: 'Gather', fallbackAction: 'EXPLORE' };
+    if (value === 'scavenge') return { tagTypes: ['EXPLORATION'], label: 'Scavenge', fallbackAction: 'EXPLORE' };
+    if (value === 'gather') return { tagTypes: ['EXPLORATION'], label: 'Gather', fallbackAction: 'FORAGE' };
     if (value === 'sweep' || value === 'dungeon') return { tagTypes: ['SWEEP', 'DUNGEON'], label: 'Sweep', fallbackAction: 'SWEEP' };
     return null;
 }
@@ -110,7 +111,8 @@ function buildActivityResourceCosts(config) {
     const { durationSeconds, tags } = config;
     return {
         enemy: calculateActionResourceCost(tags.enemy.action_type || 'BATTLE', durationSeconds, tags.enemy),
-        gather: calculateActionResourceCost(tags.gather.action_type || 'EXPLORE', durationSeconds, tags.gather),
+        scavenge: calculateActionResourceCost('EXPLORE', durationSeconds, tags.gather),
+        gather: calculateActionResourceCost('FORAGE', durationSeconds, tags.gather),
         sweep: calculateActionResourceCost(tags.sweep.action_type === 'DUNGEON' ? 'SWEEP' : (tags.sweep.action_type || 'SWEEP'), durationSeconds, tags.sweep),
     };
 }
@@ -217,6 +219,80 @@ const LOOT_FOCUS_CATEGORY_MAP = {
     materials: 'MATERIAL',
 };
 
+const GATHER_NODE_BLUEPRINTS = {
+    bush: {
+        code: 'BUSH_PATCH',
+        name: 'Bush Patch',
+        categoryLabel: 'Forage',
+        actionType: 'FORAGE',
+        lootFocus: ['food', 'seed', 'medicine'],
+        itemTags: ['Vegetable', 'Wild', 'Dandelion', 'Bramble', 'Seed', 'Plantable'],
+        weight: 1,
+    },
+    tree: {
+        code: 'TREE_STAND',
+        name: 'Tree Stand',
+        categoryLabel: 'Wood',
+        actionType: 'CHOP',
+        lootFocus: ['material'],
+        itemTags: ['Wood', 'Branch', 'Log', 'Oak', 'Pine', 'Maple', 'Sycamore', 'Willow'],
+        weight: 1,
+    },
+    stone: {
+        code: 'STONE_OUTCROP',
+        name: 'Stone Outcrop',
+        categoryLabel: 'Stone',
+        actionType: 'MINE',
+        lootFocus: ['material'],
+        itemTags: ['Stone', 'Pebble', 'Boulder', 'Mineral'],
+        weight: 1,
+    },
+    ore: {
+        code: 'ORE_VEIN',
+        name: 'Ore Vein',
+        categoryLabel: 'Ore',
+        actionType: 'MINE',
+        lootFocus: ['material'],
+        itemTags: ['Ore', 'Copper', 'Iron', 'Zinc', 'Aluminum', 'Sulfur', 'Saltpeter'],
+        weight: 1,
+    },
+    scrap: {
+        code: 'SCRAP_PILE',
+        name: 'Scrap Pile',
+        categoryLabel: 'Scrap',
+        actionType: 'FORAGE',
+        lootFocus: ['rubbish', 'material'],
+        itemTags: ['Recyclable', 'Metal', 'Plastic', 'Glass', 'Rubber', 'Fabric'],
+        weight: 1,
+    },
+    waterline: {
+        code: 'WATERLINE_REEDS',
+        name: 'Waterline Reeds',
+        categoryLabel: 'Wetland',
+        actionType: 'FORAGE',
+        lootFocus: ['food', 'material', 'medicine'],
+        itemTags: ['Vegetable', 'Wild', 'Cordage', 'Wood', 'Salt'],
+        weight: 1,
+    },
+};
+
+const GATHER_NODE_KEYS_BY_CONTEXT = {
+    safe: ['bush', 'scrap'],
+    urban: ['scrap', 'bush', 'tree'],
+    town: ['scrap', 'bush', 'tree'],
+    city: ['scrap', 'bush'],
+    industrial: ['scrap', 'stone', 'ore'],
+    rural: ['bush', 'tree', 'stone', 'ore'],
+    farm: ['bush', 'tree', 'stone'],
+    forest: ['tree', 'bush', 'stone'],
+    geological_mine: ['ore', 'stone', 'scrap'],
+    mine: ['ore', 'stone', 'scrap'],
+    coast: ['waterline', 'stone', 'scrap'],
+    pier: ['waterline', 'scrap', 'stone'],
+    swamp: ['waterline', 'bush', 'tree', 'stone'],
+    military: ['scrap', 'stone', 'bush'],
+};
+
 function getLootCategoriesFromFocus(lootFocus) {
     const categories = new Set();
     for (const focus of lootFocus || []) {
@@ -238,20 +314,102 @@ async function findPoiRooms(poiId) {
     return result.rows;
 }
 
-async function getGatherTargetCategories(targetId) {
+function getGatherContextKeys(config) {
+    const { zone, poi } = config;
+    const contextValues = [
+        poi?.poi_type,
+        zone?.zone_type,
+        zone?.biome,
+        ...(zone?.zone_tags || []),
+    ].map(value => String(value || '').toLowerCase());
+
+    const nodeKeys = [];
+    for (const contextValue of contextValues) {
+        for (const nodeKey of GATHER_NODE_KEYS_BY_CONTEXT[contextValue] || []) {
+            if (!nodeKeys.includes(nodeKey)) nodeKeys.push(nodeKey);
+        }
+    }
+
+    return nodeKeys.length > 0 ? nodeKeys : ['bush', 'scrap'];
+}
+
+function buildGatherNodeId(config) {
+    const { poiCode, nodeCode } = config;
+    return `${poiCode}_GATHER_${nodeCode}`;
+}
+
+function buildGatherNodes(config) {
+    const { zone, poi, tag, durationSeconds } = config;
+    const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
+    const nodeKeys = getGatherContextKeys({ zone, poi });
+
+    return nodeKeys.map((nodeKey, index) => {
+        const blueprint = GATHER_NODE_BLUEPRINTS[nodeKey] || GATHER_NODE_BLUEPRINTS.bush;
+        const resourceCost = durationSeconds
+            ? calculateActionResourceCost(blueprint.actionType, durationSeconds, tag)
+            : null;
+        return {
+            id: buildGatherNodeId({ poiCode: poi.code, nodeCode: blueprint.code }),
+            code: blueprint.code,
+            name: blueprint.name,
+            category: 'GATHER',
+            category_label: blueprint.categoryLabel,
+            tags: blueprint.itemTags,
+            loot_focus: blueprint.lootFocus,
+            item_tag_filter: blueprint.itemTags,
+            pool_size: blueprint.itemTags.length,
+            item_level: baseLevel,
+            rarity_hint: 'Natural resource node',
+            reward_hint: `Gather focus: ${blueprint.itemTags.slice(0, 4).join(', ')}`,
+            action_type: blueprint.actionType,
+            gameplay_tag: tag,
+            resource_cost: resourceCost,
+            sort_order: index + 1,
+        };
+    });
+}
+
+function findGatherNodeByTargetId(config) {
+    const { zone, poi, targetId } = config;
+    return buildGatherNodes({ zone, poi, tag: null })
+        .find(node => node.id === targetId || node.code === targetId) || null;
+}
+
+async function getScavengeTargetLootFilters(targetId) {
     const fallbackMatch = String(targetId || '').match(/^([a-z_]+)_gather_pool_\d+$/i);
     if (fallbackMatch) {
         const fallbackCategory = fallbackMatch[1].toUpperCase();
-        return Object.values(LOOT_FOCUS_CATEGORY_MAP).includes(fallbackCategory) ? [fallbackCategory] : null;
+        const category = Object.values(LOOT_FOCUS_CATEGORY_MAP).includes(fallbackCategory) ? fallbackCategory : null;
+        return { categories: category ? [category] : null, tagFilters: [] };
     }
 
     const result = await dbPool.query(
         `SELECT loot_focus FROM world_poi_rooms WHERE id = $1 LIMIT 1;`,
         [targetId]
     );
-    if (result.rows.length === 0) return null;
+    if (result.rows.length === 0) return { categories: null, tagFilters: [] };
 
-    return getLootCategoriesFromFocus(result.rows[0].loot_focus);
+    return { categories: getLootCategoriesFromFocus(result.rows[0].loot_focus), tagFilters: [] };
+}
+
+async function getActivityLootFilters(config) {
+    const { activityType, targetId, zone, poi } = config;
+    if (activityType === 'gather') {
+        const gatherNode = findGatherNodeByTargetId({ zone, poi, targetId });
+        return {
+            categories: gatherNode ? getLootCategoriesFromFocus(gatherNode.loot_focus) : ['MATERIAL'],
+            tagFilters: gatherNode?.item_tag_filter || [],
+            actionType: gatherNode?.action_type || 'FORAGE',
+        };
+    }
+    if (activityType === 'scavenge') {
+        return {
+            ...(await getScavengeTargetLootFilters(targetId)),
+            actionType: 'EXPLORE',
+        };
+    }
+
+    return { categories: null, tagFilters: [], actionType: null };
 }
 
 function scaleMonsterStats(monster, monsterLevel) {
@@ -300,13 +458,13 @@ function buildEnemyList(config) {
     });
 }
 
-function buildGatherList(config) {
+function buildScavengeList(config) {
     const { zone, tag, rooms } = config;
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
     if (rooms.length === 0) {
         return [{
-            id: `material_gather_pool_${baseLevel}`,
-            code: 'MATERIAL_GATHER_POOL',
+            id: `rubbish_gather_pool_${baseLevel}`,
+            code: 'ROOM_SCAVENGE_POOL',
             name: 'General Search Area',
             category: 'ROOM',
             category_label: 'Default Room',
@@ -315,7 +473,7 @@ function buildGatherList(config) {
             pool_size: 0,
             item_level: baseLevel,
             rarity_hint: 'Random room loot',
-            reward_hint: 'Searches the POI for useful materials',
+            reward_hint: 'Searches the POI for abandoned supplies',
             action_type: tag?.action_type || 'EXPLORE',
             gameplay_tag: tag,
         }];
@@ -332,7 +490,7 @@ function buildGatherList(config) {
         pool_size: (room.loot_focus || []).length,
         item_level: baseLevel,
         rarity_hint: 'Random room loot',
-        reward_hint: `Loot focus: ${(room.loot_focus || []).join(', ') || 'material, rubbish'}`,
+        reward_hint: `Scavenge focus: ${(room.loot_focus || []).join(', ') || 'material, rubbish'}`,
         action_type: tag?.action_type || 'EXPLORE',
         gameplay_tag: tag,
     }));
@@ -577,13 +735,15 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
                 tags: activityTags,
             }),
             enemies: buildEnemyList({ zone, poi, tag: activityTags.enemy, monsters: enemyMonsters }),
-            gatherables: buildGatherList({ zone, tag: activityTags.gather, rooms: gatherRooms }),
+            scavengeables: buildScavengeList({ zone, tag: activityTags.gather, rooms: gatherRooms }),
+            gatherables: buildGatherNodes({ zone, poi, tag: activityTags.gather, durationSeconds: baseDuration }),
             sweep: buildSweepInfo({ zone, poi, tag: activityTags.sweep, monsters: sweepMonsters }),
         };
 
-        if (type === 'enemy') return res.json({ success: true, data: { ...payload, gatherables: [], sweep: null } });
-        if (type === 'gather') return res.json({ success: true, data: { ...payload, enemies: [], sweep: null } });
-        if (type === 'sweep' || type === 'dungeon') return res.json({ success: true, data: { ...payload, enemies: [], gatherables: [] } });
+        if (type === 'enemy') return res.json({ success: true, data: { ...payload, scavengeables: [], gatherables: [], sweep: null } });
+        if (type === 'scavenge') return res.json({ success: true, data: { ...payload, enemies: [], gatherables: [], sweep: null } });
+        if (type === 'gather') return res.json({ success: true, data: { ...payload, enemies: [], scavengeables: [], sweep: null } });
+        if (type === 'sweep' || type === 'dungeon') return res.json({ success: true, data: { ...payload, enemies: [], scavengeables: [], gatherables: [] } });
 
         return res.json({ success: true, data: payload });
     } catch (error) {
@@ -600,6 +760,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
     const { poiId } = req.params;
     const { playerId, activityType, targetId, mode, combatAction, accuracyResult } = req.body;
     const activity = normalizeActivityType(activityType);
+    const activityTypeKey = String(activityType || '').toLowerCase();
     const combatResult = normalizeCombatResult({ combatAction, accuracyResult });
 
     if (!playerId || !activity) {
@@ -662,7 +823,22 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             });
         }
 
-        const actionType = activity.fallbackAction;
+        const lootFilters = await getActivityLootFilters({
+            activityType: activityTypeKey,
+            targetId,
+            zone: {
+                zone_type: poi.zone_type,
+                biome: poi.biome,
+                zone_tags: poi.zone_tags,
+                level_gap: poi.level_gap,
+                min_player_lv: poi.min_player_lv,
+            },
+            poi: {
+                code: poi.poi_code,
+                poi_type: poi.poi_type,
+            },
+        });
+        const actionType = lootFilters.actionType || activity.fallbackAction;
         const isSweepAction = actionType === 'SWEEP';
         const sweepEvent = isSweepAction
             ? (mode === 'retreat'
@@ -718,10 +894,10 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             ? await progressionService.processJobExpGain(playerId, jobId, expReward.jobExp)
             : null;
         const latestPlayerLevel = playerExpResult?.new_level || playerLevel;
-        const gatherSkillLevel = activityType === 'gather'
+        const gatherSkillLevel = activityTypeKey === 'gather'
             ? await findPlayerJobLevel(playerId, 'gathering')
             : null;
-        const rewardItemLevel = activityType === 'gather'
+        const rewardItemLevel = activityTypeKey === 'gather'
             ? lootService.calculateRewardItemLevel({
                 zoneLevel: mapLevel,
                 skillLevel: gatherSkillLevel,
@@ -735,12 +911,13 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
                 actual_duration_s: durationSeconds,
                 zone_min_level: mapLevel,
                 drop_item_level: rewardItemLevel,
-                category_filter: activityType === 'gather' ? await getGatherTargetCategories(targetId) : null,
-                allow_above_map_level: activityType !== 'gather',
-                max_level_offset: activityType === 'gather' ? 3 : 5,
-                include_flexible_templates: activityType === 'gather',
+                category_filter: ['gather', 'scavenge'].includes(activityTypeKey) ? lootFilters.categories : null,
+                tag_filter: ['gather', 'scavenge'].includes(activityTypeKey) ? lootFilters.tagFilters : [],
+                allow_above_map_level: activityTypeKey !== 'gather',
+                max_level_offset: activityTypeKey === 'gather' ? 3 : 5,
+                include_flexible_templates: activityTypeKey === 'gather',
             });
-        const moneyDrop = shouldDropEnemyMoney({ activityType, sweepEvent })
+        const moneyDrop = shouldDropEnemyMoney({ activityType: activityTypeKey, sweepEvent })
             ? calculateEnemyMoneyDrop({ mapLevel, combatResult })
             : { amount: 0, chance: 0, didDrop: false };
         const walletResult = moneyDrop.amount > 0
@@ -752,11 +929,11 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
             poi_name: poi.poi_name,
             zone_code: poi.zone_code,
             zone_name: poi.zone_name,
-            activity_type: activityType,
+            activity_type: activityTypeKey,
             target_id: targetId || null,
             mode: mode || 'normal',
             action_type: actionType,
-            combat_result: activityType === 'enemy' ? combatResult : null,
+            combat_result: activityTypeKey === 'enemy' ? combatResult : null,
             sweep_event: sweepEvent,
             duration_seconds: durationSeconds,
             energy_cost: cost.energyCost,

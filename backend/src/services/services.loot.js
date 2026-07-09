@@ -55,7 +55,15 @@ function calculateRewardItemLevel(config) {
 }
 
 async function getCandidateTemplates(config) {
-    const { categories, zoneMinLevel, origins, maxLevelOffset = 5, allowAboveMapLevel = true, includeFlexibleTemplates = false } = config;
+    const {
+        categories,
+        zoneMinLevel,
+        origins,
+        maxLevelOffset = 5,
+        allowAboveMapLevel = true,
+        includeFlexibleTemplates = false,
+        tagFilters = [],
+    } = config;
     if (!categories || categories.length === 0) return [];
 
     const mapLevel = Math.max(1, zoneMinLevel || 1);
@@ -63,6 +71,17 @@ async function getCandidateTemplates(config) {
     const categoryPlaceholders = categories.map((_, index) => `$${index + 1}`).join(', ');
     const originOffset = categories.length;
     const originPlaceholders = allowedOrigins.map((_, index) => `$${originOffset + index + 1}`).join(', ');
+    const baseValues = [...categories, ...allowedOrigins];
+    const mapLevelParamIndex = baseValues.length + 1;
+    const tagFilterValues = (tagFilters || []).map(tag => String(tag || '').toLowerCase()).filter(Boolean);
+    const tagFilterParamIndex = baseValues.length + 2;
+    const tagFilterQuery = tagFilterValues.length > 0
+        ? `AND EXISTS (
+              SELECT 1
+              FROM UNNEST(tags) AS item_tag
+              WHERE LOWER(item_tag) = ANY($${tagFilterParamIndex}::TEXT[])
+          )`
+        : '';
     const flexibleTemplateFilter = includeFlexibleTemplates
         ? `OR item_level = 1`
         : '';
@@ -72,13 +91,28 @@ async function getCandidateTemplates(config) {
         FROM item_templates
         WHERE category = ANY(ARRAY[${categoryPlaceholders}])
           AND origin = ANY(ARRAY[${originPlaceholders}])
-          AND (item_level = $${categories.length + allowedOrigins.length + 1} ${flexibleTemplateFilter});
+          AND (item_level = $${mapLevelParamIndex} ${flexibleTemplateFilter})
+          ${tagFilterQuery};
     `;
 
     try {
-        const exactResult = await dbPool.query(sqlQuery, [...categories, ...allowedOrigins, mapLevel]);
+        const exactValues = tagFilterValues.length > 0
+            ? [...baseValues, mapLevel, tagFilterValues]
+            : [...baseValues, mapLevel];
+        const exactResult = await dbPool.query(sqlQuery, exactValues);
         if (exactResult.rows.length > 0) return exactResult.rows;
 
+        const fallbackMinLevelParamIndex = baseValues.length + 1;
+        const fallbackMaxLevelParamIndex = baseValues.length + 2;
+        const fallbackMapLevelParamIndex = baseValues.length + 3;
+        const fallbackTagFilterParamIndex = baseValues.length + 4;
+        const fallbackTagFilterQuery = tagFilterValues.length > 0
+            ? `AND EXISTS (
+                  SELECT 1
+                  FROM UNNEST(tags) AS item_tag
+                  WHERE LOWER(item_tag) = ANY($${fallbackTagFilterParamIndex}::TEXT[])
+              )`
+            : '';
         const fallbackQuery = `
             SELECT id, category, item_level, lifecycle_model, base_duration_hours,
                    drop_weight_common, drop_weight_uncommon, drop_weight_rare, drop_weight_epic, drop_weight_legendary
@@ -86,15 +120,19 @@ async function getCandidateTemplates(config) {
             WHERE category = ANY(ARRAY[${categoryPlaceholders}])
               AND origin = ANY(ARRAY[${originPlaceholders}])
               AND (
-                  item_level BETWEEN $${categories.length + allowedOrigins.length + 1} AND $${categories.length + allowedOrigins.length + 2}
+                  item_level BETWEEN $${fallbackMinLevelParamIndex} AND $${fallbackMaxLevelParamIndex}
                   ${includeFlexibleTemplates ? 'OR item_level = 1' : ''}
               )
-            ORDER BY ABS(item_level - $${categories.length + allowedOrigins.length + 3}) ASC
+              ${fallbackTagFilterQuery}
+            ORDER BY ABS(item_level - $${fallbackMapLevelParamIndex}) ASC
             LIMIT 50;
         `;
         const minLevel = Math.max(1, mapLevel - maxLevelOffset);
         const maxLevel = allowAboveMapLevel ? mapLevel + maxLevelOffset : mapLevel;
-        const fallbackResult = await dbPool.query(fallbackQuery, [...categories, ...allowedOrigins, minLevel, maxLevel, mapLevel]);
+        const fallbackValues = tagFilterValues.length > 0
+            ? [...baseValues, minLevel, maxLevel, mapLevel, tagFilterValues]
+            : [...baseValues, minLevel, maxLevel, mapLevel];
+        const fallbackResult = await dbPool.query(fallbackQuery, fallbackValues);
         return fallbackResult.rows;
     } catch (error) {
         console.error('[ERROR] Loi khi lay candidate templates:', error.message);
@@ -183,6 +221,7 @@ async function processLootDrop(playerId, claimedAction) {
         maxLevelOffset: claimedAction.max_level_offset ?? 5,
         allowAboveMapLevel: claimedAction.allow_above_map_level !== false,
         includeFlexibleTemplates: claimedAction.include_flexible_templates === true,
+        tagFilters: claimedAction.tag_filter || [],
     });
 
     if (candidates.length === 0) {

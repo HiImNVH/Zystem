@@ -224,7 +224,8 @@ function getRotatingPois(zone, rotationSlot) {
 function getPoiActionOptions() {
     const actionOptions = [
         { type: 'enemy', label: 'Find enemies' },
-        { type: 'gather', label: 'Scavenge supplies' },
+        { type: 'scavenge', label: 'Scavenge rooms' },
+        { type: 'gather', label: 'Gather resources' },
         { type: 'sweep', label: 'Sweep' },
     ];
 
@@ -710,8 +711,15 @@ function formatDropTable(dropTable) {
 }
 
 function getActivityEnergyCost(activityData, activityType) {
-    const cost = activityData?.resource_costs?.[activityType === 'dungeon' ? 'sweep' : activityType];
+    const costKey = activityType === 'dungeon' ? 'sweep' : activityType;
+    const cost = activityData?.resource_costs?.[costKey];
     return parseInt(cost?.energyCost || cost?.energy_cost || cost?.energy) || 0;
+}
+
+function getTargetEnergyCost(activityData, activityType, target) {
+    const targetCost = target?.resource_cost;
+    const energyCost = parseInt(targetCost?.energyCost || targetCost?.energy_cost || targetCost?.energy) || 0;
+    return energyCost > 0 ? energyCost : getActivityEnergyCost(activityData, activityType);
 }
 
 function canSpendEnergy(character, energyCost) {
@@ -732,20 +740,23 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
 
     const titleMap = {
         enemy: 'Find enemies',
-        gather: 'Scavenge',
+        scavenge: 'Scavenge',
+        gather: 'Gather',
         sweep: 'Sweep',
         dungeon: 'Sweep',
     };
     const list = activityType === 'enemy'
         ? (activityData?.enemies || [])
-        : (activityType === 'gather' ? (activityData?.gatherables || []) : []);
+        : (activityType === 'scavenge'
+            ? (activityData?.scavengeables || [])
+            : (activityType === 'gather' ? (activityData?.gatherables || []) : []));
     const sweep = activityData?.sweep || activityData?.dungeon;
-    const energyCost = getActivityEnergyCost(activityData, activityType);
 
     async function startActivity(options) {
         const { item, mode } = options;
-        if (energyCost > 0 && !canSpendEnergy(character, energyCost)) {
-            setSheetError(getEnergyErrorMessage(character, energyCost));
+        const targetEnergyCost = getTargetEnergyCost(activityData, activityType, item);
+        if (targetEnergyCost > 0 && !canSpendEnergy(character, targetEnergyCost)) {
+            setSheetError(getEnergyErrorMessage(character, targetEnergyCost));
             return;
         }
 
@@ -758,8 +769,9 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
         }
 
         const result = await onExecute?.(item, mode ? { mode } : undefined);
-        if (activityType === 'gather' && result?.success !== false) {
-            setResultMessage(`Found something in ${item.name}.`);
+        if (['scavenge', 'gather'].includes(activityType) && result?.success !== false) {
+            const verb = activityType === 'gather' ? 'Gathered from' : 'Found something in';
+            setResultMessage(`${verb} ${item.name}.`);
             setResultData(result.data);
         }
     }
@@ -802,7 +814,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                         {list.map(item => (
                             <div key={item.id} className="card p-3 flex items-center gap-3">
                                 <div className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-[10px] font-bold text-accent flex-shrink-0">
-                                    {activityType === 'enemy' ? item.threat?.slice(0, 2).toUpperCase() : 'GA'}
+                                    {activityType === 'enemy' ? item.threat?.slice(0, 2).toUpperCase() : (activityType === 'gather' ? 'GA' : 'SC')}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-semibold truncate">{item.name}</p>
@@ -818,7 +830,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                                     ) : (
                                         <>
                                             <p className="text-xs text-textMuted truncate">
-                                                Zone Lv.{item.item_level} | {item.category_label || item.category}
+                                                Zone Lv.{item.item_level} | {item.category_label || item.category} | Energy {getTargetEnergyCost(activityData, activityType, item)}
                                             </p>
                                             <p className="text-[11px] text-textMuted truncate">
                                                 {item.reward_hint}
@@ -832,7 +844,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                                     disabled={Boolean(executingId)}
                                     className="btn-primary px-3 py-2 text-xs flex-shrink-0"
                                 >
-                                    {executingId === item.id ? 'Working...' : (activityType === 'enemy' ? 'Engage' : 'Search')}
+                                    {executingId === item.id ? 'Working...' : (activityType === 'enemy' ? 'Engage' : (activityType === 'gather' ? 'Gather' : 'Search'))}
                                 </button>
                             </div>
                         ))}
@@ -1329,7 +1341,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
             );
             const refreshed = await getPoiActivities(activitySheet.poi.id, activitySheet.type);
             setActivitySheet(current => current ? { ...current, data: refreshed.data, error: '' } : current);
-            if (activitySheet.type !== 'gather') {
+            if (!['scavenge', 'gather'].includes(activitySheet.type)) {
                 notify(formatActionResult(result.data), 'success');
             }
             await onUpdate?.();
