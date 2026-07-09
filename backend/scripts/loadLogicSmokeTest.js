@@ -170,6 +170,14 @@ function runPureLogicChecks(modulesByPath) {
     assertExportedFunction(playerEvents, 'markPlayerEventsRead');
 
     assert.equal(itemsSeed.ITEM_TEMPLATES.length, 192);
+    assert.deepEqual(
+        itemsSeed.normalizeItemTags(['FOOD', 'CONSUMABLES', 'FoodProcessed', 'FoodRaw (Fruit)'], 'FOOD'),
+        ['Food', 'Processed', 'Raw', 'Fruit']
+    );
+    assert.deepEqual(
+        itemsSeed.normalizeItemTags(['MATERIAL', 'MATERIALS', 'Metal (Raw)', 'Metal', 'Raw'], 'MATERIAL'),
+        ['Material', 'Metal', 'Raw']
+    );
     assert.equal(skillsSeed.ALL_SKILLS.length, 114);
     assert.ok(skillsSeed.ALL_SKILLS.every(skill => skill.desc && skill.effectType), 'Moi skill phai co mo ta va effect ro rang');
     assert.equal(skillsSeed.ALL_SKILLS.reduce((total, skill) => total + skill.sp, 0), 284);

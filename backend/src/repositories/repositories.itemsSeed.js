@@ -22,6 +22,27 @@ const SUPPORTED_CATEGORIES = [
     'BUILDING',
 ];
 
+const REDUNDANT_TAGS = new Set([
+    'materials',
+    'consumables',
+    'tools',
+    'weapons',
+    'structures',
+]);
+
+const TAG_NAME_ALIASES = {
+    ammo: 'Ammo',
+    armor: 'Armor',
+    building: 'Building',
+    equipment: 'Equipment',
+    food: 'Food',
+    material: 'Material',
+    medicine: 'Medicine',
+    tool: 'Tool',
+    weapon: 'Weapon',
+    smg: 'SMG',
+};
+
 const ITEM_TEMPLATES = [
     {
         "name": "Metal Scrap/Ore",
@@ -3490,6 +3511,68 @@ function getCategory(tags) {
     return 'MATERIAL';
 }
 
+function toTitleTag(value) {
+    const normalizedValue = String(value || '').trim();
+    if (!normalizedValue) return null;
+
+    const lowerValue = normalizedValue.toLowerCase();
+    if (REDUNDANT_TAGS.has(lowerValue)) return null;
+    if (TAG_NAME_ALIASES[lowerValue]) return TAG_NAME_ALIASES[lowerValue];
+
+    return lowerValue.charAt(0).toUpperCase() + lowerValue.slice(1);
+}
+
+function splitTagParts(tag) {
+    return String(tag || '')
+        .replace(/[()]/g, ' ')
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .split(/[^A-Za-z0-9]+/)
+        .map(part => part.trim())
+        .filter(Boolean);
+}
+
+function mergeBodySlotTags(tags) {
+    const mergedTags = [];
+
+    for (let index = 0; index < tags.length; index++) {
+        const currentTag = tags[index];
+        const nextTag = tags[index + 1];
+
+        if (currentTag === 'Lower' && nextTag === 'Body') {
+            mergedTags.push('LowerBody');
+            index++;
+            continue;
+        }
+
+        if (currentTag === 'Upper' && nextTag === 'Body') {
+            mergedTags.push('UpperBody');
+            index++;
+            continue;
+        }
+
+        mergedTags.push(currentTag);
+    }
+
+    return mergedTags;
+}
+
+function normalizeItemTags(tags, category) {
+    const primaryCategory = toTitleTag(category || getCategory(tags));
+    const normalizedTags = [];
+
+    if (primaryCategory) normalizedTags.push(primaryCategory);
+
+    for (const tag of tags || []) {
+        const tagParts = splitTagParts(tag)
+            .map(toTitleTag)
+            .filter(Boolean);
+
+        normalizedTags.push(...mergeBodySlotTags(tagParts));
+    }
+
+    return [...new Set(normalizedTags)];
+}
+
 function getItemLevel(template) {
     const levelGap = template.levelGap || '';
     const levelMatch = levelGap.match(/\d+/);
@@ -3509,13 +3592,14 @@ function getBaseDurationHours(template) {
 
 function buildTemplateRow(template) {
     const category = getCategory(template.tags);
+    const normalizedTags = normalizeItemTags(template.tags, category);
     const isStackable = !STACKABLE_EXCLUDED_CATEGORIES.includes(category);
 
     return [
         createItemCode(template.name),
         template.name,
         category,
-        template.tags,
+        normalizedTags,
         template.description || null,
         template.note || null,
         template.origin,
@@ -3596,4 +3680,5 @@ async function seedItemTemplatesAndRecipes() {
 module.exports = {
     seedItemTemplatesAndRecipes,
     ITEM_TEMPLATES,
+    normalizeItemTags,
 };
