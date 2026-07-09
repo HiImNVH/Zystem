@@ -218,6 +218,25 @@ async function initializeDatabaseSchema() {
         `);
 
         // ============================================================
+        // BANG 5.1.1: WORLD POI ROOMS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS world_poi_rooms (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                poi_id UUID NOT NULL REFERENCES world_pois(id) ON DELETE CASCADE,
+                code VARCHAR(100) NOT NULL UNIQUE,
+                display_name VARCHAR(128) NOT NULL,
+                room_type VARCHAR(40) NOT NULL DEFAULT 'room',
+                room_tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+                loot_focus TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+                sort_order SMALLINT NOT NULL DEFAULT 1,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                UNIQUE(poi_id, display_name)
+            );
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_world_poi_rooms_poi ON world_poi_rooms(poi_id);`);
+
+        // ============================================================
         // BANG 5.2: POI GAMEPLAY TAGS
         // ============================================================
         await client.query(`

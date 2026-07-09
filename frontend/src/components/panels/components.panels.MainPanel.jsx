@@ -31,6 +31,8 @@ const ZONE_TAG_LABELS = {
     coast: 'Coast',
     industrial: 'Industrial',
     geological_mine: 'Geological Mine',
+    military: 'Military',
+    swamp: 'Swamp',
 };
 
 const RESOURCE_METER_FILL_CLASSES = {
@@ -43,8 +45,8 @@ const EXPLORATION_RINGS = [
     {
         id: 'near_city',
         title: 'Near City Ring',
-        range: 'Lv.5-20',
-        minLevel: 5,
+        range: 'Lv.1-20',
+        minLevel: 1,
         maxLevel: 20,
         helper: 'Suburbs, market streets, industrial edges, greenbelt, farms, and the nearest coast.',
     },

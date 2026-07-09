@@ -185,74 +185,58 @@ async function findMonstersByProfile(monsterProfile) {
     return result.rows;
 }
 
-function getGatherCategories(lootFocus) {
-    const focusText = (lootFocus || []).join(' ').toLowerCase();
-    const categories = new Set(['MATERIAL']);
-    if (focusText.includes('food')) categories.add('FOOD');
-    if (focusText.includes('salvage')) categories.add('RUBBISH');
-    if (focusText.includes('gear')) {
-        categories.add('WEAPON');
-        categories.add('EQUIPMENT');
-        categories.add('TOOL');
+const LOOT_FOCUS_CATEGORY_MAP = {
+    food: 'FOOD',
+    drink: 'DRINK',
+    medicine: 'MEDICINE',
+    medical: 'MEDICINE',
+    tool: 'TOOL',
+    weapon: 'WEAPON',
+    ammo: 'AMMO',
+    equipment: 'EQUIPMENT',
+    gear: 'EQUIPMENT',
+    seed: 'SEED',
+    rubbish: 'RUBBISH',
+    salvage: 'RUBBISH',
+    material: 'MATERIAL',
+    materials: 'MATERIAL',
+};
+
+function getLootCategoriesFromFocus(lootFocus) {
+    const categories = new Set();
+    for (const focus of lootFocus || []) {
+        const category = LOOT_FOCUS_CATEGORY_MAP[String(focus || '').toLowerCase()];
+        if (category) categories.add(category);
     }
-    return [...categories];
+
+    return categories.size > 0 ? [...categories] : ['MATERIAL', 'RUBBISH'];
 }
 
-async function findGatherItems(config) {
-    const { tag, zoneLevel } = config;
-    const categories = getGatherCategories(tag?.loot_focus);
+async function findPoiRooms(poiId) {
     const result = await dbPool.query(`
-        SELECT id, code, display_name, category, tags, item_level
-        FROM item_templates
-        WHERE category = ANY($1::TEXT[])
-          AND origin = ANY($2::TEXT[])
-          AND item_level BETWEEN $3 AND $4
-        ORDER BY ABS(item_level - $5), category ASC, display_name ASC
-        LIMIT 40;
-    `, [
-        categories,
-        ['Gatherable', 'Loot-only'],
-        Math.max(1, zoneLevel - 5),
-        zoneLevel + 5,
-        zoneLevel,
-    ]);
+        SELECT id, code, display_name, room_type, room_tags, loot_focus, sort_order
+        FROM world_poi_rooms
+        WHERE poi_id = $1
+        ORDER BY sort_order ASC, display_name ASC;
+    `, [poiId]);
 
     return result.rows;
 }
 
-const GATHER_CATEGORY_LABELS = {
-    FOOD: 'Food Supplies',
-    MATERIAL: 'Scavenged Materials',
-    RUBBISH: 'Recyclable Scrap',
-    TOOL: 'Usable Tools',
-    WEAPON: 'Recovered Weapons',
-    EQUIPMENT: 'Recovered Gear',
-};
-
-const GATHER_DROP_CATEGORIES = new Set(Object.keys(GATHER_CATEGORY_LABELS));
-
-function getGatherTargetCategories(targetId) {
-    const match = String(targetId || '').match(/^([a-z_]+)_gather_pool_\d+$/i);
-    if (!match) return null;
-
-    const category = match[1].toUpperCase();
-    return GATHER_DROP_CATEGORIES.has(category) ? [category] : null;
-}
-
-function getGenericGatherName(category) {
-    return GATHER_CATEGORY_LABELS[category] || 'Random Supplies';
-}
-
-function getGenericGatherTags(items) {
-    const tags = new Set();
-    for (const item of items) {
-        for (const itemTag of item.tags || []) {
-            if (tags.size >= 4) break;
-            tags.add(itemTag);
-        }
-        if (tags.size >= 4) break;
+async function getGatherTargetCategories(targetId) {
+    const fallbackMatch = String(targetId || '').match(/^([a-z_]+)_gather_pool_\d+$/i);
+    if (fallbackMatch) {
+        const fallbackCategory = fallbackMatch[1].toUpperCase();
+        return Object.values(LOOT_FOCUS_CATEGORY_MAP).includes(fallbackCategory) ? [fallbackCategory] : null;
     }
-    return [...tags];
+
+    const result = await dbPool.query(
+        `SELECT loot_focus FROM world_poi_rooms WHERE id = $1 LIMIT 1;`,
+        [targetId]
+    );
+    if (result.rows.length === 0) return null;
+
+    return getLootCategoriesFromFocus(result.rows[0].loot_focus);
 }
 
 function scaleMonsterStats(monster, monsterLevel) {
@@ -302,43 +286,38 @@ function buildEnemyList(config) {
 }
 
 function buildGatherList(config) {
-    const { zone, tag, items } = config;
+    const { zone, tag, rooms } = config;
     const baseLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
-    if (items.length === 0) {
+    if (rooms.length === 0) {
         return [{
             id: `material_gather_pool_${baseLevel}`,
             code: 'MATERIAL_GATHER_POOL',
-            name: getGenericGatherName('MATERIAL'),
-            category: 'MATERIAL',
-            category_label: getGenericGatherName('MATERIAL'),
+            name: 'General Search Area',
+            category: 'ROOM',
+            category_label: 'Default Room',
             tags: [],
+            loot_focus: ['material', 'rubbish'],
             pool_size: 0,
             item_level: baseLevel,
-            rarity_hint: 'Random drop by POI',
+            rarity_hint: 'Random room loot',
             reward_hint: 'Searches the POI for useful materials',
             action_type: tag?.action_type || 'EXPLORE',
             gameplay_tag: tag,
         }];
     }
 
-    const itemGroups = items.reduce((groups, item) => {
-        const category = item.category || 'MATERIAL';
-        if (!groups[category]) groups[category] = [];
-        groups[category].push(item);
-        return groups;
-    }, {});
-
-    return Object.entries(itemGroups).map(([category, groupItems]) => ({
-        id: `${category.toLowerCase()}_gather_pool_${baseLevel}`,
-        code: `${category}_GATHER_POOL`,
-        name: getGenericGatherName(category),
-        category,
-        category_label: getGenericGatherName(category),
-        tags: getGenericGatherTags(groupItems),
-        pool_size: groupItems.length,
+    return rooms.map(room => ({
+        id: room.id,
+        code: room.code,
+        name: room.display_name,
+        category: 'ROOM',
+        category_label: room.room_type,
+        tags: room.room_tags || [],
+        loot_focus: room.loot_focus || [],
+        pool_size: (room.loot_focus || []).length,
         item_level: baseLevel,
-        rarity_hint: 'Random drop by POI',
-        reward_hint: `Randomly finds one of ${groupItems.length} matching items`,
+        rarity_hint: 'Random room loot',
+        reward_hint: `Loot focus: ${(room.loot_focus || []).join(', ') || 'material, rubbish'}`,
         action_type: tag?.action_type || 'EXPLORE',
         gameplay_tag: tag,
     }));
@@ -565,9 +544,8 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
 
         const activityTags = resolvePoiActivityTags();
         const baseDuration = Math.max(30, parseInt(poi.base_duration_s || zone.base_duration_s) || 60);
-        const zoneLevel = parseInt(zone.level_gap || zone.min_player_lv || 1);
         const enemyMonsters = await findMonstersByProfile(activityTags.enemy.monster_profile);
-        const gatherItems = await findGatherItems({ tag: activityTags.gather, zoneLevel });
+        const gatherRooms = await findPoiRooms(poi.id);
         const sweepMonsters = await findMonstersByProfile(activityTags.sweep.monster_profile);
         const payload = {
             poi: {
@@ -584,7 +562,7 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
                 tags: activityTags,
             }),
             enemies: buildEnemyList({ zone, poi, tag: activityTags.enemy, monsters: enemyMonsters }),
-            gatherables: buildGatherList({ zone, tag: activityTags.gather, items: gatherItems }),
+            gatherables: buildGatherList({ zone, tag: activityTags.gather, rooms: gatherRooms }),
             sweep: buildSweepInfo({ zone, poi, tag: activityTags.sweep, monsters: sweepMonsters }),
         };
 
@@ -731,7 +709,7 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
                 actual_duration_s: durationSeconds,
                 zone_min_level: mapLevel,
                 drop_item_level: mapLevel,
-                category_filter: activityType === 'gather' ? getGatherTargetCategories(targetId) : null,
+                category_filter: activityType === 'gather' ? await getGatherTargetCategories(targetId) : null,
                 allow_above_map_level: activityType !== 'gather',
                 max_level_offset: activityType === 'gather' ? 3 : 5,
             });
