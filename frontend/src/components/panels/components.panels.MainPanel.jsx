@@ -678,6 +678,7 @@ function getEnergyErrorMessage(character, energyCost) {
 function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, executingId }) {
     const [combatEnemy, setCombatEnemy] = useState(null);
     const [sheetError, setSheetError] = useState('');
+    const [resultMessage, setResultMessage] = useState('');
     if (!activityType) return null;
 
     const titleMap = {
@@ -692,7 +693,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
     const sweep = activityData?.sweep || activityData?.dungeon;
     const energyCost = getActivityEnergyCost(activityData, activityType);
 
-    function startActivity(options) {
+    async function startActivity(options) {
         const { item, mode } = options;
         if (energyCost > 0 && !canSpendEnergy(character, energyCost)) {
             setSheetError(getEnergyErrorMessage(character, energyCost));
@@ -700,12 +701,16 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
         }
 
         setSheetError('');
+        setResultMessage('');
         if (activityType === 'enemy') {
             setCombatEnemy(item);
             return;
         }
 
-        onExecute?.(item, mode ? { mode } : undefined);
+        const result = await onExecute?.(item, mode ? { mode } : undefined);
+        if (activityType === 'gather' && result?.success !== false) {
+            setResultMessage(`Found something in ${item.name}. ${formatActionResult(result.data)}`);
+        }
     }
 
     return (
@@ -723,6 +728,12 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
                 {(error || sheetError) && <p className="text-sm text-danger mb-3">{error || sheetError}</p>}
+                {resultMessage && (
+                    <div className="mb-3 rounded-lg border border-success/40 bg-success/10 px-3 py-2">
+                        <p className="text-sm font-semibold text-success">Search result</p>
+                        <p className="text-xs text-textSecondary mt-1">{resultMessage}</p>
+                    </div>
+                )}
                 {!isLoading && activityType === 'enemy' && combatEnemy && (
                     <CombatMiniGame
                         enemy={combatEnemy}
@@ -1266,7 +1277,9 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
             );
             const refreshed = await getPoiActivities(activitySheet.poi.id, activitySheet.type);
             setActivitySheet(current => current ? { ...current, data: refreshed.data, error: '' } : current);
-            notify(formatActionResult(result.data), 'success');
+            if (activitySheet.type !== 'gather') {
+                notify(formatActionResult(result.data), 'success');
+            }
             await onUpdate?.();
             return result;
         } catch (err) {
