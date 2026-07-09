@@ -43,8 +43,19 @@ function calculateDropCount(actionType, durationSeconds) {
     return Math.min(base + timeBonus, 5);
 }
 
+function calculateRewardItemLevel(config) {
+    const { zoneLevel, skillLevel, playerLevel } = config;
+    const levels = [zoneLevel, skillLevel, playerLevel]
+        .map(level => parseInt(level))
+        .filter(level => Number.isFinite(level) && level > 0);
+
+    if (levels.length === 0) return 1;
+
+    return Math.max(1, Math.min(...levels));
+}
+
 async function getCandidateTemplates(config) {
-    const { categories, zoneMinLevel, origins, maxLevelOffset = 5, allowAboveMapLevel = true } = config;
+    const { categories, zoneMinLevel, origins, maxLevelOffset = 5, allowAboveMapLevel = true, includeFlexibleTemplates = false } = config;
     if (!categories || categories.length === 0) return [];
 
     const mapLevel = Math.max(1, zoneMinLevel || 1);
@@ -52,13 +63,16 @@ async function getCandidateTemplates(config) {
     const categoryPlaceholders = categories.map((_, index) => `$${index + 1}`).join(', ');
     const originOffset = categories.length;
     const originPlaceholders = allowedOrigins.map((_, index) => `$${originOffset + index + 1}`).join(', ');
+    const flexibleTemplateFilter = includeFlexibleTemplates
+        ? `OR item_level = 1`
+        : '';
     const sqlQuery = `
         SELECT id, category, item_level, lifecycle_model, base_duration_hours,
                drop_weight_common, drop_weight_uncommon, drop_weight_rare, drop_weight_epic, drop_weight_legendary
         FROM item_templates
         WHERE category = ANY(ARRAY[${categoryPlaceholders}])
           AND origin = ANY(ARRAY[${originPlaceholders}])
-          AND item_level = $${categories.length + allowedOrigins.length + 1};
+          AND (item_level = $${categories.length + allowedOrigins.length + 1} ${flexibleTemplateFilter});
     `;
 
     try {
@@ -71,7 +85,10 @@ async function getCandidateTemplates(config) {
             FROM item_templates
             WHERE category = ANY(ARRAY[${categoryPlaceholders}])
               AND origin = ANY(ARRAY[${originPlaceholders}])
-              AND item_level BETWEEN $${categories.length + allowedOrigins.length + 1} AND $${categories.length + allowedOrigins.length + 2}
+              AND (
+                  item_level BETWEEN $${categories.length + allowedOrigins.length + 1} AND $${categories.length + allowedOrigins.length + 2}
+                  ${includeFlexibleTemplates ? 'OR item_level = 1' : ''}
+              )
             ORDER BY ABS(item_level - $${categories.length + allowedOrigins.length + 3}) ASC
             LIMIT 50;
         `;
@@ -165,6 +182,7 @@ async function processLootDrop(playerId, claimedAction) {
         origins: ACTION_DROP_ORIGINS[actionType],
         maxLevelOffset: claimedAction.max_level_offset ?? 5,
         allowAboveMapLevel: claimedAction.allow_above_map_level !== false,
+        includeFlexibleTemplates: claimedAction.include_flexible_templates === true,
     });
 
     if (candidates.length === 0) {
@@ -192,5 +210,6 @@ async function processLootDrop(playerId, claimedAction) {
 module.exports = {
     processLootDrop,
     calculateDropCount,
+    calculateRewardItemLevel,
     rollOneItem
 };

@@ -172,6 +172,21 @@ async function findJobIdByCode(jobCode) {
     return result.rows[0]?.id || null;
 }
 
+async function findPlayerJobLevel(playerId, jobCode) {
+    if (!playerId || !jobCode) return 1;
+
+    const result = await dbPool.query(`
+        SELECT pj.job_level
+        FROM player_jobs pj
+        JOIN jobs_seed js ON js.id = pj.job_id
+        WHERE pj.player_id = $1
+          AND js.code = $2
+        LIMIT 1;
+    `, [playerId, jobCode]);
+
+    return Math.max(1, parseInt(result.rows[0]?.job_level) || 1);
+}
+
 async function findMonstersByProfile(monsterProfile) {
     if (!monsterProfile) return [];
     const result = await dbPool.query(`
@@ -702,16 +717,28 @@ zonesRouter.post('/pois/:poiId/execute', verifyToken, verifyPlayerOwnership, asy
         const jobExpResult = jobId
             ? await progressionService.processJobExpGain(playerId, jobId, expReward.jobExp)
             : null;
+        const latestPlayerLevel = playerExpResult?.new_level || playerLevel;
+        const gatherSkillLevel = activityType === 'gather'
+            ? await findPlayerJobLevel(playerId, 'gathering')
+            : null;
+        const rewardItemLevel = activityType === 'gather'
+            ? lootService.calculateRewardItemLevel({
+                zoneLevel: mapLevel,
+                skillLevel: gatherSkillLevel,
+                playerLevel: latestPlayerLevel,
+            })
+            : mapLevel;
         const lootResult = sweepEvent?.type === 'retreat'
             ? { items_dropped: [] }
             : await lootService.processLootDrop(playerId, {
                 action_type: rewardActionType,
                 actual_duration_s: durationSeconds,
                 zone_min_level: mapLevel,
-                drop_item_level: mapLevel,
+                drop_item_level: rewardItemLevel,
                 category_filter: activityType === 'gather' ? await getGatherTargetCategories(targetId) : null,
                 allow_above_map_level: activityType !== 'gather',
                 max_level_offset: activityType === 'gather' ? 3 : 5,
+                include_flexible_templates: activityType === 'gather',
             });
         const moneyDrop = shouldDropEnemyMoney({ activityType, sweepEvent })
             ? calculateEnemyMoneyDrop({ mapLevel, combatResult })

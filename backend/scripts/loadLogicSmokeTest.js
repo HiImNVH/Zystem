@@ -130,6 +130,9 @@ function runPureLogicChecks(modulesByPath) {
 
     assertExportedFunction(loot, 'calculateDropCount');
     assert.equal(loot.calculateDropCount('EXPLORE', 600), 4);
+    assertExportedFunction(loot, 'calculateRewardItemLevel');
+    assert.equal(loot.calculateRewardItemLevel({ zoneLevel: 25, skillLevel: 18, playerLevel: 22 }), 18);
+    assert.equal(loot.calculateRewardItemLevel({ zoneLevel: 30, skillLevel: 40, playerLevel: 12 }), 12);
 
     assertExportedFunction(curelPower, 'calculateCurelPowerFromRows');
     assert.equal(curelPower.normalizePowerMode('BATTLE'), 'COMBAT_GATHERING');
