@@ -153,6 +153,35 @@ function getItemMark(itemOrCategory, tags = []) {
     return match?.mark || ITEM_CATEGORY_MARKS[String(category || '').toUpperCase()] || 'IT';
 }
 
+function getItemRarityClassName(item) {
+    return ITEM_RARITY_TEXT[String(item?.rarity || 'COMMON').toUpperCase()] || ITEM_RARITY_TEXT.COMMON;
+}
+
+function getDroppedItemName(item) {
+    return item?.display_name || item?.name || item?.template_id || 'Unknown item';
+}
+
+function getDroppedItemsText(items) {
+    const droppedItems = Array.isArray(items) ? items : [];
+    if (droppedItems.length === 0) return '';
+
+    return droppedItems.map(getDroppedItemName).join(', ');
+}
+
+function DroppedItemsInline({ items }) {
+    const droppedItems = Array.isArray(items) ? items : [];
+    if (droppedItems.length === 0) {
+        return <span className="text-textMuted">No item found.</span>;
+    }
+
+    return droppedItems.map((item, index) => (
+        <span key={item.id || `${item.template_id}-${index}`}>
+            {index > 0 && <span className="text-textMuted">, </span>}
+            <span className={getItemRarityClassName(item)}>{getDroppedItemName(item)}</span>
+        </span>
+    ));
+}
+
 function getZoneLevel(zone) {
     return parseInt(zone?.level_gap || zone?.min_player_lv || 1);
 }
@@ -527,10 +556,29 @@ function CraftingSheet({ playerId, inventory, onClose, onUpdate, onNotify }) {
 
 function formatActionResult(result) {
     if (!result) return '';
-    const lootCount = result.items_dropped?.length || 0;
+    const itemsText = getDroppedItemsText(result.items_dropped);
     const moneyText = result.money_dropped ? `, Money +${parseInt(result.money_dropped).toLocaleString()}` : '';
+    const itemText = itemsText ? `, found ${itemsText}` : '';
     const sweepText = result.sweep_event ? `${result.sweep_event.label}: ` : '';
-    return `${sweepText}Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}${moneyText}.`;
+    return `${sweepText}Energy -${result.energy_cost}, EXP +${result.player_exp}${itemText}${moneyText}.`;
+}
+
+function ActionResultDetails({ result }) {
+    if (!result) return null;
+
+    const moneyValue = parseInt(result.money_dropped) || 0;
+
+    return (
+        <div className="mt-2 space-y-1 text-xs text-textSecondary">
+            <p>
+                Energy -{result.energy_cost}, EXP +{result.player_exp}
+                {moneyValue > 0 ? `, Money +${moneyValue.toLocaleString()}` : ''}.
+            </p>
+            <p>
+                Found: <DroppedItemsInline items={result.items_dropped} />
+            </p>
+        </div>
+    );
 }
 
 function formatCurrencyName(value) {
@@ -679,6 +727,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
     const [combatEnemy, setCombatEnemy] = useState(null);
     const [sheetError, setSheetError] = useState('');
     const [resultMessage, setResultMessage] = useState('');
+    const [resultData, setResultData] = useState(null);
     if (!activityType) return null;
 
     const titleMap = {
@@ -702,6 +751,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
 
         setSheetError('');
         setResultMessage('');
+        setResultData(null);
         if (activityType === 'enemy') {
             setCombatEnemy(item);
             return;
@@ -709,7 +759,8 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
 
         const result = await onExecute?.(item, mode ? { mode } : undefined);
         if (activityType === 'gather' && result?.success !== false) {
-            setResultMessage(`Found something in ${item.name}. ${formatActionResult(result.data)}`);
+            setResultMessage(`Found something in ${item.name}.`);
+            setResultData(result.data);
         }
     }
 
@@ -732,6 +783,7 @@ function ActivityListSheet({ activityType, activityData, character, inventory, i
                     <div className="mb-3 rounded-lg border border-success/40 bg-success/10 px-3 py-2">
                         <p className="text-sm font-semibold text-success">Search result</p>
                         <p className="text-xs text-textSecondary mt-1">{resultMessage}</p>
+                        <ActionResultDetails result={resultData} />
                     </div>
                 )}
                 {!isLoading && activityType === 'enemy' && combatEnemy && (

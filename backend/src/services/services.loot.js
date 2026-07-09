@@ -114,13 +114,21 @@ async function insertDroppedItems(playerId, droppedItems) {
     for (const item of droppedItems) {
         try {
             const result = await dbPool.query(`
-                INSERT INTO items
+                WITH inserted_item AS (
+                    INSERT INTO items
                     (template_id, rarity, item_power, item_level, expires_at, owner_player_id, source, quantity,
                      stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
-                VALUES ($1, $2, $3, $4, $5, $6, 'drop', 1, $7, $8, $9, $10, $11, $12)
-                RETURNING id, template_id, rarity, item_power,
-                          item_level,
-                          stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value;
+                    VALUES ($1, $2, $3, $4, $5, $6, 'drop', 1, $7, $8, $9, $10, $11, $12)
+                    RETURNING id, template_id, rarity, item_power, item_level,
+                              stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value
+                )
+                SELECT inserted_item.id, inserted_item.template_id, inserted_item.rarity, inserted_item.item_power,
+                       inserted_item.item_level, item_templates.display_name, item_templates.category, item_templates.tags,
+                       inserted_item.stat_1_type, inserted_item.stat_1_value,
+                       inserted_item.stat_2_type, inserted_item.stat_2_value,
+                       inserted_item.stat_3_type, inserted_item.stat_3_value
+                FROM inserted_item
+                JOIN item_templates ON item_templates.id = inserted_item.template_id;
             `, [
                 item.templateId, item.rarity, item.itemPower, item.itemLevel, item.expiresAt, playerId,
                 item.stat_1_type || null, item.stat_1_value || 0,

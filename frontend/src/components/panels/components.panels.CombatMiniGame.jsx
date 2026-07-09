@@ -29,6 +29,36 @@ const WEAPON_SKILL_SETS = {
     ],
 };
 
+const ITEM_RARITY_TEXT = {
+    COMMON: 'text-textMuted',
+    UNCOMMON: 'text-success',
+    RARE: 'text-cyan',
+    EPIC: 'text-purple-400',
+    LEGENDARY: 'text-accent',
+};
+
+function getItemRarityClassName(item) {
+    return ITEM_RARITY_TEXT[String(item?.rarity || 'COMMON').toUpperCase()] || ITEM_RARITY_TEXT.COMMON;
+}
+
+function getDroppedItemName(item) {
+    return item?.display_name || item?.name || item?.template_id || 'Unknown item';
+}
+
+function DroppedItemsInline({ items }) {
+    const droppedItems = Array.isArray(items) ? items : [];
+    if (droppedItems.length === 0) {
+        return <span className="text-textMuted">No item dropped.</span>;
+    }
+
+    return droppedItems.map((item, index) => (
+        <span key={item.id || `${item.template_id}-${index}`}>
+            {index > 0 && <span className="text-textMuted">, </span>}
+            <span className={getItemRarityClassName(item)}>{getDroppedItemName(item)}</span>
+        </span>
+    ));
+}
+
 function getWeaponProfile(weapon) {
     const weaponText = [
         weapon?.display_name,
@@ -73,11 +103,22 @@ function calculateEnemyCounterDamage(enemy, accuracyResult) {
     return Math.max(1, Math.round(enemyAttack * counterMultiplier));
 }
 
-function formatEncounterReward(result) {
-    if (!result) return 'Encounter resolved.';
-    const lootCount = result.items_dropped?.length || 0;
-    const moneyText = result.money_dropped ? `, Money +${parseInt(result.money_dropped).toLocaleString()}` : '';
-    return `Energy -${result.energy_cost}, EXP +${result.player_exp}${lootCount ? `, loot x${lootCount}` : ''}${moneyText}.`;
+function EncounterRewardDetails({ result }) {
+    if (!result) return null;
+
+    const moneyValue = parseInt(result.money_dropped) || 0;
+
+    return (
+        <div className="mt-1 space-y-1 text-xs text-textSecondary">
+            <p>
+                Energy -{result.energy_cost}, EXP +{result.player_exp}
+                {moneyValue > 0 ? `, Money +${moneyValue.toLocaleString()}` : ''}.
+            </p>
+            <p>
+                Found: <DroppedItemsInline items={result.items_dropped} />
+            </p>
+        </div>
+    );
 }
 
 export default function CombatMiniGame({ enemy, character, inventory, isExecuting, onBack, onAttack }) {
@@ -257,7 +298,7 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
                 {combatOutcome?.type === 'victory' && (
                     <div className="rounded-lg border border-success/40 bg-success/10 p-3">
                         <p className="text-sm font-semibold text-success">Victory</p>
-                        <p className="text-xs text-textSecondary mt-1">{formatEncounterReward(combatOutcome.result)}</p>
+                        <EncounterRewardDetails result={combatOutcome.result} />
                     </div>
                 )}
                 {combatOutcome?.type === 'defeat' && (
