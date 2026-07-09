@@ -97,10 +97,12 @@ const ITEM_CATEGORY_MARKS = {
     RUBBISH: '??',
     MATERIAL: '??',
     WEAPON: '???',
+    AMMO: 'AM',
     EQUIPMENT: '???',
     TOOL: '??',
     BUILDING: '??',
     FOOD: '??',
+    MEDICINE: 'MD',
 };
 
 const ITEM_RARITY_TEXT = {

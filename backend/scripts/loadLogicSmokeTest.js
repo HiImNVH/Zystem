@@ -101,7 +101,18 @@ function runPureLogicChecks(modulesByPath) {
 
     assertExportedFunction(itemStats, 'calculateBaseStatValue');
     assert.equal(itemStats.calculateBaseStatValue(21), 63);
-    assert.equal(Object.keys(itemStats.rollItemStats('WEAPON', 10, 'LEGENDARY')).length, 6);
+    assert.deepEqual(itemStats.rollItemStats({
+        category: 'WEAPON',
+        itemPower: 10,
+        tags: ['WEAPON', 'Melee'],
+    }), {
+        stat_1_type: 'str',
+        stat_1_value: 20,
+        stat_2_type: 'agi',
+        stat_2_value: 10,
+        stat_3_type: null,
+        stat_3_value: 0,
+    });
 
     assertExportedFunction(progression, 'calculateExpRequired');
     assert.equal(progression.calculateExpRequired(1), 170);
@@ -158,11 +169,11 @@ function runPureLogicChecks(modulesByPath) {
     assertExportedFunction(playerEvents, 'getPlayerEvents');
     assertExportedFunction(playerEvents, 'markPlayerEventsRead');
 
-    assert.equal(itemsSeed.ITEM_TEMPLATES.length, 391);
-    assert.equal(skillsSeed.ALL_SKILLS.length, 239);
+    assert.equal(itemsSeed.ITEM_TEMPLATES.length, 192);
+    assert.equal(skillsSeed.ALL_SKILLS.length, 114);
     assert.ok(skillsSeed.ALL_SKILLS.every(skill => skill.desc && skill.effectType), 'Moi skill phai co mo ta va effect ro rang');
-    assert.equal(skillsSeed.ALL_SKILLS.reduce((total, skill) => total + skill.sp, 0), 422);
-    assert.equal(designSeed.CRAFTING_RECIPES.length, 263);
+    assert.equal(skillsSeed.ALL_SKILLS.reduce((total, skill) => total + skill.sp, 0), 284);
+    assert.equal(designSeed.CRAFTING_RECIPES.length, 161);
     assert.equal(designSeed.LEVELING_RULES.length, 40);
     assert.equal(designSeed.CUREL_RARITY_WEIGHTS.length, 41);
 }

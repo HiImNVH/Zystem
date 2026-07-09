@@ -814,180 +814,114 @@ const CUREL_RARITY_WEIGHTS = [
 
 const ITEM_TYPE_RULES = [
     {
-        "mainTag": "Rubbish",
-        "subTags": [
-            "Recyclable",
-            "Metal",
-            "Zinc",
-            "Copper",
-            "Iron",
-            "Aluminum",
-            "Glass",
-            "Plastic",
-            "Wood",
-            "NotRecyclable",
-            "Rubber",
-            "Fabric",
-            "Infected"
-        ],
-        "itemCount": 24
-    },
-    {
         "mainTag": "Material",
         "subTags": [
-            "Dirt",
-            "Sand",
-            "Glass",
-            "Plastic",
-            "Branch",
-            "Oak",
-            "Pine",
-            "Maple",
-            "Sycamore",
-            "Willow",
-            "Leaf",
-            "Log",
-            "Big",
-            "Infected",
-            "Stone",
-            "Pebble",
-            "Boulder",
-            "Amethys",
-            "Ore",
-            "Copper",
-            "Iron",
-            "Zinc",
-            "Aluminum",
-            "Mineral",
-            "Sulfur",
-            "Saltpeter",
             "Metal",
-            "Bone",
-            "Rat",
-            "Pigeon",
-            "Stray Dog",
-            "Feral Cat",
-            "Deer",
-            "Leather",
+            "Raw",
             "Processed",
             "Wood",
-            "Charcoal",
-            "Fabric",
+            "Stone",
+            "Gemstone",
+            "Synthetic",
             "Rubber",
+            "Fabric",
+            "Leather",
             "Cordage",
+            "Plantable",
+            "Seed",
             "Component",
+            "Nail",
+            "Charcoal",
+            "Bone",
             "Handle",
             "Tool Head",
             "Bowstring",
             "Gun Barrel",
             "Gun Frame",
-            "Fabric Panel",
             "Padding",
             "Gunpowder"
         ],
-        "itemCount": 69
-    },
-    {
-        "mainTag": "Seed",
-        "subTags": [
-            "Plantable",
-            "Dandelion",
-            "Wild",
-            "Feral",
-            "Pumpkin",
-            "Bramble",
-            "Wheat",
-            "Oat",
-            "Corn"
-        ],
-        "itemCount": 8
+        "itemCount": 31
     },
     {
         "mainTag": "Food",
         "subTags": [
-            "Meat",
-            "Rat",
             "Raw",
-            "Pigeon",
-            "Stray Dog",
-            "Feral Cat",
-            "Deer",
-            "Vegetable",
-            "Dandelion",
-            "Wild",
-            "Feral",
-            "Cellar",
-            "Overgrown",
-            "Fruit",
-            "Park",
-            "Bramble",
-            "Alley",
-            "Grain",
-            "Wheat",
-            "Oat",
-            "Corn",
-            "Flour",
             "Processed",
+            "Meat",
+            "Vegetable",
+            "Fruit",
+            "Grain",
+            "Flour",
             "Dried",
             "Smoked",
             "Spice",
-            "Salt",
-            "Sugar",
-            "Vinegar",
-            "Soysauce",
-            "Yeast",
-            "Butter",
-            "Cheese",
-            "Oil",
-            "Pumpkin",
-            "Grilling",
-            "Boiling",
-            "Mushroom",
+            "Soup",
+            "Stew",
             "Noodle",
-            "Tomato",
-            "Frying",
+            "Fried",
             "Bread",
             "Burger",
             "Sandwich",
             "Pizza",
             "Cake",
-            "Apple",
-            "Cherry",
-            "Berry",
             "Canned",
-            "Steaming",
-            "Ramen"
-        ],
-        "itemCount": 96
-    },
-    {
-        "mainTag": "Drink",
-        "subTags": [
-            "Infected",
-            "Processed",
+            "Steamed",
+            "Water",
             "Juice",
-            "Apple",
-            "Grape",
-            "Tomato",
             "Smoothie",
-            "Berry",
-            "Fig",
-            "Cherry",
             "Coffee",
-            "Alcohol"
+            "Wine",
+            "Moonshine"
         ],
-        "itemCount": 14
+        "itemCount": 80
     },
     {
         "mainTag": "Medicine",
         "subTags": [
             "Bandage",
-            "FirstaidKit",
+            "First Aid Kit",
             "Antibiotic",
             "Painkiller",
             "Booster"
         ],
-        "itemCount": 6
+        "itemCount": 5
+    },
+    {
+        "mainTag": "Building",
+        "subTags": [
+            "Furniture",
+            "Storage",
+            "Cooking Station",
+            "Crafting Station",
+            "Medical Station",
+            "Smelting Station",
+            "Architecture",
+            "Wood",
+            "Stone",
+            "Fence"
+        ],
+        "itemCount": 12
+    },
+    {
+        "mainTag": "Equipment",
+        "subTags": [
+            "Combating",
+            "Cooking",
+            "Scavenging",
+            "Gathering",
+            "Building",
+            "Crafting",
+            "Vest",
+            "Head",
+            "UpperBody",
+            "LowerBody",
+            "Hand",
+            "Leg",
+            "Jewelry",
+            "Backpack"
+        ],
+        "itemCount": 39
     },
     {
         "mainTag": "Tool",
@@ -996,18 +930,20 @@ const ITEM_TYPE_RULES = [
             "Pickaxe",
             "Shovel",
             "Hoe",
-            "Griller",
-            "CookPot",
-            "Ladle",
             "Hammer",
             "Saw",
-            "Crowbar"
+            "Crowbar",
+            "Grill Rack",
+            "Cooking Pot",
+            "Ladle"
         ],
-        "itemCount": 22
+        "itemCount": 10
     },
     {
         "mainTag": "Weapon",
         "subTags": [
+            "Melee",
+            "Ranged",
             "Dagger",
             "Spear",
             "Machete",
@@ -1019,52 +955,18 @@ const ITEM_TYPE_RULES = [
             "Rifle",
             "SMG"
         ],
-        "itemCount": 16
+        "itemCount": 10
     },
     {
         "mainTag": "Ammo",
         "subTags": [
             "Arrow",
-            "Handgun",
-            "Shotgun",
-            "Rifle",
-            "SMG"
+            "Handgun Ammo",
+            "Shotgun Ammo",
+            "Rifle Ammo",
+            "SMG Ammo"
         ],
-        "itemCount": 9
-    },
-    {
-        "mainTag": "Equipment",
-        "subTags": [
-            "Vest",
-            "Head",
-            "UpperBody",
-            "LowerBody",
-            "Hand",
-            "Leg",
-            "Jewelry",
-            "Backpack"
-        ],
-        "itemCount": 98
-    },
-    {
-        "mainTag": "Building",
-        "subTags": [
-            "Tent",
-            "Bed",
-            "Container",
-            "Wood",
-            "Leather",
-            "Campfire",
-            "Cooking",
-            "Crafting",
-            "Medicine",
-            "Smelting",
-            "Wooden Structure",
-            "Stone Structure",
-            "Wooden Fence",
-            "Stone Fence"
-        ],
-        "itemCount": 29
+        "itemCount": 5
     }
 ];
 
@@ -1207,22 +1109,22 @@ const STAT_DEFINITIONS = [
 const CRAFTING_RECIPES = [
     {
         "recipeNumber": 1,
-        "code": "COPPER_INGOT",
-        "outputItem": "Copper Ingot",
+        "code": "METAL_INGOT",
+        "outputItem": "Metal Ingot",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Makeshift Furnace / Industrial Blast Furnace",
-        "requiredTool": "Scrap Metal Ladle",
+        "workstationAccess": "Smelting Station",
+        "requiredTool": "Ladle",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Recyclable metal scrap or ore, Copper",
+                "tagQuery": "Material, Metal Scrap/Ore",
                 "quantity": 3
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed material, Charcoal",
+                "tagQuery": "Material, Charcoal",
                 "quantity": 1
             }
         ],
@@ -1231,100 +1133,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 300,
         "workstationQueueSlot": "Smelting queue",
         "curelRuleKey": "Material CUREL",
-        "designNotes": "Smelted from Copper Ore or recyclable Copper",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Conductive, Insulate, Structural"
-    },
-    {
-        "recipeNumber": 2,
-        "code": "IRON_INGOT",
-        "outputItem": "Iron Ingot",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Makeshift Furnace / Industrial Blast Furnace",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Recyclable metal scrap or ore, Iron",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed material, Charcoal",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Smelting queue",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Conductive, Insulate, Structural"
-    },
-    {
-        "recipeNumber": 3,
-        "code": "ZINC_INGOT",
-        "outputItem": "Zinc Ingot",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Makeshift Furnace / Industrial Blast Furnace",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Recyclable metal scrap or ore, Zinc",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed material, Charcoal",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Smelting queue",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Conductive, Insulate, Structural"
-    },
-    {
-        "recipeNumber": 4,
-        "code": "ALUMINUM_INGOT",
-        "outputItem": "Aluminum Ingot",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II: Industrial Blast Furnace",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Recyclable metal scrap or ore, Aluminum",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed material, Charcoal",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Smelting queue",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha recipe gop Copper/Iron/Zinc/Aluminum Ingot thanh Metal Ingot.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Conductive, Insulate, Structural"
@@ -1336,12 +1145,12 @@ const CRAFTING_RECIPES = [
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
         "workstationAccess": "None (hand-craft, no workstation required)",
-        "requiredTool": "Salvaged Hammer",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Branch",
+                "tagQuery": "Material, Wood",
                 "quantity": 2
             }
         ],
@@ -1350,7 +1159,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 45,
         "workstationQueueSlot": "Instant craft",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha input dung Wood thay cho Branch/Log rieng le.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Structural"
@@ -1361,13 +1170,13 @@ const CRAFTING_RECIPES = [
         "outputItem": "Metal Nail",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal (Ingot any)",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             }
         ],
@@ -1376,7 +1185,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Dung Metal Ingot da gop.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Structural"
@@ -1387,13 +1196,13 @@ const CRAFTING_RECIPES = [
         "outputItem": "Charcoal",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log/Branch)",
+                "tagQuery": "Material, Wood",
                 "quantity": 3
             }
         ],
@@ -1402,36 +1211,10 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 300,
         "workstationQueueSlot": "Cooking queue",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha input dung Wood chung.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "None (fuel/chemical)"
-    },
-    {
-        "recipeNumber": 8,
-        "code": "FABRIC",
-        "outputItem": "Fabric",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric (Shredded Fabric Scrap)",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 45,
-        "workstationQueueSlot": "Instant craft",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Insulate, Cushion"
     },
     {
         "recipeNumber": 9,
@@ -1439,13 +1222,13 @@ const CRAFTING_RECIPES = [
         "outputItem": "Rubber",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Rubbish, Rubber (Cracked Rubber Tire)",
+                "tagQuery": "Material, Synthetic Scrap",
                 "quantity": 2
             }
         ],
@@ -1454,7 +1237,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 45,
         "workstationQueueSlot": "Instant craft",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha input dung Synthetic Scrap thay cho Rubber rubbish cu.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Flexible, Cushion"
@@ -1465,13 +1248,13 @@ const CRAFTING_RECIPES = [
         "outputItem": "Cordage",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Rubbish, Plastic or Fabric",
+                "tagQuery": "Material, Fabric or Synthetic Scrap",
                 "quantity": 3
             }
         ],
@@ -1480,7 +1263,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 45,
         "workstationQueueSlot": "Instant craft",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha input gop Plastic/Fabric cu thanh Fabric hoac Synthetic Scrap.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Flexible, Bind"
@@ -1492,12 +1275,12 @@ const CRAFTING_RECIPES = [
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
         "workstationAccess": "None (hand-craft, no workstation required)",
-        "requiredTool": "None",
+        "requiredTool": null,
         "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
+                "tagQuery": "Material, Wood",
                 "quantity": 1
             }
         ],
@@ -1506,7 +1289,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 45,
         "workstationQueueSlot": "Instant craft",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha input dung Wood chung.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Structural, Flexible"
@@ -1517,13 +1300,13 @@ const CRAFTING_RECIPES = [
         "outputItem": "Stone Tool Head",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Stone (Pebble/Boulder)",
+                "tagQuery": "Material, Stone",
                 "quantity": 2
             }
         ],
@@ -1532,24 +1315,24 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 45,
         "workstationQueueSlot": "Instant craft",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha input dung Stone chung.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Edge, Impact"
     },
     {
         "recipeNumber": 13,
-        "code": "COPPER_TOOL_HEAD",
-        "outputItem": "Copper Tool Head",
+        "code": "METAL_TOOL_HEAD",
+        "outputItem": "Metal Tool Head",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Copper (Ingot)",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             }
         ],
@@ -1558,59 +1341,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Edge, Impact"
-    },
-    {
-        "recipeNumber": 14,
-        "code": "IRON_TOOL_HEAD",
-        "outputItem": "Iron Tool Head",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron (Ingot)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Edge, Impact"
-    },
-    {
-        "recipeNumber": 15,
-        "code": "ALUMINUM_TOOL_HEAD",
-        "outputItem": "Aluminum Tool Head",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum (Ingot)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha recipe gop Copper/Iron/Aluminum Tool Head thanh Metal Tool Head.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Edge, Impact"
@@ -1621,9 +1352,9 @@ const CRAFTING_RECIPES = [
         "outputItem": "Bowstring",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -1643,17 +1374,17 @@ const CRAFTING_RECIPES = [
     },
     {
         "recipeNumber": 17,
-        "code": "IRON_GUN_BARREL",
-        "outputItem": "Iron Gun Barrel",
+        "code": "METAL_GUN_BARREL",
+        "outputItem": "Metal Gun Barrel",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron (Ingot)",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 2
             }
         ],
@@ -1662,24 +1393,24 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha recipe gop Iron/Aluminum Gun Barrel thanh Metal Gun Barrel.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Structural, Insulate"
     },
     {
         "recipeNumber": 18,
-        "code": "IRON_GUN_FRAME",
-        "outputItem": "Iron Gun Frame",
+        "code": "METAL_GUN_FRAME",
+        "outputItem": "Metal Gun Frame",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron (Ingot)",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 2
             }
         ],
@@ -1688,59 +1419,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Structural, Impact"
-    },
-    {
-        "recipeNumber": 19,
-        "code": "ALUMINUM_GUN_BARREL",
-        "outputItem": "Aluminum Gun Barrel",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum (Ingot)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
-        "requiredUseCaseTags": "Structural, Insulate"
-    },
-    {
-        "recipeNumber": 20,
-        "code": "ALUMINUM_GUN_FRAME",
-        "outputItem": "Aluminum Gun Frame",
-        "outputCategory": "Material",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum (Ingot)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha recipe gop Iron/Aluminum Gun Frame thanh Metal Gun Frame.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Structural, Impact"
@@ -1751,8 +1430,8 @@ const CRAFTING_RECIPES = [
         "outputItem": "Fabric Panel",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
@@ -1777,8 +1456,8 @@ const CRAFTING_RECIPES = [
         "outputItem": "Padding",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
@@ -1788,7 +1467,7 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Rubbish, Non-recyclable",
+                "tagQuery": "Material, Synthetic Scrap",
                 "quantity": 1
             }
         ],
@@ -1797,7 +1476,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 45,
         "workstationQueueSlot": "Instant craft",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha khong con Rubbish Non-recyclable rieng, dung Synthetic Scrap lam filler.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "Cushion, Insulate"
@@ -1808,23 +1487,18 @@ const CRAFTING_RECIPES = [
         "outputItem": "Gunpowder",
         "outputCategory": "Material",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Mineral, Sulfur",
-                "quantity": 1
+                "tagQuery": "Material, Gemstone",
+                "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Mineral, Saltpeter",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Processed material, Charcoal",
+                "tagQuery": "Material, Charcoal",
                 "quantity": 1
             }
         ],
@@ -1833,7 +1507,7 @@ const CRAFTING_RECIPES = [
         "craftTimeSeconds": 45,
         "workstationQueueSlot": "Instant craft",
         "curelRuleKey": "Material CUREL",
-        "designNotes": null,
+        "designNotes": "Alpha gop Sulfur/Saltpeter vao Gemstone/mineral resource chung.",
         "mainMaterialSlots": "1",
         "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
         "requiredUseCaseTags": "None (chemical)"
@@ -1844,25 +1518,25 @@ const CRAFTING_RECIPES = [
         "outputItem": "Wild Wheat Flour",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Grain (Wild Wheat)",
+                "tagQuery": "Food, Wild Wheat",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 1,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "craftTimeSeconds": 45,
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
         "recipeNumber": 25,
@@ -1870,25 +1544,25 @@ const CRAFTING_RECIPES = [
         "outputItem": "Wild Oat Flour",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Grain (Wild Oat)",
+                "tagQuery": "Food, Wild Oat",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 1,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "craftTimeSeconds": 45,
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
         "recipeNumber": 26,
@@ -1896,240 +1570,106 @@ const CRAFTING_RECIPES = [
         "outputItem": "Feral Corn Flour",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Grain (Feral Corn)",
+                "tagQuery": "Food, Feral Corn",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 1,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "craftTimeSeconds": 45,
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
         "recipeNumber": 27,
-        "code": "RAT_DRIED_MEAT",
-        "outputItem": "Rat Dried Meat",
+        "code": "DRIED_MEAT",
+        "outputItem": "Dried Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Rat)",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Spice, Salt",
+                "tagQuery": "Food, Salt",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
         "recipeNumber": 28,
-        "code": "FERAL_CAT_DRIED_MEAT",
-        "outputItem": "Feral Cat Dried Meat",
+        "code": "SMOKED_MEAT",
+        "outputItem": "Smoked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Feral Cat)",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Spice, Salt",
+                "tagQuery": "Material, Charcoal",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Food, Salt",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "requiredSkillLevel": 15,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
         "recipeNumber": 29,
-        "code": "DEER_DRIED_MEAT",
-        "outputItem": "Deer Dried Meat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Spice, Salt",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 600,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 30,
-        "code": "PIGEON_SMOKED_MEAT",
-        "outputItem": "Pigeon Smoked Meat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Pigeon)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed material, Charcoal",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice, Salt",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 15,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 600,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 31,
-        "code": "STRAY_DOG_SMOKED_MEAT",
-        "outputItem": "Stray Dog Smoked Meat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Stray Dog)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed material, Charcoal",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice, Salt",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 15,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 600,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 32,
-        "code": "DEER_SMOKED_MEAT",
-        "outputItem": "Deer Smoked Meat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed material, Charcoal",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice, Salt",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 15,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 600,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 33,
         "code": "SALT",
         "outputItem": "Salt",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Contaminated Water or Mineral Water",
                 "quantity": 2
             }
         ],
@@ -2137,25 +1677,25 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 34,
+        "recipeNumber": 30,
         "code": "SUGAR",
         "outputItem": "Sugar",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit",
+                "tagQuery": "Food, Fruit",
                 "quantity": 2
             }
         ],
@@ -2163,21 +1703,21 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 35,
+        "recipeNumber": 31,
         "code": "VINEGAR",
         "outputItem": "Vinegar",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -2189,21 +1729,21 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 36,
+        "recipeNumber": 32,
         "code": "SOYSAUCE",
         "outputItem": "Soysauce",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -2212,33 +1752,33 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Spice, Salt",
+                "tagQuery": "Food, Salt",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 37,
+        "recipeNumber": 33,
         "code": "YEAST",
         "outputItem": "Yeast",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 1
             }
         ],
@@ -2246,25 +1786,25 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 38,
+        "recipeNumber": 34,
         "code": "BUTTER",
         "outputItem": "Butter",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Oil/Fat",
+                "tagQuery": "Food, Animal Fat or Animal Oil",
                 "quantity": 1
             }
         ],
@@ -2272,51 +1812,56 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 39,
+        "recipeNumber": 35,
         "code": "CHEESE",
         "outputItem": "Cheese",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
                 "tagQuery": "Food, Butter",
                 "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Food, Salt",
+                "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 40,
-        "code": "STRAY_DOG_FAT",
-        "outputItem": "Stray Dog Fat",
+        "recipeNumber": 36,
+        "code": "ANIMAL_FAT",
+        "outputItem": "Animal Fat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Stray Dog)",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 2
             }
         ],
@@ -2324,899 +1869,552 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 41,
-        "code": "FERAL_CAT_FAT",
-        "outputItem": "Feral Cat Fat",
+        "recipeNumber": 37,
+        "code": "ANIMAL_OIL",
+        "outputItem": "Animal Oil",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Feral Cat)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 42,
-        "code": "DEER_FAT",
-        "outputItem": "Deer Fat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 43,
-        "code": "DEER_OIL",
-        "outputItem": "Deer Oil",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, Oil, Deer Fat",
+                "tagQuery": "Food, Animal Fat",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 30,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 44,
+        "recipeNumber": 38,
         "code": "PUMPKIN_SEED_OIL",
         "outputItem": "Pumpkin Seed Oil",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Seed, Pumpkin",
+                "tagQuery": "Material, Pumpkin Seed",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 30,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 45,
+        "recipeNumber": 39,
         "code": "FERAL_CORN_OIL",
         "outputItem": "Feral Corn Oil",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Grain, Corn",
+                "tagQuery": "Food, Feral Corn",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 30,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
+        "craftTimeSeconds": 180,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 40,
+        "code": "SKEWERED_MEAT",
+        "outputItem": "Skewered Meat",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Raw Meat",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 90,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 41,
+        "code": "SEASONED_SKEWERED_MEAT",
+        "outputItem": "Seasoned Skewered Meat",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Raw Meat",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Food, Salt or Soysauce",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 42,
+        "code": "STEAK",
+        "outputItem": "Steak",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Raw Meat",
+                "quantity": 2
+            }
+        ],
+        "requiredSkillLevel": 20,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
+        "craftTimeSeconds": 120,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 43,
+        "code": "SEASONED_STEAK",
+        "outputItem": "Seasoned Steak",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Raw Meat",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Food, Salt or Soysauce",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 30,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
+        "craftTimeSeconds": 180,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 44,
+        "code": "BOILED_MEAT",
+        "outputItem": "Boiled Meat",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Raw Meat",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Food, Water (Boiled/Filtered)",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 120,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 45,
+        "code": "BOILED_PUMPKIN",
+        "outputItem": "Boiled Pumpkin",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Overgrown Pumpkin",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Food, Water (Boiled/Filtered)",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 120,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
         "recipeNumber": 46,
-        "code": "SKEWERED_RAT",
-        "outputItem": "Skewered Rat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Rat)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 47,
-        "code": "SKEWERED_PIGEON",
-        "outputItem": "Skewered Pigeon",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Pigeon)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 48,
-        "code": "SKEWERED_DEER",
-        "outputItem": "Skewered Deer",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 49,
-        "code": "SEASONED_SKEWERED_STRAY_DOG",
-        "outputItem": "Seasoned Skewered Stray Dog",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Stray Dog)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 50,
-        "code": "SEASONED_SKEWERED_FERAL_CAT",
-        "outputItem": "Seasoned Skewered Feral Cat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Feral Cat)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 51,
-        "code": "SEASONED_SKEWERED_DEER",
-        "outputItem": "Seasoned Skewered Deer",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 52,
-        "code": "STRAY_DOG_STEAK",
-        "outputItem": "Stray Dog Steak",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Stray Dog)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 53,
-        "code": "FERAL_CAT_STEAK",
-        "outputItem": "Feral Cat Steak",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Feral Cat)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 54,
-        "code": "DEER_STEAK",
-        "outputItem": "Deer Steak",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 55,
-        "code": "STRAY_DOG_SEASONED_STEAK",
-        "outputItem": "Stray Dog Seasoned Steak",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Stray Dog)",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 56,
-        "code": "FERAL_CAT_SEASONED_STEAK",
-        "outputItem": "Feral Cat Seasoned Steak",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Feral Cat)",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 57,
-        "code": "DEER_SEASONED_STEAK",
-        "outputItem": "Deer Seasoned Steak",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 58,
-        "code": "BOILED_PIGEON",
-        "outputItem": "Boiled Pigeon",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Pigeon",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 59,
-        "code": "BOILED_RAT",
-        "outputItem": "Boiled Rat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Rat",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 60,
-        "code": "BOILED_OVERGROWN_PUMPKIN",
-        "outputItem": "Boiled Overgrown Pumpkin",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Overgrown Pumpkin",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 61,
         "code": "DANDELION_GREEN_SOUP",
         "outputItem": "Dandelion Green Soup",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Dandelion",
+                "tagQuery": "Food, Dandelion Greens",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 62,
+        "recipeNumber": 47,
         "code": "CELLAR_MUSHROOM_SOUP",
         "outputItem": "Cellar Mushroom Soup",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Cellar Mushroom",
+                "tagQuery": "Food, Cellar Mushroom",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 63,
-        "code": "DEER_BONE_SOUP",
-        "outputItem": "Deer Bone Soup",
+        "recipeNumber": 48,
+        "code": "MEAT_BONE_SOUP",
+        "outputItem": "Meat Bone Soup",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Bone, Deer",
+                "tagQuery": "Material, Bone",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 64,
-        "code": "STRAY_DOG_STEW",
-        "outputItem": "Stray Dog Stew",
+        "recipeNumber": 49,
+        "code": "MEAT_STEW",
+        "outputItem": "Meat Stew",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Stray Dog",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, Spice",
+                "tagQuery": "Food, Salt or Soysauce",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 65,
-        "code": "FERAL_CAT_STEW",
-        "outputItem": "Feral Cat Stew",
+        "recipeNumber": 50,
+        "code": "PUMPKIN_STEW",
+        "outputItem": "Pumpkin Stew",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Feral Cat",
+                "tagQuery": "Food, Overgrown Pumpkin",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, Spice",
+                "tagQuery": "Food, Salt",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 66,
-        "code": "OVERGROWN_PUMPKIN_STEW",
-        "outputItem": "Overgrown Pumpkin Stew",
+        "recipeNumber": 51,
+        "code": "MEAT_BONE_NOODLE_SOUP",
+        "outputItem": "Meat Bone Noodle Soup",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Overgrown Pumpkin",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 67,
-        "code": "DEER_BONE_NOODLE_SOUP",
-        "outputItem": "Deer Bone Noodle Soup",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Bone, Deer",
+                "tagQuery": "Material, Bone",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 68,
+        "recipeNumber": 52,
         "code": "CELLAR_MUSHROOM_NOODLE",
         "outputItem": "Cellar Mushroom Noodle",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, vegetable, Cellar Mushroom",
+                "tagQuery": "Food, Cellar Mushroom",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 69,
+        "recipeNumber": 53,
         "code": "FERAL_TOMATO_NOODLE",
         "outputItem": "Feral Tomato Noodle",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, vegetable, Feral Tomato",
+                "tagQuery": "Food, Feral Tomato",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 70,
-        "code": "FRIED_RAT",
-        "outputItem": "Fried Rat",
+        "recipeNumber": 54,
+        "code": "FRIED_MEAT",
+        "outputItem": "Fried Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Rat)",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 1
             },
             {
@@ -3229,25 +2427,92 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 71,
-        "code": "FRIED_PIGEON",
-        "outputItem": "Fried Pigeon",
+        "recipeNumber": 55,
+        "code": "SEASONED_FRIED_MEAT",
+        "outputItem": "Seasoned Fried Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Pigeon)",
+                "tagQuery": "Food, Raw Meat",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Food, Oil",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Food, Salt or Soysauce",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 30,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
+        "craftTimeSeconds": 180,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 56,
+        "code": "DEEP_FRIED_MEAT",
+        "outputItem": "Deep Fried Meat",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Raw Meat",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Food, Oil",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 40,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
+        "craftTimeSeconds": 180,
+        "workstationQueueSlot": "Cooking queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
+    },
+    {
+        "recipeNumber": 57,
+        "code": "FRIED_PUMPKIN",
+        "outputItem": "Fried Pumpkin",
+        "outputCategory": "Food",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Food, Overgrown Pumpkin",
                 "quantity": 1
             },
             {
@@ -3260,164 +2525,25 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 72,
-        "code": "FRIED_OVERGROWN_PUMPKIN",
-        "outputItem": "Fried Overgrown Pumpkin",
+        "recipeNumber": 58,
+        "code": "DEEP_FRIED_MUSHROOM",
+        "outputItem": "Deep Fried Mushroom",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Overgrown Pumpkin",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Oil",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 73,
-        "code": "SEASONED_FRIED_STRAY_DOG",
-        "outputItem": "Seasoned Fried Stray Dog",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Stray Dog)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Oil",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 74,
-        "code": "SEASONED_FRIED_FERAL_CAT",
-        "outputItem": "Seasoned Fried Feral Cat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Feral Cat)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Oil",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 75,
-        "code": "SEASONED_FRIED_DEER",
-        "outputItem": "Seasoned Fried Deer",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Oil",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 76,
-        "code": "DEEP_FRIED_CELLAR_MUSHROOM",
-        "outputItem": "Deep Fried Cellar Mushroom",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Cellar Mushroom",
+                "tagQuery": "Food, Cellar Mushroom",
                 "quantity": 2
             },
             {
@@ -3428,27 +2554,27 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 40,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 77,
-        "code": "DEEP_FRIED_FERAL_TOMATO",
-        "outputItem": "Deep Fried Feral Tomato",
+        "recipeNumber": 59,
+        "code": "DEEP_FRIED_TOMATO",
+        "outputItem": "Deep Fried Tomato",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Feral Tomato",
+                "tagQuery": "Food, Feral Tomato",
                 "quantity": 2
             },
             {
@@ -3459,58 +2585,27 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 40,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 78,
-        "code": "DEEP_FRIED_DEER",
-        "outputItem": "Deep Fried Deer",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Deer",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, Oil",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 79,
+        "recipeNumber": 60,
         "code": "BREAD",
         "outputItem": "Bread",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
@@ -3521,23 +2616,23 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 15,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 80,
-        "code": "RAT_BURGER",
-        "outputItem": "Rat Burger",
+        "recipeNumber": 61,
+        "code": "MEAT_BURGER",
+        "outputItem": "Meat Burger",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -3546,29 +2641,29 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, raw meat (Rat)",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 15,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 81,
-        "code": "STRAY_DOG_BURGER",
-        "outputItem": "Stray Dog Burger",
+        "recipeNumber": 62,
+        "code": "MEAT_SANDWICH",
+        "outputItem": "Meat Sandwich",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -3577,91 +2672,29 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, raw meat (Stray Dog)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 15,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 82,
-        "code": "DEER_BURGER",
-        "outputItem": "Deer Burger",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Makeshift Grill Rack",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, Bread",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, raw meat (Deer)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 15,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 83,
-        "code": "PIGEON_SANDWICH",
-        "outputItem": "Pigeon Sandwich",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, Bread",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, raw meat, Pigeon",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 84,
-        "code": "FERAL_TOMATO_SANDWICH",
-        "outputItem": "Feral Tomato Sandwich",
+        "recipeNumber": 63,
+        "code": "TOMATO_SANDWICH",
+        "outputItem": "Tomato Sandwich",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -3670,69 +2703,38 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, vegetable, Feral Tomato",
+                "tagQuery": "Food, Feral Tomato",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 85,
-        "code": "DEER_SANDWICH",
-        "outputItem": "Deer Sandwich",
+        "recipeNumber": 64,
+        "code": "MUSHROOM_PIZZA",
+        "outputItem": "Mushroom Pizza",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Bread",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, raw meat, Deer",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 86,
-        "code": "WILD_MUSHROOM_PIZZA",
-        "outputItem": "Wild Mushroom Pizza",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, vegetable, Cellar Mushroom",
+                "tagQuery": "Food, Cellar Mushroom",
                 "quantity": 1
             },
             {
@@ -3743,32 +2745,32 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 87,
-        "code": "FERAL_TOMATO_PIZZA",
-        "outputItem": "Feral Tomato Pizza",
+        "recipeNumber": 65,
+        "code": "TOMATO_PIZZA",
+        "outputItem": "Tomato Pizza",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, vegetable, Feral Tomato",
+                "tagQuery": "Food, Feral Tomato",
                 "quantity": 1
             },
             {
@@ -3779,32 +2781,32 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 88,
-        "code": "DEER_MEAT_PIZZA",
-        "outputItem": "Deer Meat Pizza",
+        "recipeNumber": 66,
+        "code": "MEAT_PIZZA",
+        "outputItem": "Meat Pizza",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, raw meat, Deer",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 1
             },
             {
@@ -3815,27 +2817,27 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 89,
-        "code": "WILD_APPLE_CAKE",
-        "outputItem": "Wild Apple Cake",
+        "recipeNumber": 67,
+        "code": "APPLE_CAKE",
+        "outputItem": "Apple Cake",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
@@ -3845,33 +2847,33 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, fruit, Apple",
+                "tagQuery": "Food, Wild Apple",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 25,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 25, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 90,
-        "code": "PARK_CHERRY_CAKE",
-        "outputItem": "Park Cherry Cake",
+        "recipeNumber": 68,
+        "code": "CHERRY_CAKE",
+        "outputItem": "Cherry Cake",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
@@ -3881,33 +2883,33 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, fruit, Cherry",
+                "tagQuery": "Food, Park Cherry",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 25,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 25, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 91,
-        "code": "BRAMBLE_BERRY_CAKE",
-        "outputItem": "Bramble Berry Cake",
+        "recipeNumber": 69,
+        "code": "BERRY_CAKE",
+        "outputItem": "Berry Cake",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
@@ -3917,363 +2919,224 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, fruit, Berry",
+                "tagQuery": "Food, Bramble Berry",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 25,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 25, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 92,
-        "code": "CANNED_DEER_MEAT",
-        "outputItem": "Canned Deer Meat",
+        "recipeNumber": 70,
+        "code": "CANNED_MEAT",
+        "outputItem": "Canned Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Deer",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Rubbish, Metal (can shell)",
+                "tagQuery": "Material, Metal Scrap/Ore",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 93,
-        "code": "CANNED_FERAL_TOMATO",
-        "outputItem": "Canned Feral Tomato",
+        "recipeNumber": 71,
+        "code": "CANNED_TOMATO",
+        "outputItem": "Canned Tomato",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Feral Tomato",
+                "tagQuery": "Food, Feral Tomato",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Rubbish, Metal (can shell)",
+                "tagQuery": "Material, Metal Scrap/Ore",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 94,
-        "code": "CANNED_OVERGROWN_PUMPKIN",
-        "outputItem": "Canned Overgrown Pumpkin",
+        "recipeNumber": 72,
+        "code": "CANNED_PUMPKIN",
+        "outputItem": "Canned Pumpkin",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Overgrown Pumpkin",
+                "tagQuery": "Food, Overgrown Pumpkin",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Rubbish, Metal (can shell)",
+                "tagQuery": "Material, Metal Scrap/Ore",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 600,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 95,
-        "code": "IMPROVED_CANNED_DEER_MEAT",
-        "outputItem": "Improved Canned Deer Meat",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Deer",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Metal (can shell)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 600,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 96,
-        "code": "IMPROVED_CANNED_FERAL_TOMATO",
-        "outputItem": "Improved Canned Feral Tomato",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Feral Tomato",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Metal (can shell)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 600,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 97,
-        "code": "IMPROVED_CANNED_OVERGROWN_PUMPKIN",
-        "outputItem": "Improved Canned Overgrown Pumpkin",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, vegetable, Overgrown Pumpkin",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Metal (can shell)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Food, Spice",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 600,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 98,
+        "recipeNumber": 73,
         "code": "STEAMED_VEGETABLE_BASKET",
         "outputItem": "Steamed Vegetable Basket",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, vegetable",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 99,
-        "code": "STEAMED_RAT_BUNS",
-        "outputItem": "Steamed Rat Buns",
+        "recipeNumber": 74,
+        "code": "STEAMED_MEAT_BUNS",
+        "outputItem": "Steamed Meat Buns",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Rat",
+                "tagQuery": "Food, Raw Meat",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 180,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 100,
-        "code": "STEAMED_DEER_DUMPLINGS",
-        "outputItem": "Steamed Deer Dumplings",
-        "outputCategory": "Food",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Food, raw meat, Deer",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Food, flour",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 101,
-        "code": "DEER_BONE_RAMEN",
-        "outputItem": "Deer Bone Ramen",
+        "recipeNumber": 75,
+        "code": "MEAT_BONE_RAMEN",
+        "outputItem": "Meat Bone Ramen",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, flour",
+                "tagQuery": "Food, Flour",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Bone, Deer",
+                "tagQuery": "Material, Bone",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 30,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 102,
-        "code": "WATER_BOILLED_FILTERED",
-        "outputItem": "Water (Boilled/Filtered)",
-        "outputCategory": "Drink",
+        "recipeNumber": 76,
+        "code": "WATER_BOILED_FILTERED",
+        "outputItem": "Water (Boiled/Filtered)",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Campfire / Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Drink, Contaminated (Contaminated water)",
+                "tagQuery": "Food, Contaminated Water",
                 "quantity": 1
             }
         ],
@@ -4281,30 +3144,30 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 103,
+        "recipeNumber": 77,
         "code": "MINERAL_WATER",
         "outputItem": "Mineral Water",
-        "outputCategory": "Drink",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Mineral",
+                "tagQuery": "Material, Gemstone",
                 "quantity": 1
             }
         ],
@@ -4312,25 +3175,25 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 104,
-        "code": "WILD_APPLE_JUICE",
-        "outputItem": "Wild Apple Juice",
-        "outputCategory": "Drink",
+        "recipeNumber": 78,
+        "code": "APPLE_JUICE",
+        "outputItem": "Apple Juice",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Apple",
+                "tagQuery": "Food, Wild Apple",
                 "quantity": 2
             }
         ],
@@ -4338,25 +3201,25 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 105,
-        "code": "OVERGROWN_GRAPE_JUICE",
-        "outputItem": "Overgrown Grape Juice",
-        "outputCategory": "Drink",
+        "recipeNumber": 79,
+        "code": "GRAPE_JUICE",
+        "outputItem": "Grape Juice",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Grape",
+                "tagQuery": "Food, Overgrown Grape",
                 "quantity": 2
             }
         ],
@@ -4364,25 +3227,25 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 106,
-        "code": "FERAL_TOMATO_JUICE",
-        "outputItem": "Feral Tomato Juice",
-        "outputCategory": "Drink",
+        "recipeNumber": 80,
+        "code": "TOMATO_JUICE",
+        "outputItem": "Tomato Juice",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Tomato",
+                "tagQuery": "Food, Feral Tomato",
                 "quantity": 2
             }
         ],
@@ -4390,30 +3253,30 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 107,
-        "code": "BRAMBLE_BERRY_SMOOTHIE",
-        "outputItem": "Bramble Berry Smoothie",
-        "outputCategory": "Drink",
+        "recipeNumber": 81,
+        "code": "BERRY_SMOOTHIE",
+        "outputItem": "Berry Smoothie",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Berry",
+                "tagQuery": "Food, Bramble Berry",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
@@ -4421,30 +3284,30 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 108,
-        "code": "ALLEY_FIG_SMOOTHIE",
-        "outputItem": "Alley Fig Smoothie",
-        "outputCategory": "Drink",
+        "recipeNumber": 82,
+        "code": "FIG_SMOOTHIE",
+        "outputItem": "Fig Smoothie",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Fig",
+                "tagQuery": "Food, Alley Fig",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
@@ -4452,30 +3315,30 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 109,
-        "code": "PARK_CHERRY_SMOOTHIE",
-        "outputItem": "Park Cherry Smoothie",
-        "outputCategory": "Drink",
+        "recipeNumber": 83,
+        "code": "CHERRY_SMOOTHIE",
+        "outputItem": "Cherry Smoothie",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Cherry",
+                "tagQuery": "Food, Park Cherry",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
@@ -4483,30 +3346,30 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 110,
+        "recipeNumber": 84,
         "code": "COFFEE",
         "outputItem": "Coffee",
-        "outputCategory": "Drink",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Processed drink (water)",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Raw material (plant seeds or leaves)",
+                "tagQuery": "Material, Seed or Plantable",
                 "quantity": 1
             }
         ],
@@ -4514,25 +3377,25 @@ const CRAFTING_RECIPES = [
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
         "craftTimeSeconds": 120,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 111,
-        "code": "OVERGROWN_GRAPE_WINE",
-        "outputItem": "Overgrown Grape Wine",
-        "outputCategory": "Drink",
+        "recipeNumber": 85,
+        "code": "GRAPE_WINE",
+        "outputItem": "Grape Wine",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Grape",
+                "tagQuery": "Food, Overgrown Grape",
                 "quantity": 3
             },
             {
@@ -4543,27 +3406,27 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 15,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 1800,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 112,
-        "code": "WILD_APPLE_WINE",
-        "outputItem": "Wild Apple Wine",
-        "outputCategory": "Drink",
+        "recipeNumber": 86,
+        "code": "APPLE_WINE",
+        "outputItem": "Apple Wine",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Apple",
+                "tagQuery": "Food, Wild Apple",
                 "quantity": 3
             },
             {
@@ -4574,27 +3437,27 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 15,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 1800,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 113,
-        "code": "BRAMBLE_BERRY_WINE",
-        "outputItem": "Bramble Berry Wine",
-        "outputCategory": "Drink",
+        "recipeNumber": 87,
+        "code": "BERRY_WINE",
+        "outputItem": "Berry Wine",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II+: Salvaged Wood Stove / Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, fruit, Berry",
+                "tagQuery": "Food, Bramble Berry",
                 "quantity": 3
             },
             {
@@ -4605,23 +3468,23 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 15,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 1800,
+        "craftTimeSeconds": 240,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 114,
+        "recipeNumber": 88,
         "code": "MOONSHINE",
         "outputItem": "Moonshine",
-        "outputCategory": "Drink",
+        "outputCategory": "Food",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier III: Rewired Electric Stove",
-        "requiredTool": "Salvaged Cooking Pot",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Cooking Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -4641,49 +3504,49 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 40,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 120,
+        "craftTimeSeconds": 300,
         "workstationQueueSlot": "Cooking queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: cooking needs fuel, water, and queue time; unsafe ingredients should carry infection risk.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Food"
     },
     {
-        "recipeNumber": 115,
+        "recipeNumber": 89,
         "code": "BANDAGE",
         "outputItem": "Bandage",
         "outputCategory": "Medicine",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier I+: Field Medical Station / Restored Medical Lab",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Medical Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
                 "tagQuery": "Material, Fabric",
-                "quantity": 2
+                "quantity": 1
             }
         ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
         "craftTimeSeconds": 180,
         "workstationQueueSlot": "Medical queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: medical crafting should consume clean fabric, alcohol/chemical base, or medicinal plants.",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Medicine"
     },
     {
-        "recipeNumber": 116,
+        "recipeNumber": 90,
         "code": "FIRST_AID_KIT",
-        "outputItem": "First aid Kit",
+        "outputItem": "First Aid Kit",
         "outputCategory": "Medicine",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II: Restored Medical Lab",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Medical Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
@@ -4692,2481 +3555,961 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Medicine, Antibiotic",
+                "tagQuery": "Material, Fabric",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Medicine, Painkiller",
+                "tagQuery": "Material, Rubber",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
         "craftTimeSeconds": 180,
         "workstationQueueSlot": "Medical queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: medical crafting should consume clean fabric, alcohol/chemical base, or medicinal plants.",
-        "mainMaterialSlots": "1,2,3",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Medicine"
     },
     {
-        "recipeNumber": 117,
+        "recipeNumber": 91,
         "code": "ANTIBIOTIC",
         "outputItem": "Antibiotic",
         "outputCategory": "Medicine",
         "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II: Restored Medical Lab",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Raw material (medicinal plant or mineral)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Medical queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: medical crafting should consume clean fabric, alcohol/chemical base, or medicinal plants.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 118,
-        "code": "PAINKILLER",
-        "outputItem": "Painkiller",
-        "outputCategory": "Medicine",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II: Restored Medical Lab",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Raw material (medicinal plant or mineral)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Medical queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: medical crafting should consume clean fabric, alcohol/chemical base, or medicinal plants.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 119,
-        "code": "ANDERALINE_SHOT",
-        "outputItem": "Anderaline shot",
-        "outputCategory": "Medicine",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II: Restored Medical Lab",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Raw material (meat or chemical)",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Medical queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: medical crafting should consume clean fabric, alcohol/chemical base, or medicinal plants.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 120,
-        "code": "SPEED_BOOSTER",
-        "outputItem": "Speed booster",
-        "outputCategory": "Medicine",
-        "requiredJobCode": "cooking",
-        "workstationAccess": "Tier II: Restored Medical Lab",
-        "requiredTool": "Scrap Metal Ladle",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Raw material (meat or chemical)",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Medical queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Post-apocalypse logic: medical crafting should consume clean fabric, alcohol/chemical base, or medicinal plants.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 121,
-        "code": "STONE_AXE",
-        "outputItem": "Stone Axe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Stone Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 122,
-        "code": "STONE_PICKAXE",
-        "outputItem": "Stone Pickaxe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Stone Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 123,
-        "code": "STONE_SHOVEL",
-        "outputItem": "Stone Shovel",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Stone Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 124,
-        "code": "STONE_HOE",
-        "outputItem": "Stone Hoe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Stone Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 125,
-        "code": "COPPER_AXE",
-        "outputItem": "Copper Axe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Copper Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 126,
-        "code": "COPPER_PICKAXE",
-        "outputItem": "Copper Pickaxe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Copper Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 127,
-        "code": "COPPER_SHOVEL",
-        "outputItem": "Copper Shovel",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Copper Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 128,
-        "code": "COPPER_HOE",
-        "outputItem": "Copper Hoe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Copper Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 129,
-        "code": "IRON_AXE",
-        "outputItem": "Iron Axe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Iron Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 130,
-        "code": "IRON_PICKAXE",
-        "outputItem": "Iron Pickaxe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Iron Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 131,
-        "code": "IRON_SHOVEL",
-        "outputItem": "Iron Shovel",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Iron Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 132,
-        "code": "IRON_HOE",
-        "outputItem": "Iron Hoe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Iron Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 133,
-        "code": "ALUMINUM_AXE",
-        "outputItem": "Aluminum Axe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Aluminum Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 134,
-        "code": "ALUMINUM_PICKAXE",
-        "outputItem": "Aluminum Pickaxe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Aluminum Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 135,
-        "code": "ALUMINUM_SHOVEL",
-        "outputItem": "Aluminum Shovel",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Aluminum Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 136,
-        "code": "ALUMINUM_HOE",
-        "outputItem": "Aluminum Hoe",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Aluminum Tool Head",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 137,
-        "code": "MAKESHIFT_GRILL_RACK",
-        "outputItem": "Makeshift Grill Rack",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Recyclable, Metal",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Structural"
-    },
-    {
-        "recipeNumber": 138,
-        "code": "SALVAGED_COOKING_POT",
-        "outputItem": "Salvaged Cooking Pot",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Recyclable, Metal",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Structural"
-    },
-    {
-        "recipeNumber": 139,
-        "code": "SCRAP_METAL_LADLE",
-        "outputItem": "Scrap Metal Ladle",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron/Aluminum",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Structural"
-    },
-    {
-        "recipeNumber": 140,
-        "code": "SALVAGED_HAMMER",
-        "outputItem": "Salvaged Hammer",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "None (hand-craft, no workstation required)",
-        "requiredTool": "None",
+        "workstationAccess": "Medical Station",
+        "requiredTool": null,
         "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Rubbish, Recyclable, Metal",
+                "tagQuery": "Food, Cellar Mushroom",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Branch or Log",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Genesis tool: craftable by hand with zero prerequisites so the tool chain can bootstrap. Fixed 2026: previously required Reinforced Crowbar (circular) and a pre-made Wooden Handle (also circular through Rusty Hand Saw).",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 141,
-        "code": "RUSTY_HAND_SAW",
-        "outputItem": "Rusty Hand Saw",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "None (hand-craft, no workstation required)",
-        "requiredTool": "Reinforced Crowbar",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 142,
-        "code": "REINFORCED_CROWBAR",
-        "outputItem": "Reinforced Crowbar",
-        "outputCategory": "Tool",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "None (hand-craft, no workstation required)",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 143,
-        "code": "SHARPENED_STONE_SHIV",
-        "outputItem": "Sharpened Stone Shiv",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Stone Tool Head",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 144,
-        "code": "BONE_SPEAR",
-        "outputItem": "Bone Spear",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Bone (any)",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Material, Cordage",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
+        "craftTimeSeconds": 180,
+        "workstationQueueSlot": "Medical queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Medicine"
     },
     {
-        "recipeNumber": 145,
-        "code": "SCRAP_METAL_MACHETE",
-        "outputItem": "Scrap Metal Machete",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "recipeNumber": 92,
+        "code": "PAINKILLER",
+        "outputItem": "Painkiller",
+        "outputCategory": "Medicine",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Medical Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron (Ingot)",
+                "tagQuery": "Material, Dandelion Seed or Wild Lettuce Seed",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 300,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Edge"
-    },
-    {
-        "recipeNumber": 146,
-        "code": "REBAR_SLEDGE",
-        "outputItem": "Rebar Sledge",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Metal, Iron",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wooden Handle",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 147,
-        "code": "MAKESHIFT_BOW",
-        "outputItem": "Makeshift Bow",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Bowstring",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 148,
-        "code": "SALVAGED_CROSSBOW",
-        "outputItem": "Salvaged Crossbow",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Bowstring",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Material, Metal, Iron",
+                "tagQuery": "Food, Water (Boiled/Filtered)",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
+        "craftTimeSeconds": 180,
+        "workstationQueueSlot": "Medical queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Medicine"
     },
     {
-        "recipeNumber": 149,
-        "code": "REINFORCED_COMPOUND_BOW",
-        "outputItem": "Reinforced Compound Bow",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "recipeNumber": 93,
+        "code": "BOOSTER",
+        "outputItem": "Booster",
+        "outputCategory": "Medicine",
+        "requiredJobCode": "cooking",
+        "workstationAccess": "Medical Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 2
+                "tagQuery": "Medicine, Antibiotic or Painkiller",
+                "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Bowstring",
-                "quantity": 2
+                "tagQuery": "Food, Coffee",
+                "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 150,
-        "code": "REINFORCED_TACTICAL_CROSSBOW",
-        "outputItem": "Reinforced Tactical Crossbow",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Bowstring",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 3,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1,3",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 151,
-        "code": "ZIP_GUN",
-        "outputItem": "Zip Gun",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Iron Gun Barrel",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Iron Gun Frame",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Insulate"
-    },
-    {
-        "recipeNumber": 152,
-        "code": "PIPE_SHOTGUN",
-        "outputItem": "Pipe Shotgun",
-        "outputCategory": "Weapon",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Iron Gun Barrel",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Iron Gun Frame",
+                "tagQuery": "Material, Rubber",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 30,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Reality check: handle, binding, and head/blade should be separate input slots so substitutions work by tag.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Insulate"
-    },
-    {
-        "recipeNumber": 153,
-        "code": "SHARPENED_WOODEN_ARROW",
-        "outputItem": "Sharpened Wooden Arrow",
-        "outputCategory": "Ammo",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Branch",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 45,
-        "workstationQueueSlot": "Instant craft",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
+        "craftTimeSeconds": 180,
+        "workstationQueueSlot": "Medical queue",
+        "curelRuleKey": "Material CUREL",
         "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Medicine"
     },
     {
-        "recipeNumber": 154,
-        "code": "SCRAP_METAL_ARROW",
-        "outputItem": "Scrap Metal Arrow",
-        "outputCategory": "Ammo",
+        "recipeNumber": 94,
+        "code": "AXE",
+        "outputItem": "Axe",
+        "outputCategory": "Tool",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Branch",
+                "tagQuery": "Material, Wooden Handle",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 45,
-        "workstationQueueSlot": "Instant craft",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": null,
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 155,
-        "code": "BROADHEAD_HUNTING_ARROW",
-        "outputItem": "Broadhead Hunting Arrow",
-        "outputCategory": "Ammo",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Branch",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 45,
-        "workstationQueueSlot": "Instant craft",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": null,
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 156,
-        "code": "HAND_LOADED_PISTOL_ROUNDS",
-        "outputItem": "Hand-loaded Pistol Rounds",
-        "outputCategory": "Ammo",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Gunpowder",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Zinc",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 45,
-        "workstationQueueSlot": "Instant craft",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": null,
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 157,
-        "code": "IMPROVISED_SHOTGUN_SHELLS",
-        "outputItem": "Improvised Shotgun Shells",
-        "outputCategory": "Ammo",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Gunpowder",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Zinc",
+                "tagQuery": "Material, Stone Tool Head or Metal Tool Head",
                 "quantity": 1
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Material, Plastic",
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 45,
-        "workstationQueueSlot": "Instant craft",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 300,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
         "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Gathering, Wood"
     },
     {
-        "recipeNumber": 158,
-        "code": "PADDED_PUFFER_VEST",
-        "outputItem": "Padded Puffer Vest",
-        "outputCategory": "Equipment",
+        "recipeNumber": 95,
+        "code": "PICKAXE",
+        "outputItem": "Pickaxe",
+        "outputCategory": "Tool",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric",
-                "quantity": 2
+                "tagQuery": "Material, Wooden Handle",
+                "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Stone Tool Head or Metal Tool Head",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 1,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Starter - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "requiredUseCaseTags": "Gathering, Ore, Stone"
     },
     {
-        "recipeNumber": 159,
-        "code": "SKATE_HELMET",
-        "outputItem": "Skate Helmet",
-        "outputCategory": "Equipment",
+        "recipeNumber": 96,
+        "code": "SHOVEL",
+        "outputItem": "Shovel",
+        "outputCategory": "Tool",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric",
+                "tagQuery": "Material, Wooden Handle",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Stone Tool Head or Metal Tool Head",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 1,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Starter - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
+        "requiredUseCaseTags": "Gathering, Soil"
     },
     {
-        "recipeNumber": 160,
-        "code": "COTTON_T_SHIRT",
-        "outputItem": "Cotton T-Shirt",
-        "outputCategory": "Equipment",
+        "recipeNumber": 97,
+        "code": "HOE",
+        "outputItem": "Hoe",
+        "outputCategory": "Tool",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Starter - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 161,
-        "code": "DENIM_JEANS",
-        "outputItem": "Denim Jeans",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
+                "tagQuery": "Material, Wooden Handle",
+                "quantity": 1
+            },
             {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Starter - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 162,
-        "code": "WOOL_GLOVES",
-        "outputItem": "Wool Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
+                "slotIndex": 2,
+                "tagQuery": "Material, Stone Tool Head or Metal Tool Head",
+                "quantity": 1
+            },
             {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric",
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 1,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Starter - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
+        "requiredUseCaseTags": "Gathering, Farm"
     },
     {
-        "recipeNumber": 163,
-        "code": "CANVAS_SHOES",
-        "outputItem": "Canvas Shoes",
-        "outputCategory": "Equipment",
+        "recipeNumber": 98,
+        "code": "HAMMER",
+        "outputItem": "Hammer",
+        "outputCategory": "Tool",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric",
+                "tagQuery": "Material, Wooden Handle",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
+                "tagQuery": "Material, Metal Tool Head",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 300,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "CraftingTool"
+    },
+    {
+        "recipeNumber": 99,
+        "code": "SAW",
+        "outputItem": "Saw",
+        "outputCategory": "Tool",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Wooden Handle",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 300,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "CraftingTool"
+    },
+    {
+        "recipeNumber": 100,
+        "code": "CROWBAR",
+        "outputItem": "Crowbar",
+        "outputCategory": "Tool",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Rubber",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 300,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "CraftingTool"
+    },
+    {
+        "recipeNumber": 101,
+        "code": "GRILL_RACK",
+        "outputItem": "Grill Rack",
+        "outputCategory": "Tool",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Metal Nail",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 300,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "CraftingTool, Cooking"
+    },
+    {
+        "recipeNumber": 102,
+        "code": "COOKING_POT",
+        "outputItem": "Cooking Pot",
+        "outputCategory": "Tool",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Rubber",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 300,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "CraftingTool, Cooking"
+    },
+    {
+        "recipeNumber": 103,
+        "code": "LADLE",
+        "outputItem": "Ladle",
+        "outputCategory": "Tool",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Wooden Handle",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 300,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "CraftingTool, Cooking"
+    },
+    {
+        "recipeNumber": 104,
+        "code": "DAGGER",
+        "outputItem": "Dagger",
+        "outputCategory": "Weapon",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Stone Tool Head or Metal Tool Head",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 1,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Starter - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
+        "requiredUseCaseTags": "Melee"
     },
     {
-        "recipeNumber": 164,
-        "code": "MOTOCROSS_CHEST_PROTECTOR",
-        "outputItem": "Motocross Chest Protector",
-        "outputCategory": "Equipment",
+        "recipeNumber": 105,
+        "code": "SPEAR",
+        "outputItem": "Spear",
+        "outputCategory": "Weapon",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Leather",
+                "tagQuery": "Material, Wooden Handle",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Stone Tool Head or Metal Tool Head",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Melee"
+    },
+    {
+        "recipeNumber": 106,
+        "code": "MACHETE",
+        "outputItem": "Machete",
+        "outputCategory": "Weapon",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Wooden Handle",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Biker - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
+        "requiredUseCaseTags": "Melee"
     },
     {
-        "recipeNumber": 165,
-        "code": "MOTORCYCLE_HELMET",
-        "outputItem": "Motorcycle Helmet",
-        "outputCategory": "Equipment",
+        "recipeNumber": 107,
+        "code": "CLUB",
+        "outputItem": "Club",
+        "outputCategory": "Weapon",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 1
+                "tagQuery": "Material, Wood",
+                "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Metal Nail",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Melee"
+    },
+    {
+        "recipeNumber": 108,
+        "code": "BOW",
+        "outputItem": "Bow",
+        "outputCategory": "Weapon",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Wood",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Bowstring",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Ranged"
+    },
+    {
+        "recipeNumber": 109,
+        "code": "CROSSBOW",
+        "outputItem": "Crossbow",
+        "outputCategory": "Weapon",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Wood",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Bowstring",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Biker - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
+        "requiredUseCaseTags": "Ranged"
     },
     {
-        "recipeNumber": 166,
-        "code": "HEAVY_LEATHER_JACKET",
-        "outputItem": "Heavy Leather Jacket",
-        "outputCategory": "Equipment",
+        "recipeNumber": 110,
+        "code": "HANDGUN",
+        "outputItem": "Handgun",
+        "outputCategory": "Weapon",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Biker - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 167,
-        "code": "RIDING_JEANS_WITH_KNEE_PADS",
-        "outputItem": "Riding Jeans with Knee Pads",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Biker - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 168,
-        "code": "PADDED_BIKER_GLOVES",
-        "outputItem": "Padded Biker Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Biker - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 169,
-        "code": "HIGH_TOP_SKATE_SNEAKERS",
-        "outputItem": "High-Top Skate Sneakers",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
+                "tagQuery": "Material, Metal Gun Barrel",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
+                "tagQuery": "Material, Metal Gun Frame",
                 "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Biker - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 170,
-        "code": "APRON",
-        "outputItem": "Apron",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 2
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
+                "slotIndex": 3,
+                "tagQuery": "Material, Rubber",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef I - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "requiredUseCaseTags": "Ranged"
     },
     {
-        "recipeNumber": 171,
-        "code": "CHEF_S_TOQUE",
-        "outputItem": "Chef's Toque",
-        "outputCategory": "Equipment",
+        "recipeNumber": 111,
+        "code": "SHOTGUN",
+        "outputItem": "Shotgun",
+        "outputCategory": "Weapon",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef I - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 172,
-        "code": "CHEF_S_COAT",
-        "outputItem": "Chef's Coat",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef I - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 173,
-        "code": "CHEF_S_JEANS",
-        "outputItem": "Chef's Jeans",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef I - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 174,
-        "code": "CHEF_S_GLOVES",
-        "outputItem": "Chef's Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef I - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 175,
-        "code": "KITCHEN_SNEAKERS",
-        "outputItem": "Kitchen Sneakers",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef I - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 176,
-        "code": "HEAT_RESISTANT_APRON",
-        "outputItem": "Heat-Resistant Apron",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Metal Gun Barrel",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Wooden Handle",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Gun Frame",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 20,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef II - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "requiredUseCaseTags": "Ranged"
     },
     {
-        "recipeNumber": 177,
-        "code": "INSULATED_CHEF_S_CAP",
-        "outputItem": "Insulated Chef's Cap",
-        "outputCategory": "Equipment",
+        "recipeNumber": 112,
+        "code": "RIFLE",
+        "outputItem": "Rifle",
+        "outputCategory": "Weapon",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Metal Gun Barrel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Metal Gun Frame",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Wood",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 30,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Ranged"
+    },
+    {
+        "recipeNumber": 113,
+        "code": "SMG",
+        "outputItem": "SMG",
+        "outputCategory": "Weapon",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Gun Barrel",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Metal Gun Frame",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Rubber",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 30,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef II - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "requiredUseCaseTags": "Ranged"
     },
     {
-        "recipeNumber": 178,
-        "code": "FIRE_RETARDANT_CHEF_S_COAT",
-        "outputItem": "Fire-Retardant Chef's Coat",
-        "outputCategory": "Equipment",
+        "recipeNumber": 114,
+        "code": "ARROW",
+        "outputItem": "Arrow",
+        "outputCategory": "Ammo",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef II - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 179,
-        "code": "GREASE_PROOF_CHEF_S_TROUSERS",
-        "outputItem": "Grease-Proof Chef's Trousers",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
+                "tagQuery": "Material, Wood",
+                "quantity": 1
+            },
             {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef II - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 180,
-        "code": "HEAT_RESISTANT_COOKING_GLOVES",
-        "outputItem": "Heat-Resistant Cooking Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "slotIndex": 2,
+                "tagQuery": "Material, Stone Tool Head or Metal Tool Head",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
         "craftTimeSeconds": 120,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef II - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Ammo"
     },
     {
-        "recipeNumber": 181,
-        "code": "NON_SLIP_KITCHEN_BOOTS",
-        "outputItem": "Non-Slip Kitchen Boots",
-        "outputCategory": "Equipment",
+        "recipeNumber": 115,
+        "code": "HANDGUN_AMMO",
+        "outputItem": "Handgun Ammo",
+        "outputCategory": "Ammo",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Chef II - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 182,
-        "code": "HI_VIS_CONSTRUCTION_VEST",
-        "outputItem": "Hi-Vis Construction Vest",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Gunpowder",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction I - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "craftTimeSeconds": 120,
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Ammo"
     },
     {
-        "recipeNumber": 183,
-        "code": "IMPACT_CONSTRUCTION_HELMET",
-        "outputItem": "Impact Construction Helmet",
-        "outputCategory": "Equipment",
+        "recipeNumber": 116,
+        "code": "SHOTGUN_AMMO",
+        "outputItem": "Shotgun Ammo",
+        "outputCategory": "Ammo",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction I - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 184,
-        "code": "HEAVY_FLANNEL_CONSTRUCTION_SHIRT",
-        "outputItem": "Heavy Flannel Construction Shirt",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Gunpowder",
                 "quantity": 2
             }
         ],
         "requiredSkillLevel": 20,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction I - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "craftTimeSeconds": 120,
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Ammo"
     },
     {
-        "recipeNumber": 185,
-        "code": "DOUBLE_KNEE_WORK_PANTS",
-        "outputItem": "Double-Knee Work Pants",
-        "outputCategory": "Equipment",
+        "recipeNumber": 117,
+        "code": "RIFLE_AMMO",
+        "outputItem": "Rifle Ammo",
+        "outputCategory": "Ammo",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction I - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 186,
-        "code": "IMPACT_RESISTANT_PROTECTIVE_GLOVES",
-        "outputItem": "Impact-Resistant Protective Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction I - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 187,
-        "code": "STEEL_TOE_SAFETY_SHOES",
-        "outputItem": "Steel-Toe Safety Shoes",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction I - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 188,
-        "code": "REINFORCED_HI_VIS_VEST",
-        "outputItem": "Reinforced Hi-Vis Vest",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Gunpowder",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction II - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "requiredSkillLevel": 30,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
+        "craftTimeSeconds": 120,
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Ammo"
     },
     {
-        "recipeNumber": 189,
-        "code": "FULL_FACE_CONSTRUCTION_HELMET",
-        "outputItem": "Full-Face Construction Helmet",
-        "outputCategory": "Equipment",
+        "recipeNumber": 118,
+        "code": "SMG_AMMO",
+        "outputItem": "SMG Ammo",
+        "outputCategory": "Ammo",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
+        "workstationAccess": "Crafting Station",
+        "requiredTool": null,
+        "toolDurabilityCost": null,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction II - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 190,
-        "code": "KEVLAR_LINED_WORK_SHIRT",
-        "outputItem": "Kevlar-Lined Work Shirt",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction II - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 191,
-        "code": "REINFORCED_WORK_OVERALLS",
-        "outputItem": "Reinforced Work Overalls",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction II - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 192,
-        "code": "ANTI_VIBRATION_WORK_GLOVES",
-        "outputItem": "Anti-Vibration Work Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction II - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 193,
-        "code": "STEEL_PLATED_WORK_BOOTS",
-        "outputItem": "Steel-Plated Work Boots",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Construction II - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 194,
-        "code": "GATHERER_S_UTILITY_VEST",
-        "outputItem": "Gatherer's Utility Vest",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering I - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 195,
-        "code": "PROSPECTOR_S_HARDHAT",
-        "outputItem": "Prospector's Hardhat",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering I - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 196,
-        "code": "REINFORCED_CANVAS_JACKET",
-        "outputItem": "Reinforced Canvas Jacket",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Gunpowder",
                 "quantity": 2
             }
         ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering I - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "requiredSkillLevel": 30,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
+        "craftTimeSeconds": 120,
+        "workstationQueueSlot": "Instant craft",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Ammo"
     },
     {
-        "recipeNumber": 197,
-        "code": "HEAVY_DUTY_CARGO_PANTS",
-        "outputItem": "Heavy-Duty Cargo Pants",
+        "recipeNumber": 119,
+        "code": "COMBATING_VEST",
+        "outputItem": "Combating Vest",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering I - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 198,
-        "code": "GRIP_ENHANCING_WORK_GLOVES",
-        "outputItem": "Grip-Enhancing Work Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering I - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 199,
-        "code": "STEEL_TOE_FORAGING_BOOTS",
-        "outputItem": "Steel-Toe Foraging Boots",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering I - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 200,
-        "code": "EXPEDITION_UTILITY_VEST",
-        "outputItem": "Expedition Utility Vest",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
@@ -7176,28 +4519,33 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering II - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "requiredUseCaseTags": "Combating, Vest"
     },
     {
-        "recipeNumber": 201,
-        "code": "REINFORCED_PROSPECTOR_S_HELMET",
-        "outputItem": "Reinforced Prospector's Helmet",
+        "recipeNumber": 120,
+        "code": "COMBATING_HEAD",
+        "outputItem": "Combating Head",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
@@ -7207,137 +4555,33 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering II - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 202,
-        "code": "ALL_WEATHER_FIELD_JACKET",
-        "outputItem": "All-Weather Field Jacket",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering II - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 203,
-        "code": "RUGGED_TRAIL_TROUSERS",
-        "outputItem": "Rugged Trail Trousers",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering II - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 204,
-        "code": "THORNPROOF_FORAGING_GLOVES",
-        "outputItem": "Thornproof Foraging Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering II - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 205,
-        "code": "TRAILBLAZER_HIKING_BOOTS",
-        "outputItem": "Trailblazer Hiking Boots",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
+                "tagQuery": "Material, Padding",
                 "quantity": 1
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Gathering II - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
+        "requiredUseCaseTags": "Combating, Head"
     },
     {
-        "recipeNumber": 206,
-        "code": "WELDER_S_LEATHER_APRON",
-        "outputItem": "Welder's Leather Apron",
+        "recipeNumber": 121,
+        "code": "COMBATING_UPPERBODY",
+        "outputItem": "Combating UpperBody",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
@@ -7347,339 +4591,141 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting I - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 207,
-        "code": "FLIP_UP_WELDING_MASK",
-        "outputItem": "Flip-Up Welding Mask",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
+                "tagQuery": "Material, Padding",
                 "quantity": 1
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting I - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
+        "requiredUseCaseTags": "Combating, UpperBody"
     },
     {
-        "recipeNumber": 208,
-        "code": "OIL_STAINED_COVERALL_TOP",
-        "outputItem": "Oil-Stained Coverall Top",
+        "recipeNumber": 122,
+        "code": "COMBATING_LOWERBODY",
+        "outputItem": "Combating LowerBody",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
                 "tagQuery": "Material, Leather",
                 "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 1
             }
         ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting I - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
+        "requiredUseCaseTags": "Combating, LowerBody"
     },
     {
-        "recipeNumber": 209,
-        "code": "DENIM_MECHANIC_TROUSERS",
-        "outputItem": "Denim Mechanic Trousers",
+        "recipeNumber": 123,
+        "code": "COMBATING_HAND",
+        "outputItem": "Combating Hand",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
                 "tagQuery": "Material, Leather",
                 "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 1
             }
         ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting I - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
+        "requiredUseCaseTags": "Combating, Hand"
     },
     {
-        "recipeNumber": 210,
-        "code": "THICK_LEATHER_WELDING_GLOVES",
-        "outputItem": "Thick Leather Welding Gloves",
+        "recipeNumber": 124,
+        "code": "COMBATING_LEG",
+        "outputItem": "Combating Leg",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
                 "tagQuery": "Material, Leather",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting I - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 211,
-        "code": "OIL_RESISTANT_WORK_BOOTS",
-        "outputItem": "Oil-Resistant Work Boots",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting I - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 212,
-        "code": "HEAVY_DUTY_WELDING_APRON",
-        "outputItem": "Heavy-Duty Welding Apron",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting II - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 213,
-        "code": "FULL_FACE_WELDING_HELMET",
-        "outputItem": "Full-Face Welding Helmet",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
+                "tagQuery": "Material, Padding",
                 "quantity": 1
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
+                "slotIndex": 3,
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting II - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
+        "requiredUseCaseTags": "Combating, Leg"
     },
     {
-        "recipeNumber": 214,
-        "code": "FLAME_RESISTANT_COVERALLS",
-        "outputItem": "Flame-Resistant Coveralls",
+        "recipeNumber": 125,
+        "code": "COOKING_VEST",
+        "outputItem": "Cooking Vest",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting II - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 215,
-        "code": "REINFORCED_MECHANIC_TROUSERS",
-        "outputItem": "Reinforced Mechanic Trousers",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting II - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 216,
-        "code": "INSULATED_WELDING_GAUNTLETS",
-        "outputItem": "Insulated Welding Gauntlets",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting II - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 217,
-        "code": "STEEL_TOE_MECHANIC_BOOTS",
-        "outputItem": "Steel-Toe Mechanic Boots",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Crafting II - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 218,
-        "code": "TACTICAL_SCAVENGER_HARNESS",
-        "outputItem": "Tactical Scavenger Harness",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
@@ -7689,489 +4735,717 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger I - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
-    },
-    {
-        "recipeNumber": 219,
-        "code": "SCAVENGER_S_RESPIRATOR_MASK",
-        "outputItem": "Scavenger's Respirator Mask",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Padding",
                 "quantity": 1
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger I - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 220,
-        "code": "BITE_PROOF_PADDED_HOODIE",
-        "outputItem": "Bite-Proof Padded Hoodie",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger I - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 221,
-        "code": "FLEXIBLE_ATHLETIC_JOGGERS",
-        "outputItem": "Flexible Athletic Joggers",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger I - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 222,
-        "code": "FINGERLESS_COMBAT_GLOVES",
-        "outputItem": "Fingerless Combat Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger I - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 223,
-        "code": "SILENT_SOLE_RUNNING_SHOES",
-        "outputItem": "Silent Sole Running Shoes",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger I - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Edge"
-    },
-    {
-        "recipeNumber": 224,
-        "code": "REINFORCED_SCAVENGER_RIG",
-        "outputItem": "Reinforced Scavenger Rig",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger II - slot Vest Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
-    },
-    {
-        "recipeNumber": 225,
-        "code": "FULL_SEAL_RESPIRATOR_MASK",
-        "outputItem": "Full-Seal Respirator Mask",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Padding",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger II - slot Head Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Impact, Structural"
-    },
-    {
-        "recipeNumber": 226,
-        "code": "PUNCTURE_RESISTANT_FIELD_JACKET",
-        "outputItem": "Puncture-Resistant Field Jacket",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger II - slot UpperBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Insulate, Cushion"
-    },
-    {
-        "recipeNumber": 227,
-        "code": "REINFORCED_CARGO_JOGGERS",
-        "outputItem": "Reinforced Cargo Joggers",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger II - slot LowerBody Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Structural"
-    },
-    {
-        "recipeNumber": 228,
-        "code": "GRIP_LINED_TACTICAL_GLOVES",
-        "outputItem": "Grip-Lined Tactical Gloves",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger II - slot Hand Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Flexible, Cushion"
-    },
-    {
-        "recipeNumber": 229,
-        "code": "SILENT_URBAN_TREKKING_BOOTS",
-        "outputItem": "Silent Urban Trekking Boots",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Leather",
-                "quantity": 1
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Rubber",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "Set Scavenger II - slot Leg Reality check: fabric/leather/padding/metal frame should be separate slots when possible.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Cushion, Structural"
-    },
-    {
-        "recipeNumber": 230,
-        "code": "DUCT_TAPED_TOTE_SACK",
-        "outputItem": "Duct-Taped Tote Sack",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Plastic or Fabric (recycled bag or sack)",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "[NEW] Backpack tier 0 - DIY tho so Reality check: fabric/leather/padding/metal frame should be separate slots when possible. Backpack progression added from a.xlsx.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
-    },
-    {
-        "recipeNumber": 231,
-        "code": "SEWN_FEED_SACK_PACK",
-        "outputItem": "Sewn Feed Sack Pack",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric (feed sack)",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
+                "slotIndex": 3,
                 "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "[NEW] Backpack tier 0 - DIY tho so Reality check: fabric/leather/padding/metal frame should be separate slots when possible. Backpack progression added from a.xlsx.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
+        "requiredUseCaseTags": "Cooking, Vest"
     },
     {
-        "recipeNumber": 232,
-        "code": "SCHOOL_BACKPACK",
-        "outputItem": "School Backpack",
+        "recipeNumber": 126,
+        "code": "COOKING_HEAD",
+        "outputItem": "Cooking Head",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Cooking, Head"
+    },
+    {
+        "recipeNumber": 127,
+        "code": "COOKING_UPPERBODY",
+        "outputItem": "Cooking UpperBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
                 "quantity": 2
             },
             {
                 "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Cooking, UpperBody"
+    },
+    {
+        "recipeNumber": 128,
+        "code": "COOKING_LOWERBODY",
+        "outputItem": "Cooking LowerBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Cooking, LowerBody"
+    },
+    {
+        "recipeNumber": 129,
+        "code": "COOKING_HAND",
+        "outputItem": "Cooking Hand",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Cooking, Hand"
+    },
+    {
+        "recipeNumber": 130,
+        "code": "COOKING_LEG",
+        "outputItem": "Cooking Leg",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Cooking, Leg"
+    },
+    {
+        "recipeNumber": 131,
+        "code": "SCAVENGING_VEST",
+        "outputItem": "Scavenging Vest",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Scavenging, Vest"
+    },
+    {
+        "recipeNumber": 132,
+        "code": "SCAVENGING_HEAD",
+        "outputItem": "Scavenging Head",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Scavenging, Head"
+    },
+    {
+        "recipeNumber": 133,
+        "code": "SCAVENGING_UPPERBODY",
+        "outputItem": "Scavenging UpperBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Scavenging, UpperBody"
+    },
+    {
+        "recipeNumber": 134,
+        "code": "SCAVENGING_LOWERBODY",
+        "outputItem": "Scavenging LowerBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Scavenging, LowerBody"
+    },
+    {
+        "recipeNumber": 135,
+        "code": "SCAVENGING_HAND",
+        "outputItem": "Scavenging Hand",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Scavenging, Hand"
+    },
+    {
+        "recipeNumber": 136,
+        "code": "SCAVENGING_LEG",
+        "outputItem": "Scavenging Leg",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Scavenging, Leg"
+    },
+    {
+        "recipeNumber": 137,
+        "code": "GATHERING_VEST",
+        "outputItem": "Gathering Vest",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Gathering, Vest"
+    },
+    {
+        "recipeNumber": 138,
+        "code": "GATHERING_HEAD",
+        "outputItem": "Gathering Head",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Gathering, Head"
+    },
+    {
+        "recipeNumber": 139,
+        "code": "GATHERING_UPPERBODY",
+        "outputItem": "Gathering UpperBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Gathering, UpperBody"
+    },
+    {
+        "recipeNumber": 140,
+        "code": "GATHERING_LOWERBODY",
+        "outputItem": "Gathering LowerBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Gathering, LowerBody"
+    },
+    {
+        "recipeNumber": 141,
+        "code": "GATHERING_HAND",
+        "outputItem": "Gathering Hand",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Gathering, Hand"
+    },
+    {
+        "recipeNumber": 142,
+        "code": "GATHERING_LEG",
+        "outputItem": "Gathering Leg",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Gathering, Leg"
+    },
+    {
+        "recipeNumber": 143,
+        "code": "BUILDING_VEST",
+        "outputItem": "Building Vest",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
                 "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "[NEW] Backpack I Reality check: fabric/leather/padding/metal frame should be separate slots when possible. Backpack progression added from a.xlsx.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
+        "requiredUseCaseTags": "Building, Vest"
     },
     {
-        "recipeNumber": 233,
-        "code": "HIKING_DAYPACK",
-        "outputItem": "Hiking Daypack",
+        "recipeNumber": 144,
+        "code": "BUILDING_HEAD",
+        "outputItem": "Building Head",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 2
+                "tagQuery": "Material, Leather",
+                "quantity": 1
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Leather",
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "[NEW] Backpack I Reality check: fabric/leather/padding/metal frame should be separate slots when possible. Backpack progression added from a.xlsx.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
+        "requiredUseCaseTags": "Building, Head"
     },
     {
-        "recipeNumber": 234,
-        "code": "TACTICAL_MESSENGER_BAG",
-        "outputItem": "Tactical Messenger Bag",
+        "recipeNumber": 145,
+        "code": "BUILDING_UPPERBODY",
+        "outputItem": "Building UpperBody",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric Panel",
-                "quantity": 2
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Iron (lock or frame)",
-                "quantity": 1
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "Gear CUREL",
-        "designNotes": "[NEW] Backpack II Reality check: fabric/leather/padding/metal frame should be separate slots when possible. Backpack progression added from a.xlsx.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
-    },
-    {
-        "recipeNumber": 235,
-        "code": "HUNTING_RUCKSACK",
-        "outputItem": "Hunting Rucksack",
-        "outputCategory": "Equipment",
-        "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
@@ -8181,39 +5455,435 @@ const CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Fabric Panel",
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "[NEW] Backpack II Reality check: fabric/leather/padding/metal frame should be separate slots when possible. Backpack progression added from a.xlsx.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
+        "requiredUseCaseTags": "Building, UpperBody"
     },
     {
-        "recipeNumber": 236,
-        "code": "MILITARY_FIELD_RUCKSACK",
-        "outputItem": "Military Field Rucksack",
+        "recipeNumber": 146,
+        "code": "BUILDING_LOWERBODY",
+        "outputItem": "Building LowerBody",
         "outputCategory": "Equipment",
         "requiredJobCode": "crafting",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Building, LowerBody"
+    },
+    {
+        "recipeNumber": 147,
+        "code": "BUILDING_HAND",
+        "outputItem": "Building Hand",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Building, Hand"
+    },
+    {
+        "recipeNumber": 148,
+        "code": "BUILDING_LEG",
+        "outputItem": "Building Leg",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Leather",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Building, Leg"
+    },
+    {
+        "recipeNumber": 149,
+        "code": "CRAFTING_VEST",
+        "outputItem": "Crafting Vest",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
                 "tagQuery": "Material, Fabric Panel",
-                "quantity": 3
+                "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Metal, Aluminum (frame)",
+                "tagQuery": "Material, Padding",
                 "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Crafting, Vest"
+    },
+    {
+        "recipeNumber": 150,
+        "code": "CRAFTING_HEAD",
+        "outputItem": "Crafting Head",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Crafting, Head"
+    },
+    {
+        "recipeNumber": 151,
+        "code": "CRAFTING_UPPERBODY",
+        "outputItem": "Crafting UpperBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Crafting, UpperBody"
+    },
+    {
+        "recipeNumber": 152,
+        "code": "CRAFTING_LOWERBODY",
+        "outputItem": "Crafting LowerBody",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Crafting, LowerBody"
+    },
+    {
+        "recipeNumber": 153,
+        "code": "CRAFTING_HAND",
+        "outputItem": "Crafting Hand",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Crafting, Hand"
+    },
+    {
+        "recipeNumber": 154,
+        "code": "CRAFTING_LEG",
+        "outputItem": "Crafting Leg",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Padding",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 360,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Crafting, Leg"
+    },
+    {
+        "recipeNumber": 155,
+        "code": "RING",
+        "outputItem": "Ring",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Gemstone",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 15,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
+        "craftTimeSeconds": 240,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Jewelry"
+    },
+    {
+        "recipeNumber": 156,
+        "code": "NECKLACE",
+        "outputItem": "Necklace",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Gemstone",
+                "quantity": 1
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 15,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
+        "craftTimeSeconds": 240,
+        "workstationQueueSlot": "Workbench queue",
+        "curelRuleKey": "Gear CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
+        "requiredUseCaseTags": "Jewelry"
+    },
+    {
+        "recipeNumber": 157,
+        "code": "BACKPACK",
+        "outputItem": "Backpack",
+        "outputCategory": "Equipment",
+        "requiredJobCode": "crafting",
+        "workstationAccess": "Crafting Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Cordage",
+                "quantity": 2
             },
             {
                 "slotIndex": 3,
@@ -8221,216 +5891,107 @@ const CRAFTING_RECIPES = [
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 90,
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 300,
         "workstationQueueSlot": "Workbench queue",
         "curelRuleKey": "Gear CUREL",
-        "designNotes": "[NEW] Backpack III Reality check: fabric/leather/padding/metal frame should be separate slots when possible. Backpack progression added from a.xlsx.",
+        "designNotes": null,
         "mainMaterialSlots": "1",
         "curelMechanic": "Skill-based roll (Gear rarity from crafter Skill Level, independent of materials)",
-        "requiredUseCaseTags": "Structural, Bind"
+        "requiredUseCaseTags": "Utility, Backpack"
     },
     {
-        "recipeNumber": 237,
-        "code": "CAMPING_TENT",
-        "outputItem": "Camping Tent",
+        "recipeNumber": 158,
+        "code": "TENT",
+        "outputItem": "Tent",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Reinforced Crowbar",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 3
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Branch",
-                "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 238,
-        "code": "TARP_LEAN_TO_SHELTER",
-        "outputItem": "Tarp Lean-to Shelter",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Reinforced Crowbar",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Plastic",
-                "quantity": 3
+                "tagQuery": "Material, Wood",
+                "quantity": 2
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Material, Branch",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 239,
-        "code": "SALVAGED_MATTRESS_BED",
-        "outputItem": "Salvaged Mattress Bed",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Fabric/NonRecyclable",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wood (Log)",
+                "slotIndex": 3,
+                "tagQuery": "Material, Cordage",
                 "quantity": 2
             }
         ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 240,
-        "code": "RESTORED_DOUBLE_BED",
-        "outputItem": "Restored Double Bed",
+        "recipeNumber": 159,
+        "code": "BED",
+        "outputItem": "Bed",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
+                "tagQuery": "Material, Wood",
                 "quantity": 3
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 241,
-        "code": "CARDBOARD_BOX_STACK",
-        "outputItem": "Cardboard Box Stack",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Reinforced Crowbar",
-        "toolDurabilityCost": 1,
-        "inputs": [
+                "tagQuery": "Material, Padding",
+                "quantity": 2
+            },
             {
-                "slotIndex": 1,
-                "tagQuery": "Rubbish, Non-recyclable (Cardboard)",
-                "quantity": 3
+                "slotIndex": 3,
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
             }
         ],
         "requiredSkillLevel": 5,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 242,
-        "code": "WOODEN_CRATE",
-        "outputItem": "Wooden Crate",
+        "recipeNumber": 160,
+        "code": "FURNITURE_SET",
+        "outputItem": "Furniture Set",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wooden Nail",
+                "tagQuery": "Material, Wood",
                 "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 243,
-        "code": "LARGE_WOODEN_CHEST",
-        "outputItem": "Large Wooden Chest",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 5
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Wooden Nail",
-                "quantity": 6
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
             },
             {
                 "slotIndex": 3,
@@ -8440,586 +6001,203 @@ const CRAFTING_RECIPES = [
         ],
         "requiredSkillLevel": 10,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 244,
-        "code": "PLASTIC_STORAGE_BIN",
-        "outputItem": "Plastic Storage Bin",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Plastic",
-                "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 15,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 245,
-        "code": "STEEL_LOCKER",
-        "outputItem": "Steel Locker",
+        "recipeNumber": 161,
+        "code": "STORAGE_CONTAINER",
+        "outputItem": "Storage Container",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 5
+                "tagQuery": "Material, Wood",
+                "quantity": 3
             },
             {
                 "slotIndex": 2,
                 "tagQuery": "Material, Metal Nail",
-                "quantity": 4
+                "quantity": 2
             }
         ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 246,
-        "code": "MILITARY_AMMO_CRATE",
-        "outputItem": "Military Ammo Crate",
+        "recipeNumber": 162,
+        "code": "COOKING_STATION",
+        "outputItem": "Cooking Station",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 4
+                "tagQuery": "Material, Stone",
+                "quantity": 3
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Wooden Handle",
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 2
+            },
+            {
+                "slotIndex": 3,
+                "tagQuery": "Tool, Cooking Pot",
                 "quantity": 1
             }
         ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 247,
-        "code": "REINFORCED_SHIPPING_CONTAINER",
-        "outputItem": "Reinforced Shipping Container",
+        "recipeNumber": 163,
+        "code": "CRAFTING_STATION",
+        "outputItem": "Crafting Station",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 6
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal Nail",
-                "quantity": 6
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 248,
-        "code": "SCAVENGED_FURNITURE_SET",
-        "outputItem": "Scavenged Furniture Set",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 4
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish",
-                "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 249,
-        "code": "RESTORED_FURNITURE_SET",
-        "outputItem": "Restored Furniture Set",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 4
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Fabric",
+                "tagQuery": "Material, Wood",
                 "quantity": 3
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Metal Ingot",
+                "quantity": 2
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Material, Leather",
+                "tagQuery": "Tool, Hammer",
+                "quantity": 1
+            }
+        ],
+        "requiredSkillLevel": 5,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 5, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
+    },
+    {
+        "recipeNumber": 164,
+        "code": "MEDICAL_STATION",
+        "outputItem": "Medical Station",
+        "outputCategory": "Building",
+        "requiredJobCode": "building",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Wood",
                 "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 250,
-        "code": "CAMPFIRE",
-        "outputItem": "Campfire",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Reinforced Crowbar",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Stone (Pebble)",
-                "quantity": 4
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Branch",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 251,
-        "code": "SALVAGED_WOOD_STOVE",
-        "outputItem": "Salvaged Wood Stove",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 4
+                "tagQuery": "Material, Fabric Panel",
+                "quantity": 2
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Material, Stone (Pebble)",
-                "quantity": 3
+                "slotIndex": 3,
+                "tagQuery": "Medicine, First Aid Kit",
+                "quantity": 1
             }
         ],
         "requiredSkillLevel": 15,
         "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 252,
-        "code": "REWIRED_ELECTRIC_STOVE",
-        "outputItem": "Rewired Electric Stove",
+        "recipeNumber": 165,
+        "code": "SMELTING_STATION",
+        "outputItem": "Smelting Station",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Rubbish, Metal, Copper (day dien)",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 35,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 35, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 253,
-        "code": "IMPROVISED_WORKBENCH",
-        "outputItem": "Improvised Workbench",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
+                "tagQuery": "Material, Stone",
                 "quantity": 4
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Wooden Nail",
-                "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 1,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 254,
-        "code": "REINFORCED_METAL_WORKSTATION",
-        "outputItem": "Reinforced Metal Workstation",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 5
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wood (Log)",
+                "tagQuery": "Material, Metal Ingot",
                 "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 255,
-        "code": "HIGH_END_SALVAGE_WORKSTATION",
-        "outputItem": "High-End Salvage Workstation",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier II+: Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 5
             },
             {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 3
+                "slotIndex": 3,
+                "tagQuery": "Tool, Ladle",
+                "quantity": 1
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "requiredSkillLevel": 15,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 256,
-        "code": "FIELD_MEDICAL_STATION",
-        "outputItem": "Field Medical Station",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 3
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 257,
-        "code": "RESTORED_MEDICAL_LAB",
-        "outputItem": "Restored Medical Lab",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier I+: Improvised Workbench / Reinforced Metal Workstation / High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Fabric",
-                "quantity": 4
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Aluminum",
-                "quantity": 3
-            }
-        ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 258,
-        "code": "MAKESHIFT_FURNACE",
-        "outputItem": "Makeshift Furnace",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Reinforced Crowbar",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Stone (Boulder)",
-                "quantity": 4
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Stone (Pebble)",
-                "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 10,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1,2",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 259,
-        "code": "INDUSTRIAL_BLAST_FURNACE",
-        "outputItem": "Industrial Blast Furnace",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Tier III: High-End Salvage Workstation",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 6
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Stone (Boulder)",
-                "quantity": 4
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Workbench queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 260,
+        "recipeNumber": 166,
         "code": "WOODEN_STRUCTURE",
         "outputItem": "Wooden Structure",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 6
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Wooden Nail",
-                "quantity": 6
-            }
-        ],
-        "requiredSkillLevel": 15,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 15, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 261,
-        "code": "STONE_STRUCTURE",
-        "outputItem": "Stone Structure",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Stone (Boulder)",
-                "quantity": 6
-            },
-            {
-                "slotIndex": 2,
-                "tagQuery": "Material, Metal, Iron",
-                "quantity": 2
-            }
-        ],
-        "requiredSkillLevel": 30,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 30, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
-        "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
-    },
-    {
-        "recipeNumber": 262,
-        "code": "WOODEN_FENCE",
-        "outputItem": "Wooden Fence",
-        "outputCategory": "Building",
-        "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Salvaged Hammer",
-        "toolDurabilityCost": 1,
-        "inputs": [
-            {
-                "slotIndex": 1,
-                "tagQuery": "Material, Wood (Log)",
-                "quantity": 4
+                "tagQuery": "Material, Wood",
+                "quantity": 5
             },
             {
                 "slotIndex": 2,
@@ -9027,41 +6205,108 @@ const CRAFTING_RECIPES = [
                 "quantity": 3
             }
         ],
-        "requiredSkillLevel": 20,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 20, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     },
     {
-        "recipeNumber": 263,
-        "code": "STONE_FENCE",
-        "outputItem": "Stone Fence",
+        "recipeNumber": 167,
+        "code": "WOODEN_FENCE",
+        "outputItem": "Wooden Fence",
         "outputCategory": "Building",
         "requiredJobCode": "building",
-        "workstationAccess": "Placement: direct build at target location",
-        "requiredTool": "Salvaged Hammer",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
         "toolDurabilityCost": 1,
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Stone (Boulder)",
-                "quantity": 5
+                "tagQuery": "Material, Wood",
+                "quantity": 3
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Wooden Nail",
+                "quantity": 2
             }
         ],
-        "requiredSkillLevel": 40,
-        "outputLevelFormula": "MIN(AVG(non-tool input levels), 40, Player Skill Level)",
-        "craftTimeSeconds": 180,
-        "workstationQueueSlot": "Build placement queue",
-        "curelRuleKey": "None (no CUREL - not Gear/Material)",
-        "designNotes": "Placement craft: materials define quality; crowbar is a placement tool and is excluded from output level.",
+        "requiredSkillLevel": 1,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 1, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
         "mainMaterialSlots": "1",
-        "curelMechanic": "N/A",
-        "requiredUseCaseTags": "N/A"
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
+    },
+    {
+        "recipeNumber": 168,
+        "code": "STONE_STRUCTURE",
+        "outputItem": "Stone Structure",
+        "outputCategory": "Building",
+        "requiredJobCode": "building",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Stone",
+                "quantity": 5
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Metal Nail",
+                "quantity": 2
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
+    },
+    {
+        "recipeNumber": 169,
+        "code": "STONE_FENCE",
+        "outputItem": "Stone Fence",
+        "outputCategory": "Building",
+        "requiredJobCode": "building",
+        "workstationAccess": "Building Station",
+        "requiredTool": "Hammer",
+        "toolDurabilityCost": 1,
+        "inputs": [
+            {
+                "slotIndex": 1,
+                "tagQuery": "Material, Stone",
+                "quantity": 3
+            },
+            {
+                "slotIndex": 2,
+                "tagQuery": "Material, Metal Nail",
+                "quantity": 2
+            }
+        ],
+        "requiredSkillLevel": 10,
+        "outputLevelFormula": "MIN(AVG(non-tool input levels), 10, Player Skill Level)",
+        "craftTimeSeconds": 600,
+        "workstationQueueSlot": "Building queue",
+        "curelRuleKey": "Material CUREL",
+        "designNotes": null,
+        "mainMaterialSlots": "1",
+        "curelMechanic": "Inherit (deterministic, from raw material rarity - no roll)",
+        "requiredUseCaseTags": "Structure"
     }
 ];
 

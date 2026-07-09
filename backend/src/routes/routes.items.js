@@ -35,14 +35,21 @@ function getEquipSlot(item) {
     if (item.category === 'WEAPON') return 'weapon';
     if (item.category === 'TOOL') return 'tool';
     if (tags.includes('backpack')) return 'backpack';
-    if (tags.includes('jewelry')) return 'accessory_1';
-    if (tags.includes('helmet')) return 'head';
-    if (tags.includes('gloves')) return 'hands';
-    if (tags.includes('boots')) return 'feet';
-    if (tags.includes('pants')) return 'lower_body';
-    if (tags.includes('armor')) return 'armor';
+    if (tags.includes('ring')) return 'ring';
+    if (tags.includes('necklace')) return 'necklace';
+    if (tags.includes('jewelry')) return 'accessory';
+    if (tags.includes('head') || tags.includes('helmet')) return 'head';
+    if (tags.includes('hand') || tags.includes('gloves')) return 'hands';
+    if (tags.includes('leg') || tags.includes('boots')) return 'feet';
+    if (tags.includes('lowerbody') || tags.includes('pants')) return 'lower_body';
+    if (tags.includes('upperbody')) return 'upper_body';
+    if (tags.includes('vest') || tags.includes('armor')) return 'vest';
 
     return 'upper_body';
+}
+
+function canEquipItem(item) {
+    return ['WEAPON', 'TOOL', 'EQUIPMENT'].includes(String(item?.category || '').toUpperCase());
 }
 
 function normalizeIngredientSelections(ingredients) {
@@ -232,6 +239,13 @@ itemsRouter.post('/equip', verifyToken, async (req, res, next) => {
 
         const item = itemResult.rows[0];
 
+        if (!canEquipItem(item)) {
+            return res.status(400).json({
+                success: false,
+                message: `${item.display_name} cannot be equipped.`
+            });
+        }
+
         // Lay player level de kiem tra equip requirement
         const playerResult = await dbPool.query(
             `SELECT player_level FROM players WHERE id = $1;`,
@@ -318,7 +332,8 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
 
         const recipeResult = await client.query(`
             SELECT r.*, it.item_level AS template_item_level, it.display_name AS output_item_name,
-                   it.category AS output_template_category, it.base_durability,
+                   it.category AS output_template_category, it.tags AS output_template_tags,
+                   it.base_durability,
                    it.lifecycle_model, it.base_duration_hours,
                    js.code AS required_job_code
             FROM recipes r
@@ -412,7 +427,11 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
         const rarity = craftingService.resolveCraftedRarity(recipe, selectedItems, craftingPower);
         const itemPower = craftingService.calculateItemPower(outputLevel, rarity);
         const outputCategory = (recipe.output_category || recipe.output_template_category || '').toUpperCase();
-        const rolledStats = itemStatsService.rollItemStats(outputCategory, itemPower, rarity);
+        const rolledStats = itemStatsService.rollItemStats({
+            category: outputCategory,
+            itemPower,
+            tags: recipe.output_template_tags,
+        });
         const expiresAt = itemLifecycleService.calculateExpiresAt(recipe.lifecycle_model, recipe.base_duration_hours);
 
         for (const item of selectedItems) {

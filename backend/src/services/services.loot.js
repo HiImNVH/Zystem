@@ -11,10 +11,10 @@ const ACTION_DROP_POOL = {
     CHOP:    ['MATERIAL'],
     HUNT:    ['MATERIAL'],
     FORAGE:  ['MATERIAL'],
-    EXPLORE: ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
-    BATTLE:  ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
-    SWEEP:   ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
-    DUNGEON: ['RUBBISH', 'MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    EXPLORE: ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    BATTLE:  ['MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    SWEEP:   ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    DUNGEON: ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
     CRAFT:   ['WEAPON', 'EQUIPMENT', 'TOOL', 'BUILDING'],
     FARM:    ['MATERIAL'],
 };
@@ -86,7 +86,7 @@ async function getCandidateTemplates(config) {
         ? `OR item_level = 1`
         : '';
     const sqlQuery = `
-        SELECT id, category, item_level, lifecycle_model, base_duration_hours,
+        SELECT id, category, tags, item_level, lifecycle_model, base_duration_hours,
                drop_weight_common, drop_weight_uncommon, drop_weight_rare, drop_weight_epic, drop_weight_legendary
         FROM item_templates
         WHERE category = ANY(ARRAY[${categoryPlaceholders}])
@@ -114,7 +114,7 @@ async function getCandidateTemplates(config) {
               )`
             : '';
         const fallbackQuery = `
-            SELECT id, category, item_level, lifecycle_model, base_duration_hours,
+            SELECT id, category, tags, item_level, lifecycle_model, base_duration_hours,
                    drop_weight_common, drop_weight_uncommon, drop_weight_rare, drop_weight_epic, drop_weight_legendary
             FROM item_templates
             WHERE category = ANY(ARRAY[${categoryPlaceholders}])
@@ -148,7 +148,11 @@ function rollOneItem(config) {
     const rarity = craftingService.rollCurelRarity(curelPower);
     const dropItemLevel = Math.max(1, parseInt(itemLevel || template.item_level) || 1);
     const itemPower = craftingService.calculateItemPower(dropItemLevel, rarity);
-    const rolledStats = itemStatsService.rollItemStats(template.category, itemPower, rarity);
+    const rolledStats = itemStatsService.rollItemStats({
+        category: template.category,
+        itemPower,
+        tags: template.tags,
+    });
     const expiresAt = itemLifecycleService.calculateExpiresAt(template.lifecycle_model, template.base_duration_hours);
 
     return {

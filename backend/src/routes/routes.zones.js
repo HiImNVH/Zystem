@@ -204,7 +204,7 @@ async function findMonstersByProfile(monsterProfile) {
 
 const LOOT_FOCUS_CATEGORY_MAP = {
     food: 'FOOD',
-    drink: 'DRINK',
+    drink: 'FOOD',
     medicine: 'MEDICINE',
     medical: 'MEDICINE',
     tool: 'TOOL',
@@ -212,9 +212,9 @@ const LOOT_FOCUS_CATEGORY_MAP = {
     ammo: 'AMMO',
     equipment: 'EQUIPMENT',
     gear: 'EQUIPMENT',
-    seed: 'SEED',
-    rubbish: 'RUBBISH',
-    salvage: 'RUBBISH',
+    seed: 'MATERIAL',
+    rubbish: 'MATERIAL',
+    salvage: 'MATERIAL',
     material: 'MATERIAL',
     materials: 'MATERIAL',
 };

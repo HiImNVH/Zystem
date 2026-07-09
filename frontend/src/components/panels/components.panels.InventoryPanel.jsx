@@ -34,21 +34,24 @@ const CATEGORY_MARKS = {
     RUBBISH: '??',
     MATERIAL: '??',
     WEAPON: '???',
+    AMMO: 'AM',
     EQUIPMENT: '???',
     TOOL: '??',
     BUILDING: '??',
     FOOD: '??',
+    MEDICINE: 'MD',
 };
 
 const FILTERS = [
     { value: 'ALL', label: 'All' },
     { value: 'FOOD', label: 'Food' },
+    { value: 'MEDICINE', label: 'Medicine' },
     { value: 'WEAPON', label: 'Weapons' },
+    { value: 'AMMO', label: 'Ammo' },
     { value: 'TOOL', label: 'Tools' },
     { value: 'EQUIPMENT', label: 'Gear' },
     { value: 'MATERIAL', label: 'Materials' },
-    { value: 'RUBBISH', label: 'Junk' },
-    { value: 'BUILDING', label: 'Building' },
+    { value: 'BUILDING', label: 'Structures' },
 ];
 
 const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
