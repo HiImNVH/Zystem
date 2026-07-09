@@ -4,6 +4,7 @@ const { dbPool } = require('./repositories.database');
 const walletRepository = require('./repositories.wallet');
 const combatService = require('../services/services.combat');
 const { ensurePlayerDefaultJobs, autoUnlockFreeSkills } = require('./repositories.skillsSeed');
+const starterGearRepository = require('./repositories.starterGear');
 
 function calculateMaxEnergy(vitStat, strStat) {
     const vit = parseFloat(vitStat) || 0;
@@ -37,6 +38,7 @@ async function createCharacter(characterData) {
             [characterData.accountId]
         );
         if (existingCheck.rows.length > 0) {
+            await client.query('ROLLBACK');
             return { error: `This account already has a character: "${existingCheck.rows[0].character_name}". Each account can only create one character.` };
         }
 
@@ -48,6 +50,7 @@ async function createCharacter(characterData) {
                 [characterData.startingJobCode.toLowerCase()]
             );
             if (jobResult.rows.length === 0) {
+                await client.query('ROLLBACK');
                 return { error: `Invalid starting job: ${characterData.startingJobCode}` };
             }
             startingJob = jobResult.rows[0];
@@ -123,6 +126,13 @@ async function createCharacter(characterData) {
 
         await autoUnlockFreeSkills(newPlayer.id, client);
 
+        const starterGear = startingJob
+            ? await starterGearRepository.grantStarterGear({
+                playerId: newPlayer.id,
+                jobCode: startingJob.code,
+            }, client)
+            : [];
+
         // Tao vi tien
         await walletRepository.initializeWallet(newPlayer.id);
 
@@ -136,7 +146,8 @@ async function createCharacter(characterData) {
                 code:         startingJob.code,
                 display_name: startingJob.display_name,
                 level:        20,
-            } : null
+            } : null,
+            starter_gear: starterGear
         };
     } catch (error) {
         await client.query('ROLLBACK');
