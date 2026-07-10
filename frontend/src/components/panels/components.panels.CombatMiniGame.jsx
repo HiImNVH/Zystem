@@ -94,6 +94,25 @@ function getWeaponStatPower(weapon) {
     return Math.max(itemPower, itemLevelPower, statPower);
 }
 
+function getPlayerEvasionRate(character) {
+    const rawPct = Math.max(
+        getNumber(character?.evasion_rate_pct),
+        getNumber(character?.derived?.evasion_rate_pct),
+        getNumber(character?.derived?.dodge_rate_pct)
+    );
+    const agiFallback = Math.max(
+        getNumber(character?.base_agi),
+        getNumber(character?.stats?.total?.agi),
+        getNumber(character?.total_stats?.agi)
+    ) * 0.05;
+    const evasionPct = rawPct > 0 ? rawPct : agiFallback;
+    return Math.min(0.5, Math.max(0, evasionPct / 100));
+}
+
+function getEnemyHitChance(character) {
+    return Math.max(0.4, 1 - getPlayerEvasionRate(character));
+}
+
 function getPrimaryStatKey(weaponProfile) {
     if (weaponProfile.type === 'ranged') return 'dex';
     if (weaponProfile.type === 'blade') return 'str';
@@ -137,11 +156,25 @@ function getBaseDamage(config) {
     return Math.max(8, Math.round(rawDamage * (1 - defenseReduction)));
 }
 
-function calculateEnemyCounterDamage(enemy, accuracyResult) {
-    if (accuracyResult.outcome === 'critical') return 0;
+function calculateEnemyCounterDamage(config) {
+    const { enemy, accuracyResult, character } = config;
+    if (accuracyResult.outcome === 'critical') {
+        return { damage: 0, isEvaded: false, hitChance: 0 };
+    }
+
+    const hitChance = getEnemyHitChance(character);
+    const isEvaded = Math.random() > hitChance;
+    if (isEvaded) {
+        return { damage: 0, isEvaded, hitChance };
+    }
+
     const enemyAttack = parseInt(enemy?.attack) || 8;
     const counterMultiplier = accuracyResult.outcome === 'graze' ? 1 : 0.55;
-    return Math.max(1, Math.round(enemyAttack * counterMultiplier));
+    return {
+        damage: Math.max(1, Math.round(enemyAttack * counterMultiplier)),
+        isEvaded,
+        hitChance,
+    };
 }
 
 function EncounterRewardDetails({ result }) {
@@ -204,7 +237,10 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
         const accuracyResult = getAccuracyResult(Math.round(accuracyMarker));
         const damage = Math.max(1, Math.round(baseDamage * action.damageMultiplier * accuracyResult.multiplier));
         const nextEnemyHealth = Math.max(0, enemyHealth - damage);
-        const counterDamage = nextEnemyHealth > 0 ? calculateEnemyCounterDamage(enemy, accuracyResult) : 0;
+        const counterResult = nextEnemyHealth > 0
+            ? calculateEnemyCounterDamage({ enemy, accuracyResult, character })
+            : { damage: 0, isEvaded: false, hitChance: 0 };
+        const counterDamage = counterResult.damage;
         const nextPlayerHealth = Math.max(0, playerHealth - counterDamage);
         const combatAction = {
             code: action.code,
@@ -219,6 +255,8 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
             ...accuracyResult,
             damage,
             counterDamage,
+            enemyHitChance: counterResult.hitChance,
+            enemyAttackEvaded: counterResult.isEvaded,
             enemyHealth: nextEnemyHealth,
             playerHealth: nextPlayerHealth,
         };
@@ -293,7 +331,7 @@ export default function CombatMiniGame({ enemy, character, inventory, isExecutin
                         <span>ACCURACY</span>
                         <span>
                             {lastAccuracyResult
-                                ? `${lastAccuracyResult.label} | DMG ${lastAccuracyResult.damage} | Taken ${lastAccuracyResult.counterDamage}`
+                                ? `${lastAccuracyResult.label} | DMG ${lastAccuracyResult.damage} | ${lastAccuracyResult.enemyAttackEvaded ? 'Evaded' : `Taken ${lastAccuracyResult.counterDamage}`}`
                                 : 'Time the strike'}
                         </span>
                     </div>

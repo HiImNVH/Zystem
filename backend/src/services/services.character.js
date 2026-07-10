@@ -69,7 +69,7 @@ async function calculateTotalStats(playerId) {
     });
     const attack = combatService.calculateAttack(totalStr, 0);
     const defense = combatService.calculateDefense(totalVit, 0);
-    const dodgeRate = combatService.calculateDodgeRate(totalAgi);
+    const evasionRate = combatService.calculateEvasionRate(totalAgi);
     const critRate = combatService.calculateCritRate(totalDex, 0);
 
     return {
@@ -97,7 +97,8 @@ async function calculateTotalStats(playerId) {
             max_hp: maxHp,
             attack,
             defense,
-            dodge_rate_pct: (dodgeRate * 100).toFixed(2),
+            evasion_rate_pct: (evasionRate * 100).toFixed(2),
+            dodge_rate_pct: (evasionRate * 100).toFixed(2),
             crit_rate_pct: (critRate * 100).toFixed(2),
         }
     };

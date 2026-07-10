@@ -28,11 +28,23 @@ function calculateDefense(vitStat, equipmentDefense) {
     return parseFloat(((equipmentDefense || 0) + (vitStat || 0) / 5).toFixed(2));
 }
 
-// Tinh ty le ne duong: moi 1 AGI cho 0.05% dodge, cap 50%
-// Ne duong dua tren AGI theo Balance Sheet
-function calculateDodgeRate(agiStat) {
+const MONSTER_BASE_HIT_CHANCE = 1;
+const MIN_MONSTER_HIT_CHANCE = 0.4;
+
+// Tinh ty le ne tranh: moi 1 AGI cho 0.05% evasion, cap 50%
+// Chi so nay dung de tru vao base hit 100% cua quai.
+function calculateEvasionRate(agiStat) {
     const agi = agiStat || 0;
     return Math.min(agi * 0.0005, 0.50); // 0.05% per AGI, cap 50%
+}
+
+function calculateDodgeRate(agiStat) {
+    return calculateEvasionRate(agiStat);
+}
+
+function calculateMonsterHitChance(defenderStats) {
+    const evasionRate = Math.max(0, Math.min(1, Number(defenderStats?.evasion_rate || defenderStats?.evasionRate) || calculateEvasionRate(defenderStats?.base_agi)));
+    return Math.max(MIN_MONSTER_HIT_CHANCE, MONSTER_BASE_HIT_CHANCE - evasionRate);
 }
 
 // Tinh ty le chi mang: base 5% + tang tu DEX va Gear
@@ -59,11 +71,11 @@ function calculateAttackDamage(attackerStats, defenderStats) {
     const isCrit = Math.random() < critRate;
     const critMult = isCrit ? calculateCritDamage(0) : 1;
 
-    const dodgeRate = calculateDodgeRate(defenderStats.base_agi);
-    const isDodged = Math.random() < dodgeRate;
+    const hitChance = calculateMonsterHitChance(defenderStats);
+    const isDodged = Math.random() > hitChance;
 
     if (isDodged) {
-        return { damage: 0, is_crit: false, is_dodged: true };
+        return { damage: 0, is_crit: false, is_dodged: true, hit_chance: hitChance };
     }
 
     const rawDamage = baseAtk * critMult;
@@ -76,7 +88,8 @@ function calculateAttackDamage(attackerStats, defenderStats) {
     return {
         damage: Math.max(1, finalDamage), // Toi thieu 1 sat thuong
         is_crit: isCrit,
-        is_dodged: false
+        is_dodged: false,
+        hit_chance: hitChance
     };
 }
 
@@ -107,7 +120,11 @@ module.exports = {
     calculateMaxHp,
     calculateAttack,
     calculateDefense,
+    calculateEvasionRate,
     calculateDodgeRate,
+    calculateMonsterHitChance,
+    MONSTER_BASE_HIT_CHANCE,
+    MIN_MONSTER_HIT_CHANCE,
     calculateCritRate,
     calculateCritDamage,
     calculateAttackDamage,

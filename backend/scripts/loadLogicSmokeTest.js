@@ -65,6 +65,9 @@ function runPureLogicChecks(modulesByPath) {
     assert.equal(combat.calculateMaxHp({ vit: 10, str: 4, playerLevel: 2 }), 162);
     assert.equal(combat.calculateAttack(7, 12), 19);
     assert.equal(combat.calculateDefense(10, 3), 5);
+    assert.equal(combat.calculateMonsterHitChance({ base_agi: 0 }), 1);
+    assert.equal(combat.calculateMonsterHitChance({ evasion_rate: 0.2 }), 0.8);
+    assert.equal(combat.calculateMonsterHitChance({ evasion_rate: 0.95 }), 0.4);
 
     assertExportedFunction(crafting, 'calculateItemPower');
     assert.deepEqual(crafting.getCurelRarityWeights(40), {
