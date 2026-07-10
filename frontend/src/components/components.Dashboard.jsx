@@ -18,6 +18,7 @@ import { connectSocket } from '../api/api.socket';
 const TAB = { MAIN: 'MAIN', COMBAT: 'COMBAT', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
 const SIDE_TABS = [
     { key: TAB.INVENTORY, label: 'Inventory' },
+    { key: TAB.COMBAT, label: 'Combat' },
     { key: TAB.CHAT, label: 'Chat' },
 ];
 
