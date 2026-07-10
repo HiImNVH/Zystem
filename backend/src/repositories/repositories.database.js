@@ -82,6 +82,7 @@ async function initializeDatabaseSchema() {
                 DROP TABLE IF EXISTS player_jobs CASCADE;
                 DROP TABLE IF EXISTS jobs_seed CASCADE;
                 DROP TABLE IF EXISTS zones CASCADE;
+                DROP TABLE IF EXISTS player_settings CASCADE;
                 DROP TABLE IF EXISTS players CASCADE;
                 DROP TABLE IF EXISTS accounts CASCADE;
             `);
@@ -163,6 +164,17 @@ async function initializeDatabaseSchema() {
         await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS level_gap SMALLINT NOT NULL DEFAULT 5;`);
         await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS world_stage VARCHAR(20) NOT NULL DEFAULT 'early';`);
         await client.query(`ALTER TABLE zones ADD COLUMN IF NOT EXISTS map_role VARCHAR(40);`);
+
+        // ============================================================
+        // BANG 3.1: PLAYER SETTINGS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS player_settings (
+                player_id UUID PRIMARY KEY REFERENCES players(id) ON DELETE CASCADE,
+                settings JSONB NOT NULL DEFAULT '{}'::JSONB,
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        `);
 
         // ============================================================
         // BANG 4: JOBS SEED

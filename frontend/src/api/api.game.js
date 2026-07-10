@@ -38,6 +38,45 @@ export async function getZones() {
     return handleResponse(res);
 }
 
+export async function getZoneLayer() {
+    const res = await fetch(`${BASE_URL}/api/layers/zone`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function getZonePoiLayer(zoneCode) {
+    const res = await fetch(`${BASE_URL}/api/layers/zone/${encodeURIComponent(zoneCode)}/pois`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function getPoiLayer(poiId) {
+    const res = await fetch(`${BASE_URL}/api/layers/poi/${poiId}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function getSkillLayer(playerId) {
+    const res = await fetch(`${BASE_URL}/api/layers/skill/${playerId}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function getProfileLayer(playerId) {
+    const res = await fetch(`${BASE_URL}/api/layers/profile/${playerId}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function getSettingsLayer(playerId) {
+    const res = await fetch(`${BASE_URL}/api/layers/settings/${playerId}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function updateSettingsLayer(playerId, settings) {
+    const res = await fetch(`${BASE_URL}/api/layers/settings/${playerId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ settings })
+    });
+    return handleResponse(res);
+}
+
 export async function getPoiActivities(poiId, type) {
     const query = type ? `?type=${encodeURIComponent(type)}` : '';
     const res = await fetch(`${BASE_URL}/api/zones/pois/${poiId}/activities${query}`, { headers: getHeaders() });
