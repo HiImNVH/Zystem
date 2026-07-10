@@ -63,6 +63,16 @@ const CUREL_BUFF_SUFFIX = {
     quality_power: '',
 };
 
+function formatExpiry(expiresAt) {
+    if (!expiresAt) return null;
+    return new Date(expiresAt).toLocaleString([], {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
 function getItemMark(item) {
     const text = [
         item?.display_name,
@@ -73,115 +83,105 @@ function getItemMark(item) {
     return match?.mark || CATEGORY_MARKS[String(item?.category || '').toUpperCase()] || 'IT';
 }
 
+function ItemTile({ item, onSelect }) {
+    const rarity = (item.rarity || 'COMMON').toUpperCase();
+    const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
+    const mark = getItemMark(item);
+
+    return (
+        <button
+            onClick={() => onSelect(item)}
+            className={`relative aspect-square rounded-lg bg-surface border border-border ring-1 ${style.ring} card-hover flex flex-col items-center justify-center gap-1 p-2`}
+        >
+            {item.is_equipped && (
+                <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-success" />
+            )}
+            {item.is_expired && (
+                <span className="absolute top-1 left-1 text-[8px] font-bold text-danger">OLD</span>
+            )}
+            <span className="w-9 h-9 rounded bg-elevated flex items-center justify-center text-xs font-bold text-textSecondary">{mark}</span>
+            <span className={`text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</span>
+        </button>
+    );
+}
+
+function groupItemsByCategory(items) {
+    const groups = FILTERS
+        .filter(filterItem => filterItem.value !== 'ALL')
+        .map(filterItem => ({
+            category: filterItem.value,
+            label: filterItem.label,
+            items: [],
+        }));
+    const groupByCategory = Object.fromEntries(groups.map(group => [group.category, group]));
+    const otherGroup = { category: 'OTHER', label: 'Other', items: [] };
+
+    for (const item of items || []) {
+        const category = String(item.category || '').toUpperCase();
+        const group = groupByCategory[category] || otherGroup;
+        group.items.push(item);
+    }
+
+    return [...groups, otherGroup].filter(group => group.items.length > 0);
+}
+
 function getCurelBuffText(buff) {
     const value = Number(buff?.value) || 0;
     const suffix = CUREL_BUFF_SUFFIX[buff?.code] ?? '';
     return `Lv.${buff?.level || 1} +${value}${suffix}`;
 }
 
-function InventoryFilterRail({ activeFilter, onChange }) {
+function InventoryGrid({ items, onSelect }) {
     return (
-        <nav className="grid grid-cols-4 sm:grid-cols-1 sm:w-24 flex-shrink-0 bg-black/25 border border-border overflow-x-auto sm:overflow-visible">
-            {FILTERS.map(filterItem => (
-                <button
-                    key={filterItem.value}
-                    type="button"
-                    onClick={() => onChange(filterItem.value)}
-                    className={`relative min-h-14 px-2 py-2 text-center border-border ${
-                        activeFilter === filterItem.value
-                            ? 'bg-accent/15 text-accent'
-                            : 'text-textMuted hover:text-textPrimary hover:bg-white/5'
-                    } border-r sm:border-r-0 sm:border-b last:border-r-0 sm:last:border-b-0`}
-                >
-                    <span className="block text-[10px] font-bold leading-none">{filterItem.value === 'ALL' ? 'ALL' : filterItem.value.slice(0, 2)}</span>
-                    <span className="block text-[11px] font-semibold mt-1 truncate">{filterItem.label}</span>
-                    {activeFilter === filterItem.value && <span className="absolute inset-x-2 bottom-1 h-0.5 bg-accent sm:inset-x-auto sm:inset-y-2 sm:left-1 sm:h-auto sm:w-0.5" />}
-                </button>
+        <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+            {items.map(item => (
+                <ItemTile key={item.id} item={item} onSelect={onSelect} />
             ))}
-        </nav>
-    );
-}
-
-function InventoryRow({ item, isSelected, onSelect }) {
-    const rarity = (item.rarity || 'COMMON').toUpperCase();
-    const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
-    const durability = item.max_durability > 0
-        ? `${Number(item.current_durability || 0).toFixed(1)}/${Number(item.max_durability || 0).toFixed(1)}`
-        : '-';
-
-    return (
-        <button
-            type="button"
-            onClick={() => onSelect(item)}
-            className={`w-full grid grid-cols-[42px_minmax(0,1fr)_50px_72px] items-center gap-2 px-3 py-2 text-left border-b border-border/70 ${
-                isSelected ? 'bg-accent/12' : 'hover:bg-white/5'
-            }`}
-        >
-            <span className={`w-9 h-9 bg-black/30 border border-border ring-1 ${style.ring} flex items-center justify-center text-[10px] font-bold text-accent`}>
-                {getItemMark(item)}
-            </span>
-            <span className="min-w-0">
-                <span className={`block text-xs font-semibold truncate ${style.text}`}>{item.display_name || item.category}</span>
-                <span className="block text-[10px] text-textMuted truncate">{Array.isArray(item.tags) ? item.tags.slice(0, 2).join(' | ') : item.category}</span>
-            </span>
-            <span className="text-xs text-textSecondary">Lv.{item.item_level || 1}</span>
-            <span className="text-[11px] text-textMuted">{durability}</span>
-        </button>
-    );
-}
-
-function InventoryTable({ items, selectedItem, onSelect }) {
-    return (
-        <div className="min-h-0 flex-1 border border-border bg-black/20 overflow-hidden">
-            <div className="grid grid-cols-[42px_minmax(0,1fr)_50px_72px] gap-2 px-3 py-2 border-b border-border bg-black/25 text-[10px] font-semibold text-textMuted">
-                <span />
-                <span>Item Name/Type</span>
-                <span>Level</span>
-                <span>Durability</span>
-            </div>
-            <div className="max-h-[50vh] sm:max-h-none sm:h-full overflow-y-auto">
-                {items.length === 0 && <p className="text-sm text-textMuted text-center py-10">No items yet.</p>}
-                {items.map(item => (
-                    <InventoryRow
-                        key={item.id}
-                        item={item}
-                        isSelected={selectedItem?.id === item.id}
-                        onSelect={onSelect}
-                    />
-                ))}
-            </div>
         </div>
     );
 }
 
-function InventoryDetailPanel({ item, playerId, onUpdate }) {
+function InventoryGroups({ groups, onSelect }) {
+    return (
+        <div className="space-y-5">
+            {groups.map(group => (
+                <section key={group.category}>
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-xs font-semibold uppercase text-textMuted">{group.label}</h3>
+                        <span className="text-[10px] font-mono text-textMuted">{group.items.length}</span>
+                    </div>
+                    <InventoryGrid items={group.items} onSelect={onSelect} />
+                </section>
+            ))}
+        </div>
+    );
+}
+
+function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
-
-    if (!item) {
-        return (
-            <aside className="border border-border bg-black/20 min-h-44 sm:w-64 flex items-center justify-center text-sm text-textMuted">
-                Select an item.
-            </aside>
-        );
-    }
+    if (!item) return null;
 
     const rarity = (item.rarity || 'COMMON').toUpperCase();
     const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
     const normalizedCategory = (item.category || '').toUpperCase();
     const canEquip = EQUIPABLE_CATEGORIES.includes(normalizedCategory) && !item.is_equipped;
     const canEat = normalizedCategory === 'FOOD';
+    const tags = Array.isArray(item.tags) ? item.tags : [];
+    const curelBuffs = Array.isArray(item.curel_buffs) ? item.curel_buffs : [];
+    const expiryText = formatExpiry(item.expires_at);
+
     const itemStats = [1, 2, 3]
         .map(index => ({ type: item[`stat_${index}_type`], value: item[`stat_${index}_value`] }))
         .filter(stat => stat.type);
-    const curelBuffs = Array.isArray(item.curel_buffs) ? item.curel_buffs : [];
 
     async function handleEquip() {
         setIsLoading(true);
         setError('');
         try {
             await equipItem(playerId, item.id);
-            await onUpdate?.();
+            onEquipped();
+            onClose();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -194,7 +194,8 @@ function InventoryDetailPanel({ item, playerId, onUpdate }) {
         setError('');
         try {
             await useFoodItem(playerId, item.id);
-            await onUpdate?.();
+            onEquipped();
+            onClose();
         } catch (err) {
             setError(err.message);
         } finally {
@@ -203,58 +204,102 @@ function InventoryDetailPanel({ item, playerId, onUpdate }) {
     }
 
     return (
-        <aside className="border border-border bg-black/20 p-3 sm:w-64 flex-shrink-0">
-            <div className="flex items-start gap-3">
-                <div className={`w-14 h-14 bg-black/30 border border-border ring-1 ${style.ring} flex items-center justify-center text-xs font-bold text-accent`}>
-                    {getItemMark(item)}
-                </div>
-                <div className="min-w-0">
-                    <p className="font-semibold text-sm truncate">{item.display_name || item.category}</p>
-                    <p className={`text-xs mt-1 ${style.text}`}>Lv.{item.item_level || 1} | {rarity}</p>
-                    <p className="text-xs text-textMuted mt-1">{normalizedCategory}</p>
-                </div>
-            </div>
-
-            {itemStats.length > 0 && (
-                <div className="grid grid-cols-2 gap-2 mt-4 text-xs">
-                    {itemStats.map((stat, index) => (
-                        <div key={index} className="bg-surface/70 p-2">
-                            <p className="text-textMuted">{STAT_LABELS[stat.type] || stat.type}</p>
-                            <p className="font-semibold text-accent">+{parseFloat(stat.value).toFixed(1)}</p>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4" onClick={onClose}>
+            <div className="card w-full sm:max-w-sm p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+                <div className="flex items-start justify-between gap-3 mb-4">
+                    <div className="flex items-start gap-3 min-w-0">
+                        <div className="flex-shrink-0 text-center">
+                            <div className="w-14 h-14 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">
+                                {getItemMark(item)}
+                            </div>
+                            <p className={`mt-1 text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</p>
                         </div>
-                    ))}
+                        <div className="min-w-0">
+                            <p className="font-semibold text-textPrimary truncate">{item.display_name || item.category}</p>
+                            <p className={`text-xs font-medium ${style.text}`}>{rarity}</p>
+                            {normalizedCategory && <p className="text-[10px] text-textMuted mt-1">{normalizedCategory}</p>}
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
                 </div>
-            )}
 
-            {curelBuffs.length > 0 && (
-                <div className="mt-4 space-y-1">
-                    {curelBuffs.map(buff => (
-                        <p key={buff.code} className="text-xs text-textSecondary flex justify-between gap-3">
-                            <span>{buff.label || buff.code}</span>
-                            <span className="text-accent font-semibold">{getCurelBuffText(buff)}</span>
+                {tags.length > 0 && (
+                    <div className="card p-3 mb-3">
+                        <p className="text-textMuted text-xs mb-2">Tags</p>
+                        <div className="flex flex-wrap gap-1.5">
+                            {tags.map(tag => (
+                                <span key={tag} className="text-[10px] px-2 py-0.5 rounded bg-elevated text-textSecondary">
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {(item.origin || item.note) && (
+                    <div className="card p-3 mb-3">
+                        {item.origin && <p className="text-xs text-textMuted">Source: <span className="text-textSecondary">{item.origin}</span></p>}
+                        {item.note && <p className="text-xs text-textMuted mt-1">{item.note}</p>}
+                    </div>
+                )}
+
+                {(expiryText || item.is_expired) && (
+                    <div className="card p-3 mb-3">
+                        <p className={`text-xs ${item.is_expired ? 'text-danger' : 'text-textMuted'}`}>
+                            {item.is_expired ? 'Expired' : `Expires: ${expiryText}`}
                         </p>
-                    ))}
-                </div>
-            )}
+                    </div>
+                )}
 
-            {item.quantity > 1 && <p className="text-xs text-textMuted mt-3">Quantity: x{item.quantity}</p>}
-            {item.is_expired && <p className="text-xs text-danger mt-3">Expired</p>}
-            {error && <p className="text-sm text-danger mt-3">{error}</p>}
+                {itemStats.length > 0 && (
+                    <div className="card p-3 mb-3">
+                        <p className="text-textMuted text-xs mb-2">Bonus stats</p>
+                        <div className="flex flex-wrap gap-3">
+                            {itemStats.map((stat, index) => (
+                                <span key={index} className="text-sm">
+                                    <span className="text-textMuted">{STAT_LABELS[stat.type]} </span>
+                                    <span className="text-accent font-semibold">+{parseFloat(stat.value).toFixed(1)}</span>
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
-            {canEat && (
-                <button onClick={handleEat} disabled={isLoading || item.is_expired} className="btn-primary w-full mt-4 text-sm">
-                    {item.is_expired ? 'Expired' : (isLoading ? 'Eating...' : 'Eat')}
-                </button>
-            )}
+                {curelBuffs.length > 0 && (
+                    <div className="card p-3 mb-3">
+                        <p className="text-textMuted text-xs mb-2">CUREL buffs</p>
+                        <div className="space-y-1">
+                            {curelBuffs.map(buff => (
+                                <p key={buff.code} className="text-xs text-textSecondary flex justify-between gap-3">
+                                    <span>{buff.label || buff.code}</span>
+                                    <span className="text-accent font-semibold">{getCurelBuffText(buff)}</span>
+                                </p>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
-            {item.is_equipped ? (
-                <div className="text-center text-sm text-success py-2 mt-4">Equipped</div>
-            ) : canEquip ? (
-                <button onClick={handleEquip} disabled={isLoading} className="btn-primary w-full mt-4 text-sm">
-                    {isLoading ? 'Equipping...' : 'Equip'}
-                </button>
-            ) : null}
-        </aside>
+                {item.quantity > 1 && (
+                    <p className="text-xs text-textMuted mb-3">Quantity: x{item.quantity}</p>
+                )}
+
+                {error && <p className="text-sm text-danger mb-3">{error}</p>}
+
+                {canEat && (
+                    <button onClick={handleEat} disabled={isLoading || item.is_expired} className="btn-primary w-full mb-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {item.is_expired ? 'Expired' : (isLoading ? 'Eating...' : 'Eat')}
+                    </button>
+                )}
+
+                {item.is_equipped ? (
+                    <div className="text-center text-sm text-success py-2">Equipped</div>
+                ) : canEquip ? (
+                    <button onClick={handleEquip} disabled={isLoading} className="btn-primary w-full">
+                        {isLoading ? 'Equipping...' : 'Equip'}
+                    </button>
+                ) : null}
+            </div>
+        </div>
     );
 }
 
@@ -263,25 +308,50 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
     const [selected, setSelected] = useState(null);
 
     const filtered = (items || []).filter(item => filter === 'ALL' || (item.category || '').toUpperCase() === filter);
-    const selectedItem = filtered.some(item => item.id === selected?.id) ? selected : (filtered[0] || null);
+    const groups = filter === 'ALL' ? groupItemsByCategory(filtered) : [];
 
     return (
-        <div className="h-full flex flex-col bg-[#121318]">
-            <header className="h-12 flex items-center justify-between gap-3 px-3 bg-black/35 border-b border-border flex-shrink-0">
-                <div className="min-w-0">
-                    <h2 className="font-semibold text-sm truncate">Inventory</h2>
-                    <p className="text-[10px] text-textMuted">{filter === 'ALL' ? 'All categories' : FILTERS.find(item => item.value === filter)?.label}</p>
+        <div className="h-full flex flex-col">
+            <div className="px-4 py-3 border-b border-border flex-shrink-0">
+                <div className="flex items-center justify-between mb-3">
+                    <h2 className="font-semibold text-sm">Inventory</h2>
+                    <span className="text-xs text-textMuted font-mono">{items?.length || 0} items</span>
                 </div>
-                <span className="text-xs text-textMuted font-mono flex-shrink-0">{items?.length || 0} items</span>
-            </header>
-
-            <div className="min-h-0 flex-1 flex flex-col sm:flex-row gap-2 p-2">
-                <InventoryFilterRail activeFilter={filter} onChange={setFilter} />
-                <main className="min-w-0 flex-1 flex flex-col sm:flex-row gap-2">
-                    <InventoryTable items={filtered} selectedItem={selectedItem} onSelect={setSelected} />
-                    <InventoryDetailPanel item={selectedItem} playerId={playerId} onUpdate={onUpdate} />
-                </main>
+                <div className="flex gap-1.5 overflow-x-auto pb-1">
+                    {FILTERS.map(filterItem => (
+                        <button
+                            key={filterItem.value}
+                            onClick={() => setFilter(filterItem.value)}
+                            className={`tab-pill flex-shrink-0 ${filter === filterItem.value ? 'tab-pill-active' : 'tab-pill-inactive'}`}
+                        >
+                            {filterItem.label}
+                        </button>
+                    ))}
+                </div>
             </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+                {filtered.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                        <div className="text-center max-w-[200px]">
+                            <div className="text-3xl mb-3 opacity-20">0</div>
+                            <p className="text-sm text-textSecondary mb-1">No items yet</p>
+                            <p className="text-xs text-textMuted">Complete actions to collect loot.</p>
+                        </div>
+                    </div>
+                ) : (
+                    filter === 'ALL'
+                        ? <InventoryGroups groups={groups} onSelect={setSelected} />
+                        : <InventoryGrid items={filtered} onSelect={setSelected} />
+                )}
+            </div>
+
+            <ItemDetailSheet
+                item={selected}
+                playerId={playerId}
+                onClose={() => setSelected(null)}
+                onEquipped={() => onUpdate?.()}
+            />
         </div>
     );
 }
