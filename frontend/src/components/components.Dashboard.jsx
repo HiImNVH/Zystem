@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import BottomNav from './layout/components.layout.BottomNav';
 import MainPanel from './panels/components.panels.MainPanel';
+import CombatPanel from './panels/components.panels.CombatPanel';
 import InventoryPanel from './panels/components.panels.InventoryPanel';
 import ChatPanel from './panels/components.panels.ChatPanel';
 import ProfilePanel from './panels/components.panels.ProfilePanel';
@@ -14,7 +15,7 @@ import {
 import { getMyCharacter } from '../api/api.character';
 import { connectSocket } from '../api/api.socket';
 
-const TAB = { MAIN: 'MAIN', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
+const TAB = { MAIN: 'MAIN', COMBAT: 'COMBAT', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
 const SIDE_TABS = [
     { key: TAB.INVENTORY, label: 'Inventory' },
     { key: TAB.CHAT, label: 'Chat' },
@@ -31,6 +32,10 @@ function renderPanel(tab, ctx) {
 
     if (tab === TAB.INVENTORY) {
         return <InventoryPanel items={inventory} playerId={playerId} onUpdate={loadAll} />;
+    }
+
+    if (tab === TAB.COMBAT) {
+        return <CombatPanel character={character} inventory={inventory} />;
     }
 
     if (tab === TAB.QUEST) {
