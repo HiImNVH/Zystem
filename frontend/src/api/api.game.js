@@ -72,6 +72,61 @@ export async function exchangeCurrency(playerId, currency, quantity, side) {
     return handleResponse(res);
 }
 
+export async function getNpcShop() {
+    const res = await fetch(`${BASE_URL}/api/trading/npc-shop`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function buyNpcShopItem(playerId, templateCode) {
+    const res = await fetch(`${BASE_URL}/api/trading/npc-shop/buy`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, templateCode })
+    });
+    return handleResponse(res);
+}
+
+export async function sellItemToNpc(playerId, itemId) {
+    const res = await fetch(`${BASE_URL}/api/trading/npc-shop/sell`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, itemId })
+    });
+    return handleResponse(res);
+}
+
+export async function getBlackMarketListings(playerId) {
+    const res = await fetch(`${BASE_URL}/api/trading/black-market/${playerId}`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function listBlackMarketItem(playerId, itemId, priceMoney) {
+    const res = await fetch(`${BASE_URL}/api/trading/black-market/list`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, itemId, priceMoney })
+    });
+    return handleResponse(res);
+}
+
+export async function buyBlackMarketListing(playerId, listingId) {
+    const res = await fetch(`${BASE_URL}/api/trading/black-market/buy`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, listingId })
+    });
+    return handleResponse(res);
+}
+
+export async function cancelBlackMarketListing(playerId, listingId) {
+    const res = await fetch(`${BASE_URL}/api/trading/black-market/cancel`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId, listingId })
+    });
+    return handleResponse(res);
+}
+
 export async function getPlayerJobs(playerId) {
     const res = await fetch(`${BASE_URL}/api/jobs/player/${playerId}`, { headers: getHeaders() });
     return handleResponse(res);

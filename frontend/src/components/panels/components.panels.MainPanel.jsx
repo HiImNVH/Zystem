@@ -11,6 +11,7 @@ import {
 } from '../../api/api.game';
 import { getFactions, getMyFaction, createFaction, joinFaction, leaveFaction } from '../../api/api.faction';
 import CombatMiniGame from './components.panels.CombatMiniGame';
+import TradingSheet from './components.panels.TradingSheet';
 
 const POI_ROTATION_MS = 15 * 60 * 1000;
 
@@ -1297,6 +1298,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     const [showFaction, setShowFaction] = useState(false);
     const [showSafeHouse, setShowSafeHouse] = useState(false);
     const [showCurrencyExchange, setShowCurrencyExchange] = useState(false);
+    const [showTrading, setShowTrading] = useState(false);
     const [currentExpeditionZone, setCurrentExpeditionZone] = useState(null);
     const [selectedPoi, setSelectedPoi] = useState(null);
     const [activitySheet, setActivitySheet] = useState(null);
@@ -1429,12 +1431,21 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                                 <p className="text-xs text-textMuted leading-relaxed mt-1">Rest, cook, craft, and manage your safe house.</p>
                             </div>
                         </button>
-                        <button onClick={() => setShowCurrencyExchange(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
+                        <button onClick={() => setShowTrading(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">NPC</span>
                             </div>
                             <div className="min-w-0">
                                 <p className="font-semibold">Refugee Camp</p>
+                                <p className="text-xs text-textMuted leading-relaxed mt-1">Trade with camp merchants and the black market.</p>
+                            </div>
+                        </button>
+                        <button onClick={() => setShowCurrencyExchange(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className="w-10 h-10 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">EX</span>
+                            </div>
+                            <div className="min-w-0">
+                                <p className="font-semibold">Currency Exchange</p>
                                 <p className="text-xs text-textMuted leading-relaxed mt-1">Exchange Money for silver and gold coins.</p>
                             </div>
                         </button>
@@ -1601,6 +1612,16 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     playerId={playerId}
                     character={character}
                     onClose={() => setShowCurrencyExchange(false)}
+                    onUpdate={onUpdate}
+                    onNotify={notify}
+                />
+            )}
+            {showTrading && (
+                <TradingSheet
+                    playerId={playerId}
+                    character={character}
+                    inventory={inventory}
+                    onClose={() => setShowTrading(false)}
                     onUpdate={onUpdate}
                     onNotify={notify}
                 />

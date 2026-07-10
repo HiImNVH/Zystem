@@ -65,6 +65,7 @@ async function initializeDatabaseSchema() {
                 DROP TABLE IF EXISTS player_recipes CASCADE;
                 DROP TABLE IF EXISTS recipe_ingredients CASCADE;
                 DROP TABLE IF EXISTS recipes CASCADE;
+                DROP TABLE IF EXISTS market_listings CASCADE;
                 DROP TABLE IF EXISTS items CASCADE;
                 DROP TABLE IF EXISTS item_templates CASCADE;
                 DROP TABLE IF EXISTS stat_definitions CASCADE;
@@ -464,6 +465,27 @@ async function initializeDatabaseSchema() {
         await client.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS curel_buffs JSONB NOT NULL DEFAULT '[]'::JSONB;`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_items_owner ON items(owner_player_id) WHERE owner_player_id IS NOT NULL;`);
         await client.query(`CREATE INDEX IF NOT EXISTS idx_items_equipped ON items(owner_player_id, is_equipped) WHERE is_equipped = TRUE;`);
+
+        // ============================================================
+        // BANG 15.1: MARKET LISTINGS
+        // ============================================================
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS market_listings (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                seller_player_id UUID NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+                buyer_player_id UUID REFERENCES players(id) ON DELETE SET NULL,
+                item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
+                price_money BIGINT NOT NULL CHECK (price_money > 0),
+                status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                sold_at TIMESTAMPTZ,
+                cancelled_at TIMESTAMPTZ,
+                CHECK (status IN ('ACTIVE', 'SOLD', 'CANCELLED'))
+            );
+        `);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_market_listings_status ON market_listings(status, created_at DESC);`);
+        await client.query(`CREATE INDEX IF NOT EXISTS idx_market_listings_seller ON market_listings(seller_player_id, status);`);
+        await client.query(`CREATE UNIQUE INDEX IF NOT EXISTS idx_market_listings_active_item ON market_listings(item_id) WHERE status = 'ACTIVE';`);
 
         // ============================================================
         // BANG 16: RECIPES
