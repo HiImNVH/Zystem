@@ -432,6 +432,7 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
             itemPower,
             tags: recipe.output_template_tags,
         });
+        const curelBuffs = itemStatsService.rollItemCurelBuffs({ rarity });
         const expiresAt = itemLifecycleService.calculateExpiresAt(recipe.lifecycle_model, recipe.base_duration_hours);
 
         for (const item of selectedItems) {
@@ -446,8 +447,8 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
             INSERT INTO items
                 (template_id, rarity, item_power, item_level, expires_at, max_durability, current_durability,
                  owner_player_id, source, quantity, crafted_by_player_id, crafted_at,
-                 stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
-            VALUES ($1,$2,$3,$4,$5,$6,$6,$7,'craft',$8,$7,NOW(),$9,$10,$11,$12,$13,$14)
+                 curel_buffs, stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
+            VALUES ($1,$2,$3,$4,$5,$6,$6,$7,'craft',$8,$7,NOW(),$9::JSONB,$10,$11,$12,$13,$14,$15)
             RETURNING *;
         `, [
             recipe.output_template_id,
@@ -458,6 +459,7 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
             recipe.base_durability || 100,
             playerId,
             recipe.output_qty || 1,
+            JSON.stringify(curelBuffs),
             rolledStats.stat_1_type || null,
             rolledStats.stat_1_value || 0,
             rolledStats.stat_2_type || null,

@@ -68,6 +68,7 @@ function buildStarterItemRow(config) {
         itemPower,
         tags: template.tags,
     });
+    const curelBuffs = itemStatsService.rollItemCurelBuffs({ rarity });
 
     return {
         playerId,
@@ -78,6 +79,7 @@ function buildStarterItemRow(config) {
         maxDurability: template.base_durability || 100,
         equipSlot: getEquipSlot(template),
         stats: rolledStats,
+        curelBuffs,
     };
 }
 
@@ -99,8 +101,8 @@ async function insertStarterItem(config, client) {
         INSERT INTO items
             (template_id, rarity, item_power, item_level, max_durability, current_durability,
              owner_player_id, source, quantity, is_equipped, equip_slot,
-             stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
-        VALUES ($1,$2,$3,$4,$5,$5,$6,'starter',1,TRUE,$7,$8,$9,$10,$11,$12,$13)
+             curel_buffs, stat_1_type, stat_1_value, stat_2_type, stat_2_value, stat_3_type, stat_3_value)
+        VALUES ($1,$2,$3,$4,$5,$5,$6,'starter',1,TRUE,$7,$8::JSONB,$9,$10,$11,$12,$13,$14)
         RETURNING id;
     `, [
         row.templateId,
@@ -110,6 +112,7 @@ async function insertStarterItem(config, client) {
         row.maxDurability,
         row.playerId,
         row.equipSlot,
+        JSON.stringify(row.curelBuffs),
         row.stats.stat_1_type || null,
         row.stats.stat_1_value || 0,
         row.stats.stat_2_type || null,

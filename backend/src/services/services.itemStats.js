@@ -31,6 +31,21 @@ const TAG_STAT_PAIR_RULES = [
     { tag: 'gatheringtool', stats: ['dex', 'agi'] },
 ];
 
+const CUREL_BUFF_LINE_COUNT = {
+    COMMON: 0,
+    UNCOMMON: 1,
+    RARE: 2,
+    EPIC: 3,
+    LEGENDARY: 5,
+};
+
+const CUREL_BUFF_POOL = [
+    { code: 'durability_pct', label: 'Durability', valuePerLevel: 4 },
+    { code: 'action_speed_pct', label: 'Action Speed', valuePerLevel: 2 },
+    { code: 'yield_chance_pct', label: 'Yield Chance', valuePerLevel: 2 },
+    { code: 'quality_power', label: 'Quality Power', valuePerLevel: 1 },
+];
+
 function calculateBaseStatValue(itemPower) {
     return Math.max(1, Math.floor((itemPower || 1) * 3));
 }
@@ -87,6 +102,31 @@ function rollItemStats(config) {
     };
 }
 
+function getCurelBuffLineCount(rarity) {
+    const normalizedRarity = String(rarity || 'COMMON').toUpperCase();
+    return CUREL_BUFF_LINE_COUNT[normalizedRarity] || 0;
+}
+
+function rollItemCurelBuffs(config) {
+    const lineCount = getCurelBuffLineCount(config?.rarity);
+    if (lineCount <= 0) return [];
+
+    const buffLevels = {};
+    for (let index = 0; index < lineCount; index++) {
+        const buff = CUREL_BUFF_POOL[Math.floor(Math.random() * CUREL_BUFF_POOL.length)];
+        buffLevels[buff.code] = (buffLevels[buff.code] || 0) + 1;
+    }
+
+    return CUREL_BUFF_POOL
+        .filter(buff => buffLevels[buff.code])
+        .map(buff => ({
+            code: buff.code,
+            label: buff.label,
+            level: buffLevels[buff.code],
+            value: buffLevels[buff.code] * buff.valuePerLevel,
+        }));
+}
+
 // Tinh tong stat bonus tu toan bo gear dang equip cua nhan vat
 async function calculateGearStatBonus(playerId) {
     const zeroStats = { str: 0, agi: 0, dex: 0, vit: 0, int: 0, chr: 0 };
@@ -124,8 +164,12 @@ async function calculateGearStatBonus(playerId) {
 
 module.exports = {
     rollItemStats,
+    rollItemCurelBuffs,
+    getCurelBuffLineCount,
     calculateGearStatBonus,
     calculateBaseStatValue,
     DEFAULT_STAT_PAIR,
     TAG_STAT_PAIR_RULES,
+    CUREL_BUFF_LINE_COUNT,
+    CUREL_BUFF_POOL,
 };

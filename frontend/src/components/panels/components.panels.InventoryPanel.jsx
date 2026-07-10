@@ -56,6 +56,12 @@ const FILTERS = [
 
 const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
 const STAT_LABELS = { str:'STR', agi:'AGI', dex:'DEX', vit:'VIT', int:'INT', chr:'CHR' };
+const CUREL_BUFF_SUFFIX = {
+    durability_pct: '%',
+    action_speed_pct: '%',
+    yield_chance_pct: '%',
+    quality_power: '',
+};
 
 function formatExpiry(expiresAt) {
     if (!expiresAt) return null;
@@ -119,6 +125,12 @@ function groupItemsByCategory(items) {
     return [...groups, otherGroup].filter(group => group.items.length > 0);
 }
 
+function getCurelBuffText(buff) {
+    const value = Number(buff?.value) || 0;
+    const suffix = CUREL_BUFF_SUFFIX[buff?.code] ?? '';
+    return `Lv.${buff?.level || 1} +${value}${suffix}`;
+}
+
 function InventoryGrid({ items, onSelect }) {
     return (
         <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
@@ -156,6 +168,7 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
     const canEquip = EQUIPABLE_CATEGORIES.includes(normalizedCategory) && !item.is_equipped;
     const canEat = normalizedCategory === 'FOOD';
     const tags = Array.isArray(item.tags) ? item.tags : [];
+    const curelBuffs = Array.isArray(item.curel_buffs) ? item.curel_buffs : [];
     const expiryText = formatExpiry(item.expires_at);
 
     const itemStats = [1, 2, 3]
@@ -247,6 +260,20 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                                     <span className="text-textMuted">{STAT_LABELS[stat.type]} </span>
                                     <span className="text-accent font-semibold">+{parseFloat(stat.value).toFixed(1)}</span>
                                 </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {curelBuffs.length > 0 && (
+                    <div className="card p-3 mb-3">
+                        <p className="text-textMuted text-xs mb-2">CUREL buffs</p>
+                        <div className="space-y-1">
+                            {curelBuffs.map(buff => (
+                                <p key={buff.code} className="text-xs text-textSecondary flex justify-between gap-3">
+                                    <span>{buff.label || buff.code}</span>
+                                    <span className="text-accent font-semibold">{getCurelBuffText(buff)}</span>
+                                </p>
                             ))}
                         </div>
                     </div>
