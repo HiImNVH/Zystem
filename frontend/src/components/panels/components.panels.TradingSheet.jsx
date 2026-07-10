@@ -239,14 +239,18 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
-            <div className="card w-full sm:max-w-2xl max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+        <div className="p-4 space-y-4">
+            <button onClick={onClose} className="w-full btn-secondary text-left">
+                Back to Refugee Camp
+            </button>
+
+            <section className="card p-4">
                 <div className="flex items-start justify-between gap-4 mb-4">
-                    <div>
-                        <h3 className="font-semibold">Refugee Camp Trading</h3>
+                    <div className="min-w-0">
+                        <h3 className="font-semibold">Trading</h3>
                         <p className="text-xs text-textMuted mt-1">Money balance: {money.toLocaleString()}</p>
                     </div>
-                    <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
+                    <span className="text-[10px] font-bold text-accent flex-shrink-0">NPC</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-4">
@@ -269,7 +273,7 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading trading data...</p>}
                 {error && <p className="text-sm text-danger mb-3">{error}</p>}
                 {!isLoading && (activeTab === 'NPC' ? renderNpcShop() : renderBlackMarket())}
-            </div>
+            </section>
         </div>
     );
 }
