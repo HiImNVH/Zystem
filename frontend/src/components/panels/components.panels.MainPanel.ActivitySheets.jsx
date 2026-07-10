@@ -1,7 +1,6 @@
 // frontend/src/components/panels/components.panels.MainPanel.ActivitySheets.jsx
 
 import { useState } from 'react';
-import CombatMiniGame from './components.panels.CombatMiniGame';
 import {
     canSpendEnergy,
     formatDropTable,
@@ -60,8 +59,7 @@ function ActionResultDetails({ result }) {
 
 
 
-export function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, executingId }) {
-    const [combatEnemy, setCombatEnemy] = useState(null);
+export function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, onOpenCombat, executingId }) {
     const [sheetError, setSheetError] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [resultData, setResultData] = useState(null);
@@ -93,7 +91,7 @@ export function ActivityListSheet({ activityType, activityData, character, inven
         setResultMessage('');
         setResultData(null);
         if (activityType === 'enemy') {
-            setCombatEnemy(item);
+            onOpenCombat?.(item);
             return;
         }
 
@@ -127,18 +125,7 @@ export function ActivityListSheet({ activityType, activityData, character, inven
                         <ActionResultDetails result={resultData} />
                     </div>
                 )}
-                {!isLoading && activityType === 'enemy' && combatEnemy && (
-                    <CombatMiniGame
-                        enemy={combatEnemy}
-                        character={character}
-                        inventory={inventory}
-                        isExecuting={Boolean(executingId)}
-                        onBack={() => setCombatEnemy(null)}
-                        onAttack={options => onExecute?.(combatEnemy, options)}
-                    />
-                )}
-
-                {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && !(activityType === 'enemy' && combatEnemy) && (
+                {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && (
                     <div className="space-y-2">
                         {list.map(item => (
                             <div key={item.id} className="card p-3 flex items-center gap-3">
@@ -267,5 +254,4 @@ export function PoiActionSheet({ poi, onClose, onOpenActivity }) {
         </div>
     );
 }
-
 

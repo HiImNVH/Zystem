@@ -71,7 +71,28 @@ function getEnemyHitChance(character) {
     return Math.max(0.4, 1 - getPlayerEvasionRate(character));
 }
 
-function createEnemy(character) {
+function createEnemyFromRequest(combatRequest) {
+    const sourceEnemy = combatRequest?.enemy;
+    if (!sourceEnemy) return null;
+
+    const level = Math.max(1, parseInt(sourceEnemy.level) || parseInt(combatRequest?.zone?.level_gap) || 1);
+    const maxHp = Math.max(1, parseInt(sourceEnemy.health) || parseInt(sourceEnemy.maxHp) || 80);
+
+    return {
+        id: sourceEnemy.id || `${sourceEnemy.name}-${combatRequest.requestId}`,
+        name: sourceEnemy.name || sourceEnemy.display_name || 'Unknown Threat',
+        rank: sourceEnemy.threat || sourceEnemy.rank || 'Common',
+        level,
+        maxHp,
+        attack: Math.max(1, getNumber(sourceEnemy.attack) || 10),
+        defense: Math.max(0, getNumber(sourceEnemy.defense)),
+    };
+}
+
+function createEnemy(character, combatRequest) {
+    const requestedEnemy = createEnemyFromRequest(combatRequest);
+    if (requestedEnemy) return requestedEnemy;
+
     const playerLevel = Math.max(1, parseInt(character?.player_level) || 1);
     const base = ENEMY_POOL[(playerLevel - 1) % ENEMY_POOL.length];
     const level = Math.max(1, playerLevel + ((playerLevel % 3) - 1));
@@ -131,8 +152,8 @@ function EnemyPortrait({ enemy }) {
     );
 }
 
-export default function CombatPanel({ character, inventory }) {
-    const [enemy, setEnemy] = useState(() => createEnemy(character));
+export default function CombatPanel({ character, inventory, combatRequest }) {
+    const [enemy, setEnemy] = useState(() => createEnemy(character, combatRequest));
     const [enemyHp, setEnemyHp] = useState(enemy.maxHp);
     const [playerHp, setPlayerHp] = useState(() => Math.max(1, parseInt(character?.current_hp) || parseInt(character?.max_hp) || 100));
     const [hitMarker, setHitMarker] = useState(50);
@@ -167,11 +188,19 @@ export default function CombatPanel({ character, inventory }) {
     }
 
     function resetEnemy() {
-        const nextEnemy = createEnemy(character);
+        const nextEnemy = createEnemy(character, combatRequest);
         setEnemy(nextEnemy);
         setEnemyHp(nextEnemy.maxHp);
         setLogs([`A ${nextEnemy.name} appears.`]);
     }
+
+    useEffect(() => {
+        const nextEnemy = createEnemy(character, combatRequest);
+        setEnemy(nextEnemy);
+        setEnemyHp(nextEnemy.maxHp);
+        setPlayerHp(Math.max(1, parseInt(character?.current_hp) || parseInt(character?.max_hp) || 100));
+        setLogs([`A ${nextEnemy.name} appears.`]);
+    }, [combatRequest?.requestId]);
 
     function handleAction(action) {
         if (enemyHp <= 0 || playerHp <= 0) return;

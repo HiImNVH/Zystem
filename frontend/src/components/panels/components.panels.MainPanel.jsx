@@ -26,7 +26,7 @@ import {
     isZoneLockedForPlayer,
 } from './components.panels.mainPanel.shared';
 
-export default function MainPanel({ playerId, character, zones, inventory, onUpdate }) {
+export default function MainPanel({ playerId, character, zones, inventory, onUpdate, onOpenCombat }) {
     const [showZonePicker, setShowZonePicker] = useState(false);
     const [showCrafting, setShowCrafting] = useState(false);
     const [showFaction, setShowFaction] = useState(false);
@@ -91,6 +91,16 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
         } finally {
             setExecutingActivityId('');
         }
+    }
+
+    function openCombatEncounter(enemy) {
+        if (!activitySheet?.poi) return;
+        setActivitySheet(null);
+        onOpenCombat?.({
+            enemy,
+            poi: activitySheet.poi,
+            zone: activitySheet.data?.zone,
+        });
     }
 
     const safeZone = zones.find(zone => zone.zone_type === 'safe') || zones[0];
@@ -330,6 +340,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     error={activitySheet.error}
                     executingId={executingActivityId}
                     onExecute={executeActivity}
+                    onOpenCombat={openCombatEncounter}
                     onClose={() => setActivitySheet(null)}
                 />
             )}
