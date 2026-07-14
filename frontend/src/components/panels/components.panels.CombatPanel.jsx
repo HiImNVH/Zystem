@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 const TURN_DURATION_MS = 10000;
 const READY_DELAY_MIN_MS = 500;
 const READY_DELAY_RANGE_MS = 500;
-const SAFE_MARKER_GAP_MIN_MS = 250;
-const SAFE_MARKER_GAP_RANGE_MS = 100;
+const SAFE_MARKER_GAP_MIN_MS = 100;
+const SAFE_MARKER_GAP_RANGE_MS = 320;
 
 const COMBAT_ACTIONS = [
     { code: 'punch', label: 'Punch', mark: 'ATK', multiplier: 1 },
@@ -171,12 +171,17 @@ function getActionTiming(action, weaponProfile) {
 
 function createRhythmRun(action, weaponProfile) {
     const timing = getActionTiming(action, weaponProfile);
-    const safeGap = SAFE_MARKER_GAP_MIN_MS + Math.random() * SAFE_MARKER_GAP_RANGE_MS;
-    const markers = Array.from({ length: timing.hitCount }, (_, index) => ({
-        id: `${action.code}-${index}-${Math.random().toString(36).slice(2)}`,
-        startOffset: 120 + index * safeGap + Math.random() * 90,
-    }));
-    const totalMs = Math.max(...markers.map(marker => marker.startOffset)) + timing.travelMs + 80;
+    const travelMs = clamp(timing.travelMs + (Math.random() * 420 - 190), 900, 1650);
+    let nextOffset = 80 + Math.random() * 180;
+    const markers = Array.from({ length: timing.hitCount }, (_, index) => {
+        const marker = {
+            id: `${action.code}-${index}-${Math.random().toString(36).slice(2)}`,
+            startOffset: Math.round(nextOffset),
+        };
+        nextOffset += SAFE_MARKER_GAP_MIN_MS + Math.random() * SAFE_MARKER_GAP_RANGE_MS;
+        return marker;
+    });
+    const totalMs = Math.max(...markers.map(marker => marker.startOffset)) + travelMs + 80;
 
     return {
         action,
@@ -184,7 +189,7 @@ function createRhythmRun(action, weaponProfile) {
         results: [],
         startedAt: Date.now(),
         totalMs,
-        travelMs: timing.travelMs,
+        travelMs,
     };
 }
 
@@ -299,8 +304,13 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
     }
 
     useEffect(() => {
-        const timerId = setInterval(() => setClockMs(Date.now()), 50);
-        return () => clearInterval(timerId);
+        let frameId = 0;
+        function tick() {
+            setClockMs(Date.now());
+            frameId = requestAnimationFrame(tick);
+        }
+        frameId = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(frameId);
     }, []);
 
     useEffect(() => {
