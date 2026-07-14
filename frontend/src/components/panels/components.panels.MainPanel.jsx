@@ -11,6 +11,7 @@ import CraftingSheet from './components.panels.MainPanel.CraftingSheet';
 import CurrencyExchangeSheet from './components.panels.MainPanel.CurrencyExchangeSheet';
 import SafeHousePanel from './components.panels.MainPanel.SafeHousePanel';
 import FactionSheet from './components.panels.MainPanel.FactionSheet';
+import NavigationLine from './components.panels.MainPanel.NavigationLine';
 import {
     ActivityListSheet,
     PoiActionSheet,
@@ -110,6 +111,26 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
         }),
     }));
     const currentPois = getRotatingPois(currentExpeditionZone, poiRotationSlot);
+    const activityTitleMap = {
+        enemy: 'Find enemies',
+        scavenge: 'Scavenge',
+        gather: 'Gather',
+        sweep: 'Sweep',
+        dungeon: 'Sweep',
+    };
+    const navigationItems = [
+        'Map',
+        showZonePicker && !isExploring ? 'Exploration Routes' : null,
+        !isExploring && !showZonePicker ? 'Refugee Camp' : null,
+        isExploring ? currentZone?.display_name : null,
+        showSafeHouse || showCrafting ? 'Personal Home' : null,
+        showTrading ? 'Trading' : null,
+        showCurrencyExchange ? 'Currency Exchange' : null,
+        showFaction ? 'Faction' : null,
+        selectedPoi?.display_name || activitySheet?.poi?.display_name,
+        activitySheet ? activityTitleMap[activitySheet.type] || activitySheet.type : null,
+        showCrafting ? 'Crafting' : null,
+    ];
 
     return (
         <div className="h-full overflow-y-auto">
@@ -137,6 +158,8 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     </p>
                 </div>
             </div>
+
+            <NavigationLine items={navigationItems} />
 
             {notification && (
                 <div className={`mx-4 mt-3 p-2.5 rounded-lg text-sm animate-slideup ${
