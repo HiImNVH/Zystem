@@ -5,6 +5,23 @@ const tradingRouter = express.Router();
 const tradingService = require('../services/services.trading');
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 
+tradingRouter.get('/npc-shops', verifyToken, async (req, res, next) => {
+    try {
+        return res.json({ success: true, data: tradingService.getNpcShopList() });
+    } catch (error) {
+        next(error);
+    }
+});
+
+tradingRouter.get('/npc-shop/:playerId/:shopKey', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
+    try {
+        const catalog = await tradingService.getNpcShopCatalog(req.params.playerId, req.params.shopKey);
+        return res.json({ success: true, data: catalog });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
+    }
+});
+
 tradingRouter.get('/npc-shop/:playerId', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
     try {
         const catalog = await tradingService.getNpcShopCatalog(req.params.playerId);
@@ -24,13 +41,13 @@ tradingRouter.get('/npc-shop', verifyToken, async (req, res, next) => {
 });
 
 tradingRouter.post('/npc-shop/buy', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
-    const { playerId, templateCode } = req.body;
+    const { playerId, templateCode, shopKey } = req.body;
     if (!playerId || !templateCode) {
         return res.status(400).json({ success: false, message: 'Missing parameters: playerId, templateCode.' });
     }
 
     try {
-        const result = await tradingService.buyNpcShopItem({ playerId, templateCode });
+        const result = await tradingService.buyNpcShopItem({ playerId, templateCode, shopKey });
         return res.json({ success: true, message: 'Item bought successfully.', data: result });
     } catch (error) {
         return res.status(400).json({ success: false, message: error.message });

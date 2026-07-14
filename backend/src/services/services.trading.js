@@ -36,6 +36,7 @@ const NPC_VENDOR_CONFIGS = [
         tagHints: ['Bone', 'Meat', 'Animal', 'Hide', 'Fat'],
     },
 ];
+const NPC_VENDOR_KEYS = NPC_VENDOR_CONFIGS.map(vendor => vendor.key);
 
 const SHOP_ORIGINS = ['Starter', 'Gatherable', 'Loot-only', 'Craftable'];
 const WASTE_TAGS = ['Rubbish', 'Junk', 'Recyclable', 'Scrap', 'Broken', 'Plastic', 'Cloth', 'Glass'];
@@ -83,6 +84,20 @@ function getNpcVendorForItem(item) {
     }
     if (['FOOD', 'MEDICINE'].includes(category)) return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'provisioner');
     return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'quartermaster');
+}
+
+function getNpcVendorByKey(shopKey) {
+    if (!shopKey) return null;
+    return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === String(shopKey).toLowerCase()) || null;
+}
+
+function getNpcShopList() {
+    return NPC_VENDOR_CONFIGS.map(vendor => ({
+        key: vendor.key,
+        name: vendor.name,
+        role: vendor.role,
+        categories: vendor.categories,
+    }));
 }
 
 function parsePositiveInt(value) {
@@ -205,33 +220,43 @@ function decorateNpcCatalogItem(row, vendor) {
     });
 }
 
-async function getNpcShopCatalog(playerId) {
-    const playerLevel = await getPlayerLevel(playerId);
-    const catalog = [];
+async function getVendorCatalog(config) {
+    const { playerLevel, vendor } = config;
     const originPlaceholders = SHOP_ORIGINS.map((_, index) => `$${index + 3}`).join(', ');
-
-    for (const vendor of NPC_VENDOR_CONFIGS) {
-        const result = await dbPool.query(`
-            SELECT DISTINCT ON (code)
-                   id, code, display_name, category, tags, item_level, lifecycle_model,
-                   base_durability, base_duration_hours, is_stackable, max_stack,
-                   $1::INT AS shop_item_level
-            FROM item_templates
-            WHERE category = ANY($2::TEXT[])
-              AND origin = ANY(ARRAY[${originPlaceholders}])
-              AND item_level <= $1
-              AND (
-                  $${SHOP_ORIGINS.length + 3}::TEXT[] = ARRAY[]::TEXT[]
-                  OR EXISTS (
-                      SELECT 1
-                      FROM UNNEST(tags) AS item_tag
-                      WHERE item_tag = ANY($${SHOP_ORIGINS.length + 3}::TEXT[])
-                  )
+    const result = await dbPool.query(`
+        SELECT DISTINCT ON (code)
+               id, code, display_name, category, tags, item_level, lifecycle_model,
+               base_durability, base_duration_hours, is_stackable, max_stack,
+               $1::INT AS shop_item_level
+        FROM item_templates
+        WHERE category = ANY($2::TEXT[])
+          AND origin = ANY(ARRAY[${originPlaceholders}])
+          AND item_level <= $1
+          AND (
+              $${SHOP_ORIGINS.length + 3}::TEXT[] = ARRAY[]::TEXT[]
+              OR EXISTS (
+                  SELECT 1
+                  FROM UNNEST(tags) AS item_tag
+                  WHERE item_tag = ANY($${SHOP_ORIGINS.length + 3}::TEXT[])
               )
-            ORDER BY code, item_level DESC
-            LIMIT $${SHOP_ORIGINS.length + 4};
-        `, [playerLevel, vendor.categories, ...SHOP_ORIGINS, vendor.tagHints || [], vendor.sellLimit]);
-        catalog.push(...result.rows.map(row => decorateNpcCatalogItem(row, vendor)));
+          )
+        ORDER BY code, item_level DESC
+        LIMIT $${SHOP_ORIGINS.length + 4};
+    `, [playerLevel, vendor.categories, ...SHOP_ORIGINS, vendor.tagHints || [], vendor.sellLimit]);
+
+    return result.rows.map(row => decorateNpcCatalogItem(row, vendor));
+}
+
+async function getNpcShopCatalog(playerId, shopKey = null) {
+    const playerLevel = await getPlayerLevel(playerId);
+    const selectedVendor = getNpcVendorByKey(shopKey);
+    if (shopKey && !selectedVendor) throw new Error('Shop not found.');
+
+    const catalog = [];
+    const vendors = selectedVendor ? [selectedVendor] : NPC_VENDOR_CONFIGS;
+
+    for (const vendor of vendors) {
+        catalog.push(...await getVendorCatalog({ playerLevel, vendor }));
     }
 
     return catalog.sort((a, b) => (
@@ -243,7 +268,7 @@ async function getNpcShopCatalog(playerId) {
 
 async function isTemplateSoldByNpc(config) {
     const playerLevel = await getPlayerLevel(config.playerId);
-    const catalog = await getNpcShopCatalog(config.playerId);
+    const catalog = await getNpcShopCatalog(config.playerId, config.shopKey);
     return catalog.some(item => (
         item.code === String(config.templateCode).toUpperCase() &&
         parseInt(item.item_level) <= playerLevel
@@ -641,7 +666,9 @@ async function cancelBlackMarketListing(config) {
 
 module.exports = {
     NPC_VENDOR_CONFIGS,
+    NPC_VENDOR_KEYS,
     MARKET_TAX_RATE,
+    getNpcShopList,
     getNpcShopCatalog,
     buyNpcShopItem,
     sellItemToNpc,

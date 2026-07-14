@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
+    getNpcShops,
     getNpcShop,
     buyNpcShopItem,
     sellItemToNpc,
@@ -27,20 +28,24 @@ function getItemTags(item) {
     return item.tags.slice(0, 4).join(' | ');
 }
 
-function groupItemsByVendor(items) {
-    return (items || []).reduce((groups, item) => {
-        const key = item.vendor_key || 'camp';
-        if (!groups[key]) {
-            groups[key] = {
-                key,
-                name: item.vendor_name || 'Camp Merchant',
-                role: item.vendor_role || 'General supplies',
-                items: [],
-            };
-        }
-        groups[key].items.push(item);
-        return groups;
-    }, {});
+const SHOP_SELL_RULES = {
+    quartermaster: { categories: ['WEAPON', 'EQUIPMENT', 'TOOL'], tags: [] },
+    provisioner: { categories: ['FOOD', 'MEDICINE'], tags: [] },
+    salvage_yard: { categories: ['MATERIAL', 'BUILDING'], tags: ['Rubbish', 'Junk', 'Recyclable', 'Scrap', 'Broken', 'Plastic', 'Cloth', 'Glass'] },
+    hunter_butcher: { categories: ['MATERIAL', 'FOOD'], tags: ['Bone', 'Meat', 'Animal', 'Hide', 'Fat', 'Organic', 'Trophy', 'Rotten', 'Claw', 'Fang'] },
+};
+
+function hasAnyTag(item, tags) {
+    const itemTags = Array.isArray(item?.tags) ? item.tags.map(tag => String(tag).toLowerCase()) : [];
+    return tags.some(tag => itemTags.includes(String(tag).toLowerCase()));
+}
+
+function canShopBuyItem(item, shopKey) {
+    const rule = SHOP_SELL_RULES[shopKey];
+    if (!rule) return true;
+
+    const category = String(item?.category || item?.template_category || '').toUpperCase();
+    return rule.categories.includes(category) || hasAnyTag(item, rule.tags);
 }
 
 function TradingItemCard({ item, actionLabel, isBusy, onAction, children }) {
@@ -69,6 +74,8 @@ function TradingItemCard({ item, actionLabel, isBusy, onAction, children }) {
 
 export default function TradingSheet({ playerId, character, inventory, onClose, onUpdate, onNotify }) {
     const [activeTab, setActiveTab] = useState('NPC');
+    const [npcShops, setNpcShops] = useState([]);
+    const [activeShopKey, setActiveShopKey] = useState('quartermaster');
     const [npcShop, setNpcShop] = useState([]);
     const [marketListings, setMarketListings] = useState([]);
     const [selectedItemId, setSelectedItemId] = useState('');
@@ -81,15 +88,27 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
     const sellableItems = useMemo(() => (
         (inventory || []).filter(item => !item.is_equipped && !item.is_expired)
     ), [inventory]);
+    const selectedShop = useMemo(() => (
+        npcShops.find(shop => shop.key === activeShopKey) || npcShops[0] || null
+    ), [npcShops, activeShopKey]);
+    const selectedShopSellableItems = useMemo(() => (
+        sellableItems.filter(item => canShopBuyItem(item, selectedShop?.key))
+    ), [sellableItems, selectedShop]);
 
     async function loadTradingData() {
         setIsLoading(true);
         setError('');
         try {
-            const [shopResult, marketResult] = await Promise.all([
-                getNpcShop(playerId),
+            const [shopsResult, shopResult, marketResult] = await Promise.all([
+                getNpcShops(),
+                getNpcShop(playerId, activeShopKey),
                 getBlackMarketListings(playerId),
             ]);
+            const shops = shopsResult.data || [];
+            setNpcShops(shops);
+            if (shops.length > 0 && !shops.some(shop => shop.key === activeShopKey)) {
+                setActiveShopKey(shops[0].key);
+            }
             setNpcShop(shopResult.data || []);
             setMarketListings(marketResult.data || []);
         } catch (err) {
@@ -101,7 +120,7 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
 
     useEffect(() => {
         loadTradingData();
-    }, [playerId]);
+    }, [playerId, activeShopKey]);
 
     async function runTradeAction(config) {
         setBusyKey(config.busyKey);
@@ -144,62 +163,78 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
     }
 
     function renderNpcShop() {
-        const vendorGroups = Object.values(groupItemsByVendor(npcShop));
-
         return (
             <div className="space-y-4">
-                <div className="card p-3">
-                    <div className="flex items-start justify-between gap-3">
-                        <div>
-                            <h4 className="text-sm font-semibold">Waste Processing</h4>
-                            <p className="text-[11px] text-textMuted mt-1">
-                                Salvage junk, scrap, recyclable parts, and recipe-free monster trophies.
-                            </p>
-                        </div>
+                <div className="grid grid-cols-2 gap-2">
+                    {npcShops.map(shop => (
                         <button
+                            key={shop.key}
                             type="button"
-                            onClick={handleRecycleWaste}
-                            disabled={busyKey === 'npc:recycle'}
-                            className="btn-primary text-xs px-3 py-2 flex-shrink-0"
+                            onClick={() => setActiveShopKey(shop.key)}
+                            className={activeShopKey === shop.key ? 'btn-primary text-xs' : 'btn-secondary text-xs'}
                         >
-                            {busyKey === 'npc:recycle' ? 'Working...' : 'Process All'}
+                            {shop.name}
                         </button>
+                    ))}
+                </div>
+
+                {selectedShop && (
+                    <div>
+                        <h4 className="text-sm font-semibold">{selectedShop.name}</h4>
+                        <p className="text-[11px] text-textMuted mt-1">{selectedShop.role}</p>
+                    </div>
+                )}
+
+                {activeShopKey === 'salvage_yard' && (
+                    <div className="card p-3">
+                        <div className="flex items-start justify-between gap-3">
+                            <div>
+                                <h4 className="text-sm font-semibold">Waste Processing</h4>
+                                <p className="text-[11px] text-textMuted mt-1">
+                                    Salvage junk, scrap, recyclable parts, and recipe-free monster trophies.
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={handleRecycleWaste}
+                                disabled={busyKey === 'npc:recycle'}
+                                className="btn-primary text-xs px-3 py-2 flex-shrink-0"
+                            >
+                                {busyKey === 'npc:recycle' ? 'Working...' : 'Process All'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                <div>
+                    <h4 className="text-sm font-semibold mb-2">Shop Stock</h4>
+                    <div className="space-y-2">
+                        {npcShop.length === 0 && <p className="text-sm text-textMuted">No stock available.</p>}
+                        {npcShop.map(item => (
+                            <TradingItemCard
+                                key={`${activeShopKey}:${item.code}`}
+                                item={item}
+                                actionLabel={`Buy ${formatMoney(item.npc_buy_price)}`}
+                                isBusy={busyKey === `npc:buy:${item.code}`}
+                                onAction={() => runTradeAction({
+                                    busyKey: `npc:buy:${item.code}`,
+                                    action: () => buyNpcShopItem(playerId, item.code, activeShopKey),
+                                    successMessage: result => `Bought ${result.data.item_name}.`,
+                                })}
+                            >
+                                <p className="text-[11px] text-textMuted mt-1">
+                                    Price: {formatMoney(item.npc_buy_price)} Money
+                                </p>
+                            </TradingItemCard>
+                        ))}
                     </div>
                 </div>
 
-                {vendorGroups.map(group => (
-                    <div key={group.key}>
-                        <div className="mb-2">
-                            <h4 className="text-sm font-semibold">{group.name}</h4>
-                            <p className="text-[11px] text-textMuted mt-1">{group.role}</p>
-                        </div>
-                        <div className="space-y-2">
-                            {group.items.map(item => (
-                                <TradingItemCard
-                                    key={`${group.key}:${item.code}`}
-                                    item={item}
-                                    actionLabel={`Buy ${formatMoney(item.npc_buy_price)}`}
-                                    isBusy={busyKey === `npc:buy:${item.code}`}
-                                    onAction={() => runTradeAction({
-                                        busyKey: `npc:buy:${item.code}`,
-                                        action: () => buyNpcShopItem(playerId, item.code),
-                                        successMessage: result => `Bought ${result.data.item_name}.`,
-                                    })}
-                                >
-                                    <p className="text-[11px] text-textMuted mt-1">
-                                        Price: {formatMoney(item.npc_buy_price)} Money
-                                    </p>
-                                </TradingItemCard>
-                            ))}
-                        </div>
-                    </div>
-                ))}
-
                 <div>
-                    <h4 className="text-sm font-semibold mb-2">Sell to Professionals</h4>
+                    <h4 className="text-sm font-semibold mb-2">Sell Counter</h4>
                     <div className="space-y-2">
-                        {sellableItems.length === 0 && <p className="text-sm text-textMuted">No sellable items.</p>}
-                        {sellableItems.slice(0, 24).map(item => (
+                        {selectedShopSellableItems.length === 0 && <p className="text-sm text-textMuted">No matching sellable items.</p>}
+                        {selectedShopSellableItems.slice(0, 24).map(item => (
                             <TradingItemCard
                                 key={item.id}
                                 item={item}

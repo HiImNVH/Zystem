@@ -111,19 +111,25 @@ export async function exchangeCurrency(playerId, currency, quantity, side) {
     return handleResponse(res);
 }
 
-export async function getNpcShop(playerId) {
+export async function getNpcShops() {
+    const res = await fetch(`${BASE_URL}/api/trading/npc-shops`, { headers: getHeaders() });
+    return handleResponse(res);
+}
+
+export async function getNpcShop(playerId, shopKey) {
+    const shopPath = shopKey ? `/${encodeURIComponent(shopKey)}` : '';
     const path = playerId
-        ? `/api/trading/npc-shop/${playerId}`
+        ? `/api/trading/npc-shop/${playerId}${shopPath}`
         : '/api/trading/npc-shop';
     const res = await fetch(`${BASE_URL}${path}`, { headers: getHeaders() });
     return handleResponse(res);
 }
 
-export async function buyNpcShopItem(playerId, templateCode) {
+export async function buyNpcShopItem(playerId, templateCode, shopKey) {
     const res = await fetch(`${BASE_URL}/api/trading/npc-shop/buy`, {
         method: 'POST',
         headers: getHeaders(),
-        body: JSON.stringify({ playerId, templateCode })
+        body: JSON.stringify({ playerId, templateCode, shopKey })
     });
     return handleResponse(res);
 }
