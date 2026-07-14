@@ -1,6 +1,7 @@
 // backend/src/repositories/repositories.userProgress.js
 
-const { dbPool } = require('./repositories.database');
+const { playerDataDb } = require('./repositories.databaseDomains');
+const dbPool = playerDataDb;
 
 const TIMESTAMP_FIELDS = [
     'last_seen_at',

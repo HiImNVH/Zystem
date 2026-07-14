@@ -2,7 +2,8 @@
 
 const express = require('express');
 const chatRouter = express.Router();
-const { dbPool } = require('../repositories/repositories.database');
+const { activityLogDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = activityLogDb;
 const { verifyToken } = require('../middleware/middleware.auth');
 const { emitChatMessage } = require('../sockets/sockets.io');
 

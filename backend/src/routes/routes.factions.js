@@ -5,7 +5,8 @@
 const express = require('express');
 const factionsRouter = express.Router();
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
-const { dbPool } = require('../repositories/repositories.database');
+const { playerDataDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = playerDataDb;
 const { logPlayerEvent } = require('../services/services.playerEvents');
 
 /**

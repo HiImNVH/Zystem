@@ -1,9 +1,11 @@
 // backend/src/services/services.trading.js
 
-const { dbPool } = require('../repositories/repositories.database');
+const { gameDataDb, playerDataDb } = require('../repositories/repositories.databaseDomains');
 const craftingService = require('./services.crafting');
 const itemStatsService = require('./services.itemStats');
 const itemLifecycleService = require('./services.itemLifecycle');
+
+const dbPool = playerDataDb;
 
 const NPC_VENDOR_CONFIGS = [
     {
@@ -238,7 +240,7 @@ function decorateNpcCatalogItem(row, vendor) {
 async function getVendorCatalog(config) {
     const { playerLevel, vendor } = config;
     const originPlaceholders = SHOP_ORIGINS.map((_, index) => `$${index + 3}`).join(', ');
-    const result = await dbPool.query(`
+    const result = await gameDataDb.query(`
         SELECT DISTINCT ON (code)
                id, code, display_name, category, tags, item_level, lifecycle_model,
                base_durability, base_duration_hours, is_stackable, max_stack,

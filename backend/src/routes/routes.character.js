@@ -6,7 +6,8 @@ const express = require('express');
 const characterRouter = express.Router();
 const characterRepository = require('../repositories/repositories.character');
 const characterService = require('../services/services.character');
-const { dbPool } = require('../repositories/repositories.database');
+const { playerDataDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = playerDataDb;
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 
 const SAFE_HOUSE_REST_CONFIG = {

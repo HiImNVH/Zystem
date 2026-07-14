@@ -1,6 +1,7 @@
 // backend/src/services/services.itemStats.js
 
-const { dbPool } = require('../repositories/repositories.database');
+const { gameDataDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = gameDataDb;
 
 const DEFAULT_STAT_PAIR = {
     WEAPON: ['str', 'agi'],

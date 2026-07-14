@@ -1,6 +1,7 @@
 ﻿// backend/src/repositories/repositories.jobsSeed.js
 
-const { dbPool } = require('./repositories.database');
+const { gameDataDb } = require('./repositories.databaseDomains');
+const dbPool = gameDataDb;
 
 const jobsList = [
     { code: 'fighting',   name: 'Fighting',   cat: 'combat',     str: 0.7, agi: 0.4, dex: 0.0, vit: 0.4, int: 0.0, chr: 0.0 },

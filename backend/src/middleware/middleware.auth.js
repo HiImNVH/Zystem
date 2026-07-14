@@ -50,7 +50,8 @@ function verifyToken(req, res, next) {
 // Middleware kiem tra player thuoc ve account dang dang nhap
 // Dung cho cac route co :playerId de chong truy cap cheo
 async function verifyPlayerOwnership(req, res, next) {
-    const { dbPool } = require('../repositories/repositories.database');
+    const { playerDataDb } = require('../repositories/repositories.databaseDomains');
+    const dbPool = playerDataDb;
     const playerId = req.params.playerId || req.params.id || req.body.playerId;
 
     if (!playerId) return next();

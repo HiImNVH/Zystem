@@ -1,6 +1,7 @@
 ﻿// backend/src/repositories/repositories.wallet.js
 
-const { dbPool } = require('./repositories.database');
+const { playerDataDb } = require('./repositories.databaseDomains');
+const dbPool = playerDataDb;
 const playerEventsService = require('../services/services.playerEvents');
 
 const WALLET_CURRENCIES = ['money', 'silver_coin', 'gold_coin'];

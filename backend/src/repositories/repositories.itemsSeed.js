@@ -1,6 +1,7 @@
 // backend/src/repositories/repositories.itemsSeed.js
 
-const { dbPool } = require('./repositories.database');
+const { gameDataDb } = require('./repositories.databaseDomains');
+const dbPool = gameDataDb;
 
 const DEFAULT_DROP_WEIGHTS = {
     common: 200,

@@ -1,6 +1,7 @@
 ﻿// backend/src/repositories/repositories.character.js
 
-const { dbPool } = require('./repositories.database');
+const { playerDataDb } = require('./repositories.databaseDomains');
+const dbPool = playerDataDb;
 const walletRepository = require('./repositories.wallet');
 const combatService = require('../services/services.combat');
 const { ensurePlayerDefaultJobs, autoUnlockFreeSkills } = require('./repositories.skillsSeed');

@@ -1,6 +1,7 @@
 ﻿// backend/src/repositories/repositories.account.js
 
-const { dbPool } = require('./repositories.database');
+const { playerDataDb } = require('./repositories.databaseDomains');
+const dbPool = playerDataDb;
 const bcrypt = require('bcryptjs');
 
 const BCRYPT_ROUNDS = 12;

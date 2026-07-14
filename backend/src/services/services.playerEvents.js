@@ -1,6 +1,7 @@
 // backend/src/services/services.playerEvents.js
 
-const { dbPool } = require('../repositories/repositories.database');
+const { activityLogDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = activityLogDb;
 const { emitPlayerEvent } = require('../sockets/sockets.io');
 
 async function logPlayerEvent(playerId, event) {

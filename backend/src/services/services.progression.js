@@ -1,7 +1,8 @@
 ﻿// backend/src/services/services.progression.js
 // Xu ly EXP player/ky nang theo sheet CAP DO
 
-const { dbPool } = require('../repositories/repositories.database');
+const { playerDataDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = playerDataDb;
 const characterRepository = require('../repositories/repositories.character');
 const playerEventsService = require('./services.playerEvents');
 const { autoUnlockFreeSkills } = require('../repositories/repositories.skillsSeed');

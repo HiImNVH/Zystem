@@ -6,7 +6,8 @@
 
 const { Server } = require('socket.io');
 const jwt = require('jsonwebtoken');
-const { dbPool } = require('../repositories/repositories.database');
+const { activityLogDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = activityLogDb;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'zystem_jwt_secret_change_in_production';
 

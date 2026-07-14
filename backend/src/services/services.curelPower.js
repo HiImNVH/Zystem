@@ -1,6 +1,7 @@
 // backend/src/services/services.curelPower.js
 
-const { dbPool } = require('../repositories/repositories.database');
+const { playerDataDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = playerDataDb;
 
 const POWER_MODES = {
     GATHERING: {

@@ -1,10 +1,11 @@
 ﻿// backend/src/services/services.loot.js
 
-const { dbPool } = require('../repositories/repositories.database');
+const { gameDataDb, playerDataDb } = require('../repositories/repositories.databaseDomains');
 const craftingService = require('./services.crafting');
 const itemStatsService = require('./services.itemStats');
 const curelPowerService = require('./services.curelPower');
 const itemLifecycleService = require('./services.itemLifecycle');
+const dbPool = playerDataDb;
 
 const ACTION_DROP_POOL = {
     MINE:    ['MATERIAL'],
@@ -114,7 +115,7 @@ async function getCandidateTemplates(config) {
         const exactValues = tagFilterValues.length > 0
             ? [...baseValues, mapLevel, tagFilterValues]
             : [...baseValues, mapLevel];
-        const exactResult = await dbPool.query(sqlQuery, exactValues);
+        const exactResult = await gameDataDb.query(sqlQuery, exactValues);
         if (exactResult.rows.length > 0) return exactResult.rows;
 
         const fallbackMinLevelParamIndex = baseValues.length + 1;
@@ -147,7 +148,7 @@ async function getCandidateTemplates(config) {
         const fallbackValues = tagFilterValues.length > 0
             ? [...baseValues, minLevel, maxLevel, mapLevel, tagFilterValues]
             : [...baseValues, minLevel, maxLevel, mapLevel];
-        const fallbackResult = await dbPool.query(fallbackQuery, fallbackValues);
+        const fallbackResult = await gameDataDb.query(fallbackQuery, fallbackValues);
         return fallbackResult.rows;
     } catch (error) {
         console.error('[ERROR] Loi khi lay candidate templates:', error.message);

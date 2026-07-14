@@ -1,6 +1,7 @@
 // backend/src/repositories/repositories.designSeed.js
 
-const { dbPool } = require('./repositories.database');
+const { gameDataDb } = require('./repositories.databaseDomains');
+const dbPool = gameDataDb;
 
 const LEVELING_RULES = [
     {

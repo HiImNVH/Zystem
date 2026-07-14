@@ -3,7 +3,8 @@
 const characterRepository = require('../repositories/repositories.character');
 const combatService = require('./services.combat');
 const itemStatsService = require('./services.itemStats');
-const { dbPool } = require('../repositories/repositories.database');
+const { playerDataDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = playerDataDb;
 
 // Tinh tong stat cua nhan vat: base_stat + stat tu nghe + stat tu title + stat tu gear
 async function calculateTotalStats(playerId) {

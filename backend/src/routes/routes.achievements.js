@@ -4,7 +4,8 @@
 const express = require('express');
 const achievementsRouter = express.Router();
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
-const { dbPool } = require('../repositories/repositories.database');
+const { playerDataDb } = require('../repositories/repositories.databaseDomains');
+const dbPool = playerDataDb;
 const characterRepository = require('../repositories/repositories.character');
 
 /**
