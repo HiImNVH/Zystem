@@ -136,14 +136,14 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
         <div className="h-full overflow-y-auto">
             <PlayerStatusBar character={character} />
 
-            <div className={`relative min-h-48 bg-gradient-to-b ${banner.gradient} flex items-end p-4`}>
-                <span className="absolute top-4 right-4 text-3xl font-bold opacity-20">{banner.mark}</span>
+            <div className={`relative min-h-28 bg-gradient-to-b ${banner.gradient} flex items-end p-4`}>
+                <span className="absolute top-3 right-4 text-2xl font-bold opacity-15">{banner.mark}</span>
                 <div>
                     <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">
                         {isExploring ? 'EXPLORING' : (showTrading ? 'TRADING' : (showSafeHouse ? 'SAFE HOUSE' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP')))}
                     </span>
                     <h1 className="text-xl font-bold">
-                        {isExploring ? currentZone.display_name : (showTrading ? 'Refugee Camp Trading' : (showSafeHouse ? 'Personal Home' : (isChoosingRoute ? 'Exploration Routes' : (character?.character_name || 'Survivor'))))}
+                        {isExploring ? currentZone.display_name : (showTrading ? 'Refugee Camp Trading' : (showSafeHouse ? 'Personal Home' : (isChoosingRoute ? 'Exploration Routes' : 'Refugee Camp')))}
                     </h1>
                     <p className="text-sm text-textSecondary mt-1">
                         {isExploring
