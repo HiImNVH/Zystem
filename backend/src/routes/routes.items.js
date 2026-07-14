@@ -10,6 +10,7 @@ const curelPowerService = require('../services/services.curelPower');
 const itemStatsService = require('../services/services.itemStats');
 const itemLifecycleService = require('../services/services.itemLifecycle');
 const playerEventsService = require('../services/services.playerEvents');
+const itemTaxonomyService = require('../services/services.itemTaxonomy');
 
 function calculateFoodRestore(item) {
     const tags = (item.tags || []).map(tag => String(tag).toLowerCase());
@@ -32,8 +33,8 @@ function calculateFoodRestore(item) {
 function getEquipSlot(item) {
     const tags = (item.tags || []).map(tag => tag.toLowerCase());
 
-    if (item.category === 'WEAPON') return 'weapon';
-    if (item.category === 'TOOL') return 'tool';
+    if (tags.includes('weapon')) return 'weapon';
+    if (tags.includes('tool')) return 'tool';
     if (tags.includes('backpack')) return 'backpack';
     if (tags.includes('ring')) return 'ring';
     if (tags.includes('necklace')) return 'necklace';
@@ -49,7 +50,7 @@ function getEquipSlot(item) {
 }
 
 function canEquipItem(item) {
-    return ['WEAPON', 'TOOL', 'EQUIPMENT'].includes(String(item?.category || '').toUpperCase());
+    return itemTaxonomyService.isEquipmentCategory(item?.category);
 }
 
 function normalizeIngredientSelections(ingredients) {
@@ -101,7 +102,7 @@ itemsRouter.get('/recipes', verifyToken, async (req, res, next) => {
     try {
         const result = await dbPool.query(`
             SELECT
-                r.id, r.code, r.recipe_number, r.output_category, r.output_qty,
+                r.id, r.code, r.recipe_number, it.category AS output_category, r.output_qty,
                 r.required_job_level, r.base_craft_time_s, r.workstation_access,
                 r.required_tool_name, r.tool_durability_cost, r.output_level_formula,
                 r.workstation_queue_slot, r.curel_rule_key, r.design_notes,
@@ -128,6 +129,7 @@ itemsRouter.get('/recipes/:code', verifyToken, async (req, res, next) => {
         const recipeResult = await dbPool.query(`
             SELECT
                 r.*,
+                it.category AS output_category,
                 it.display_name AS output_item_name,
                 it.item_level AS output_item_level,
                 it.tags AS output_item_tags,
@@ -426,7 +428,7 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
         const outputLevel = craftingService.calculateRecipeOutputItemLevel(recipe, selectedItems, craftJobLevel);
         const rarity = craftingService.resolveCraftedRarity(recipe, selectedItems, craftingPower);
         const itemPower = craftingService.calculateItemPower(outputLevel, rarity);
-        const outputCategory = (recipe.output_category || recipe.output_template_category || '').toUpperCase();
+        const outputCategory = (recipe.output_template_category || recipe.output_category || '').toUpperCase();
         const rolledStats = itemStatsService.rollItemStats({
             category: outputCategory,
             itemPower,
@@ -567,7 +569,8 @@ itemsRouter.post('/use-food', verifyToken, async (req, res, next) => {
         }
 
         const item = itemResult.rows[0];
-        if ((item.category || '').toUpperCase() !== 'FOOD') {
+        const itemTags = (item.tags || []).map(tag => String(tag || '').toLowerCase());
+        if (!itemTaxonomyService.isConsumableCategory(item.category) || !itemTags.includes('food')) {
             await client.query('ROLLBACK');
             return res.status(400).json({ success: false, message: 'Only food items can restore energy.' });
         }

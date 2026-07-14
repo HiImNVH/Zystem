@@ -18,17 +18,15 @@ const RARITY_COLORS = {
 
 const FILTERS = [
     { value: 'ALL', label: 'All' },
-    { value: 'FOOD', label: 'Food' },
-    { value: 'MEDICINE', label: 'Medicine' },
-    { value: 'WEAPON', label: 'Weapons' },
-    { value: 'AMMO', label: 'Ammo' },
-    { value: 'TOOL', label: 'Tools' },
-    { value: 'EQUIPMENT', label: 'Gear' },
     { value: 'MATERIAL', label: 'Materials' },
-    { value: 'BUILDING', label: 'Structures' },
+    { value: 'MISC', label: 'Misc' },
+    { value: 'CONSUMABLE', label: 'Consumables' },
+    { value: 'EQUIPMENT', label: 'Equipment' },
+    { value: 'SPECIAL', label: 'Special' },
+    { value: 'CURRENCY', label: 'Currency' },
 ];
 
-const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
+const EQUIPABLE_CATEGORIES = ['EQUIPMENT'];
 const STAT_LABELS = { str:'STR', agi:'AGI', dex:'DEX', vit:'VIT', int:'INT', chr:'CHR' };
 
 function formatExpiry(expiresAt) {
@@ -136,8 +134,9 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
     const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
     const normalizedCategory = (item.category || '').toUpperCase();
     const canEquip = EQUIPABLE_CATEGORIES.includes(normalizedCategory) && !item.is_equipped;
-    const canEat = normalizedCategory === 'FOOD';
     const tags = Array.isArray(item.tags) ? item.tags : [];
+    const normalizedTags = tags.map(tag => String(tag || '').toLowerCase());
+    const canEat = normalizedCategory === 'CONSUMABLE' && normalizedTags.includes('food');
     const curelBuffs = Array.isArray(item.curel_buffs) ? item.curel_buffs : [];
     const expiryText = formatExpiry(item.expires_at);
 

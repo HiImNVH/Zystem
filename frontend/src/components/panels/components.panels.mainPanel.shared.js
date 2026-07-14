@@ -82,15 +82,12 @@ export const ITEM_TAG_MARKS = [
 ];
 
 export const ITEM_CATEGORY_MARKS = {
-    RUBBISH: '??',
-    MATERIAL: '??',
-    WEAPON: '???',
-    AMMO: 'AM',
-    EQUIPMENT: '???',
-    TOOL: '??',
-    BUILDING: '??',
-    FOOD: '??',
-    MEDICINE: 'MD',
+    MATERIAL: 'MA',
+    MISC: 'MI',
+    CONSUMABLE: 'CO',
+    EQUIPMENT: 'EQ',
+    SPECIAL: 'SP',
+    CURRENCY: 'CU',
 };
 
 export const ITEM_RARITY_TEXT = {
@@ -159,15 +156,12 @@ export const ITEM_ICON_RULES = [
 ];
 
 export const ITEM_CATEGORY_ICONS = {
-    RUBBISH: 'rubbish',
     MATERIAL: 'scrap',
-    WEAPON: 'weapon',
-    AMMO: 'ammo',
+    MISC: 'rubbish',
+    CONSUMABLE: 'food',
     EQUIPMENT: 'armor',
-    TOOL: 'tool',
-    BUILDING: 'building',
-    FOOD: 'food',
-    MEDICINE: 'medicine',
+    SPECIAL: 'building',
+    CURRENCY: 'generic',
 };
 
 export function getItemText(itemOrCategory, tags = []) {

@@ -32,10 +32,10 @@ function getItemTags(item) {
 }
 
 const SHOP_SELL_RULES = {
-    quartermaster: { categories: ['WEAPON', 'EQUIPMENT', 'TOOL'], tags: [] },
-    provisioner: { categories: ['FOOD', 'MEDICINE'], tags: [] },
-    salvage_yard: { categories: ['MATERIAL', 'BUILDING'], tags: ['Rubbish', 'Junk', 'Recyclable', 'Scrap', 'Broken', 'Plastic', 'Cloth', 'Glass'] },
-    hunter_butcher: { categories: ['MATERIAL', 'FOOD'], tags: ['Bone', 'Meat', 'Animal', 'Hide', 'Fat', 'Organic', 'Trophy', 'Rotten', 'Claw', 'Fang'] },
+    quartermaster: { categories: ['EQUIPMENT'], tags: [] },
+    provisioner: { categories: ['CONSUMABLE'], tags: ['Food', 'Medicine', 'Ammo'] },
+    salvage_yard: { categories: ['MISC', 'MATERIAL'], tags: ['Rubbish', 'Junk', 'Recyclable', 'Scrap', 'Broken', 'Plastic', 'Cloth', 'Glass'] },
+    hunter_butcher: { categories: ['MISC', 'MATERIAL', 'CONSUMABLE'], tags: ['Bone', 'Meat', 'Animal', 'Hide', 'Fat', 'Organic', 'Trophy', 'Rotten', 'Claw', 'Fang'] },
 };
 
 const SHOP_DEFINITIONS = [

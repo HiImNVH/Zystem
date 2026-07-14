@@ -130,7 +130,7 @@ function parseMainMaterialSlots(mainMaterialSlots) {
 function calculateRecipeOutputItemLevel(recipe, selectedMaterials, craftJobLevel) {
     const materialRows = Array.isArray(selectedMaterials) ? selectedMaterials : [];
     const nonToolLevels = materialRows
-        .filter(item => (item.category || '').toUpperCase() !== 'TOOL')
+        .filter(item => !(Array.isArray(item.tags) && item.tags.map(tag => String(tag).toLowerCase()).includes('tool')))
         .map(item => parseInt(item.item_level) || 1);
 
     const averageMaterialLevel = nonToolLevels.length > 0

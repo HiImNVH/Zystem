@@ -40,10 +40,9 @@ function getStarterTemplateCodes(jobCode) {
 
 function getEquipSlot(template) {
     const tags = (template.tags || []).map(tag => String(tag).toLowerCase());
-    const category = String(template.category || '').toUpperCase();
 
-    if (category === 'WEAPON') return 'weapon';
-    if (category === 'TOOL') return 'tool';
+    if (tags.includes('weapon')) return 'weapon';
+    if (tags.includes('tool')) return 'tool';
     if (tags.includes('backpack')) return 'backpack';
     if (tags.includes('ring')) return 'ring';
     if (tags.includes('necklace')) return 'necklace';

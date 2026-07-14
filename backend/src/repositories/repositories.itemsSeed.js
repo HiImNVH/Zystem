@@ -1,6 +1,7 @@
 // backend/src/repositories/repositories.itemsSeed.js
 
 const { gameDataDb } = require('./repositories.databaseDomains');
+const itemTaxonomyService = require('../services/services.itemTaxonomy');
 const dbPool = gameDataDb;
 
 const DEFAULT_DROP_WEIGHTS = {
@@ -11,17 +12,8 @@ const DEFAULT_DROP_WEIGHTS = {
     legendary: 1,
 };
 
-const STACKABLE_EXCLUDED_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL', 'BUILDING'];
-const SUPPORTED_CATEGORIES = [
-    'MATERIAL',
-    'FOOD',
-    'MEDICINE',
-    'TOOL',
-    'WEAPON',
-    'AMMO',
-    'EQUIPMENT',
-    'BUILDING',
-];
+const STACKABLE_EXCLUDED_CATEGORIES = ['EQUIPMENT', 'SPECIAL'];
+const SUPPORTED_CATEGORIES = itemTaxonomyService.MAIN_ITEM_CATEGORIES;
 
 const REDUNDANT_TAGS = new Set([
     'materials',
@@ -3580,9 +3572,9 @@ function createItemCode(itemName) {
 }
 
 function getCategory(tags) {
-    const primaryTag = tags[0]?.toUpperCase();
-    if (SUPPORTED_CATEGORIES.includes(primaryTag)) return primaryTag;
-    return 'MATERIAL';
+    const mainCategory = itemTaxonomyService.resolveMainItemCategory({ tags });
+    if (SUPPORTED_CATEGORIES.includes(mainCategory)) return mainCategory;
+    return 'MISC';
 }
 
 function toTitleTag(value) {
@@ -3665,7 +3657,11 @@ function getBaseDurationHours(template) {
 }
 
 function buildTemplateRow(template) {
-    const category = getCategory(template.tags);
+    const category = itemTaxonomyService.resolveMainItemCategory({
+        tags: template.tags,
+        origin: template.origin,
+        name: template.name,
+    });
     const normalizedTags = normalizeItemTags(template.tags, category);
     const isStackable = !STACKABLE_EXCLUDED_CATEGORIES.includes(category);
 

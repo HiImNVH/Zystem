@@ -12,28 +12,29 @@ const NPC_VENDOR_CONFIGS = [
         key: 'quartermaster',
         name: 'Camp Quartermaster',
         role: 'Weapons, gear, and tools',
-        categories: ['WEAPON', 'EQUIPMENT', 'TOOL'],
+        categories: ['EQUIPMENT'],
         sellLimit: 12,
     },
     {
         key: 'provisioner',
         name: 'Camp Provisioner',
-        role: 'Food and medicine',
-        categories: ['FOOD', 'MEDICINE'],
+        role: 'Food, medicine, and ammunition',
+        categories: ['CONSUMABLE'],
         sellLimit: 12,
+        tagHints: ['Food', 'Medicine', 'Ammo'],
     },
     {
         key: 'salvage_yard',
         name: 'Salvage Yard',
         role: 'Resources and waste buyback',
-        categories: ['MATERIAL', 'BUILDING'],
+        categories: ['MATERIAL', 'MISC'],
         sellLimit: 16,
     },
     {
         key: 'hunter_butcher',
         name: 'Hunter Butcher',
         role: 'Meat, bones, and hides',
-        categories: ['MATERIAL', 'FOOD'],
+        categories: ['MISC', 'MATERIAL', 'CONSUMABLE'],
         sellLimit: 10,
         tagHints: ['Bone', 'Meat', 'Animal', 'Hide', 'Fat'],
     },
@@ -45,13 +46,12 @@ const WASTE_TAGS = ['Rubbish', 'Junk', 'Recyclable', 'Scrap', 'Broken', 'Plastic
 const HUNTER_TAGS = ['Bone', 'Meat', 'Animal', 'Hide', 'Fat', 'Organic', 'Trophy', 'Rotten', 'Claw', 'Fang'];
 
 const CATEGORY_VALUE_MULTIPLIER = {
-    WEAPON: 18,
     EQUIPMENT: 16,
-    TOOL: 14,
-    MEDICINE: 10,
-    FOOD: 6,
+    CONSUMABLE: 7,
     MATERIAL: 4,
-    BUILDING: 8,
+    MISC: 3,
+    SPECIAL: 8,
+    CURRENCY: 1,
 };
 
 const TEMPLATE_VALUE_MULTIPLIER = {
@@ -81,10 +81,10 @@ function hasAnyTag(item, tagList) {
 function getNpcVendorForItem(item) {
     const category = String(item?.category || item?.template_category || '').toUpperCase();
     if (hasAnyTag(item, HUNTER_TAGS)) return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'hunter_butcher');
-    if (hasAnyTag(item, WASTE_TAGS) || ['MATERIAL', 'BUILDING'].includes(category)) {
+    if (hasAnyTag(item, WASTE_TAGS) || category === 'MISC') {
         return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'salvage_yard');
     }
-    if (['FOOD', 'MEDICINE'].includes(category)) return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'provisioner');
+    if (category === 'CONSUMABLE') return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'provisioner');
     return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'quartermaster');
 }
 
@@ -138,7 +138,7 @@ function getNpcBuyPrice(item) {
 function getNpcSellPrice(item) {
     const vendor = getNpcVendorForItem(item);
     const category = String(item?.category || item?.template_category || '').toUpperCase();
-    const wasteBonus = vendor?.key === 'salvage_yard' && (hasAnyTag(item, WASTE_TAGS) || category === 'MATERIAL') ? 1.25 : 1;
+    const wasteBonus = vendor?.key === 'salvage_yard' && (hasAnyTag(item, WASTE_TAGS) || category === 'MISC') ? 1.25 : 1;
     const hunterBonus = vendor?.key === 'hunter_butcher' && hasAnyTag(item, HUNTER_TAGS) ? 1.35 : 1;
     return Math.max(1, Math.floor(calculateBaseValue(item) * NPC_BUYBACK_RATE * wasteBonus * hunterBonus));
 }
@@ -463,7 +463,7 @@ async function recycleWasteItems(config) {
                       WHERE item_tag = ANY($2::TEXT[])
                   )
                   OR (
-                      it.category IN ('MATERIAL', 'BUILDING')
+                      it.category IN ('MISC')
                       AND it.origin = 'Loot-only'
                       AND NOT EXISTS (
                           SELECT 1

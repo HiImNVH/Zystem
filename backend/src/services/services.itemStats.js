@@ -4,9 +4,7 @@ const { gameDataDb } = require('../repositories/repositories.databaseDomains');
 const dbPool = gameDataDb;
 
 const DEFAULT_STAT_PAIR = {
-    WEAPON: ['str', 'agi'],
     EQUIPMENT: ['vit', 'str'],
-    TOOL: ['dex', 'int'],
 };
 
 const TAG_STAT_PAIR_RULES = [
@@ -17,6 +15,11 @@ const TAG_STAT_PAIR_RULES = [
     { tag: 'buildings', stats: [] },
     { tag: 'structures', stats: [] },
     { tag: 'materials', stats: [] },
+    { tag: 'weapon', stats: ['str', 'agi'] },
+    { tag: 'weapons', stats: ['str', 'agi'] },
+    { tag: 'tool', stats: ['dex', 'int'] },
+    { tag: 'tools', stats: ['dex', 'int'] },
+    { tag: 'armor', stats: ['vit', 'str'] },
     { tag: 'consumables', stats: [] },
     { tag: 'ranged', stats: ['dex', 'agi'] },
     { tag: 'melee', stats: ['str', 'agi'] },

@@ -8,16 +8,16 @@ const itemLifecycleService = require('./services.itemLifecycle');
 const dbPool = playerDataDb;
 
 const ACTION_DROP_POOL = {
-    MINE:    ['MATERIAL'],
-    CHOP:    ['MATERIAL'],
-    HUNT:    ['MATERIAL'],
-    FORAGE:  ['MATERIAL'],
-    EXPLORE: ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
-    BATTLE:  ['MATERIAL', 'FOOD'],
-    SWEEP:   ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
-    DUNGEON: ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
-    CRAFT:   ['WEAPON', 'EQUIPMENT', 'TOOL', 'BUILDING'],
-    FARM:    ['MATERIAL'],
+    MINE:    ['MATERIAL', 'MISC'],
+    CHOP:    ['MATERIAL', 'MISC'],
+    HUNT:    ['MATERIAL', 'MISC', 'CONSUMABLE'],
+    FORAGE:  ['MATERIAL', 'MISC', 'CONSUMABLE'],
+    EXPLORE: ['MATERIAL', 'MISC', 'CONSUMABLE', 'EQUIPMENT', 'SPECIAL'],
+    BATTLE:  ['MISC', 'CONSUMABLE'],
+    SWEEP:   ['MATERIAL', 'MISC', 'CONSUMABLE', 'EQUIPMENT', 'SPECIAL'],
+    DUNGEON: ['MATERIAL', 'MISC', 'CONSUMABLE', 'EQUIPMENT', 'SPECIAL'],
+    CRAFT:   ['MATERIAL', 'CONSUMABLE', 'EQUIPMENT', 'SPECIAL'],
+    FARM:    ['MATERIAL', 'MISC', 'CONSUMABLE'],
 };
 
 const ACTION_DROP_ORIGINS = {

@@ -33,7 +33,10 @@ function getNumber(value) {
 function getEquippedWeapon(inventory) {
     return (inventory || []).find(item => (
         item.is_equipped &&
-        (item.equip_slot === 'weapon' || String(item.category || '').toUpperCase() === 'WEAPON')
+        (
+            item.equip_slot === 'weapon' ||
+            (Array.isArray(item.tags) && item.tags.map(tag => String(tag).toLowerCase()).includes('weapon'))
+        )
     ));
 }
 

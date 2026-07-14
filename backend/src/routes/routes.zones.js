@@ -225,18 +225,19 @@ async function findMonstersByProfile(monsterProfile) {
 }
 
 const LOOT_FOCUS_CATEGORY_MAP = {
-    food: 'FOOD',
-    drink: 'FOOD',
-    medicine: 'MEDICINE',
-    medical: 'MEDICINE',
-    tool: 'TOOL',
-    weapon: 'WEAPON',
-    ammo: 'AMMO',
+    food: 'CONSUMABLE',
+    drink: 'CONSUMABLE',
+    medicine: 'CONSUMABLE',
+    medical: 'CONSUMABLE',
+    tool: 'EQUIPMENT',
+    weapon: 'EQUIPMENT',
+    ammo: 'CONSUMABLE',
     equipment: 'EQUIPMENT',
     gear: 'EQUIPMENT',
     seed: 'MATERIAL',
-    rubbish: 'MATERIAL',
-    salvage: 'MATERIAL',
+    rubbish: 'MISC',
+    salvage: 'MISC',
+    scrap: 'MISC',
     material: 'MATERIAL',
     materials: 'MATERIAL',
 };
@@ -322,7 +323,7 @@ function getLootCategoriesFromFocus(lootFocus) {
         if (category) categories.add(category);
     }
 
-    return categories.size > 0 ? [...categories] : ['MATERIAL', 'RUBBISH'];
+    return categories.size > 0 ? [...categories] : ['MATERIAL', 'MISC'];
 }
 
 async function findPoiRooms(poiId) {
