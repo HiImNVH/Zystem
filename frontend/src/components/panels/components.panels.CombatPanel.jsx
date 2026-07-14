@@ -188,6 +188,23 @@ function createRhythmRun(action, weaponProfile) {
     };
 }
 
+function createAutoRhythmRun(action) {
+    return {
+        action,
+        markers: [{ id: `${action.code}-auto-good` }],
+        results: [{
+            id: `${action.code}-auto-good`,
+            score: 50,
+            outcome: 'good',
+            multiplier: 1,
+        }],
+        startedAt: Date.now(),
+        totalMs: 0,
+        travelMs: 0,
+        isAuto: true,
+    };
+}
+
 function calculatePlayerDamage(config) {
     const rawDamage = (config.playerAttack + config.enemy.level * 2) * config.action.multiplier * config.multiplier;
     const reduction = Math.min(0.45, config.enemy.defense / (config.enemy.defense + 140));
@@ -232,6 +249,7 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
     const [rhythmRun, setRhythmRun] = useState(null);
     const [clockMs, setClockMs] = useState(Date.now());
     const [combatStatus, setCombatStatus] = useState('fighting');
+    const [isAutoBattle, setIsAutoBattle] = useState(false);
     const [logs, setLogs] = useState(['A hostile target is in front of you.']);
     const weapon = useMemo(() => getEquippedWeapon(inventory), [inventory]);
     const weaponProfile = useMemo(() => getWeaponProfile(weapon), [weapon]);
@@ -304,6 +322,10 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
 
     useEffect(() => {
         if (phase !== 'ready' || clockMs < readyEndsAt || !rhythmRun) return;
+        if (rhythmRun.isAuto) {
+            resolveRhythm();
+            return;
+        }
         setPhase('rhythm');
         setRhythmRun(current => current ? { ...current, startedAt: Date.now() } : current);
     }, [clockMs, phase, readyEndsAt, rhythmRun]);
@@ -333,12 +355,17 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
 
     function startAction(action) {
         if (phase !== 'choosing' || combatStatus !== 'fighting' || isResolving) return;
-        const nextRun = createRhythmRun(action, weaponProfile);
+        const nextRun = isAutoBattle ? createAutoRhythmRun(action) : createRhythmRun(action, weaponProfile);
         setRhythmRun(nextRun);
         setReadyEndsAt(Date.now() + READY_DELAY_MIN_MS + Math.random() * READY_DELAY_RANGE_MS);
         setPhase('ready');
-        pushLog(`${action.label} ready...`);
+        pushLog(`${action.label} ready${isAutoBattle ? ' (Auto Good)' : ''}...`);
     }
+
+    useEffect(() => {
+        if (!isAutoBattle || phase !== 'choosing' || combatStatus !== 'fighting' || isResolving) return;
+        startAction(COMBAT_ACTIONS[0]);
+    }, [isAutoBattle, phase, combatStatus, isResolving]);
 
     function getMarkerProgress(marker) {
         if (!rhythmRun) return -1;
@@ -527,7 +554,16 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
                         Strike
                     </button>
                 ) : (
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-4 gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setIsAutoBattle(current => !current)}
+                            className={`card card-hover p-2.5 text-left ${isAutoBattle ? 'ring-1 ring-accent' : ''}`}
+                        >
+                            <span className="text-[10px] font-bold text-accent block">AUTO</span>
+                            <span className="text-sm font-semibold block mt-1">Auto</span>
+                            <span className="text-[10px] text-textMuted">Good</span>
+                        </button>
                         {COMBAT_ACTIONS.map(action => {
                             const timing = getActionTiming(action, weaponProfile);
                             return (
