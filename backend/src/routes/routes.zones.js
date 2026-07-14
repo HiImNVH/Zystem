@@ -102,6 +102,7 @@ function normalizeCombatResult(payload) {
     const accuracy = payload?.accuracyResult || {};
     const action = payload?.combatAction || {};
     if (!accuracy.outcome && !action.code) return null;
+    const accuracyMultiplier = parseFloat(accuracy.multiplier);
 
     return {
         action_code: String(action.code || 'normal_attack'),
@@ -110,8 +111,10 @@ function normalizeCombatResult(payload) {
         weapon_name: String(action.weaponName || 'Unarmed'),
         accuracy_score: Math.max(0, Math.min(100, parseInt(accuracy.score) || 0)),
         accuracy_outcome: String(accuracy.outcome || 'graze'),
-        accuracy_multiplier: parseFloat(accuracy.multiplier) || 1,
+        accuracy_multiplier: Number.isFinite(accuracyMultiplier) ? accuracyMultiplier : 1,
         calculated_damage: Math.max(0, parseInt(accuracy.damage || action.calculatedDamage) || 0),
+        hit_count: Math.max(1, parseInt(accuracy.hitCount || action.hitCount) || 1),
+        hits_landed: Math.max(0, parseInt(accuracy.hitsLanded) || 0),
     };
 }
 
@@ -157,9 +160,10 @@ function calculateExpReward(actionType, durationSeconds, zoneMinLevel) {
 
 function calculateEnemyMoneyDrop(config) {
     const { mapLevel, combatResult } = config;
-    const accuracyBonus = combatResult?.accuracy_outcome === 'critical'
+    const outcome = combatResult?.accuracy_outcome;
+    const accuracyBonus = ['critical', 'perfect'].includes(outcome)
         ? 0.15
-        : (combatResult?.accuracy_outcome === 'hit' ? 0.05 : 0);
+        : (['hit', 'good'].includes(outcome) ? 0.05 : 0);
     const dropChance = Math.min(0.85, 0.60 + accuracyBonus);
     if (Math.random() > dropChance) {
         return {

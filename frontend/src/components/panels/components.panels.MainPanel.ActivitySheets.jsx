@@ -122,8 +122,8 @@ export function ActivityListSheet({ activityType, activityData, character, inven
         }
     }
 
-    async function resolveVictory(enemy) {
-        const result = await onExecute?.(enemy);
+    async function resolveVictory(enemy, combatPayload) {
+        const result = await onExecute?.(enemy, combatPayload);
         if (result?.success === false) {
             setCombatResult({ type: 'error', message: result.error || 'Could not claim combat reward.' });
             setActiveEnemy(null);
@@ -154,7 +154,7 @@ export function ActivityListSheet({ activityType, activityData, character, inven
                     }}
                     isResolving={Boolean(executingId)}
                     onBack={() => setActiveEnemy(null)}
-                    onVictory={() => resolveVictory(activeEnemy)}
+                    onVictory={combatPayload => resolveVictory(activeEnemy, combatPayload)}
                     onDefeat={resolveDefeat}
                 />
             </div>
