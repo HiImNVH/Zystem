@@ -146,7 +146,47 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 </div>
             )}
 
-            {!isExploring && !showZonePicker && !showSafeHouse && !showTrading ? (
+            {showCrafting ? (
+                <CraftingSheet
+                    playerId={playerId}
+                    inventory={inventory}
+                    onClose={() => setShowCrafting(false)}
+                    onUpdate={onUpdate}
+                    onNotify={notify}
+                />
+            ) : showFaction ? (
+                <FactionSheet
+                    playerId={playerId}
+                    onClose={() => setShowFaction(false)}
+                    onNotify={notify}
+                />
+            ) : showCurrencyExchange ? (
+                <CurrencyExchangeSheet
+                    playerId={playerId}
+                    character={character}
+                    onClose={() => setShowCurrencyExchange(false)}
+                    onUpdate={onUpdate}
+                    onNotify={notify}
+                />
+            ) : selectedPoi ? (
+                <PoiActionSheet
+                    poi={selectedPoi}
+                    onClose={() => setSelectedPoi(null)}
+                    onOpenActivity={openPoiActivity}
+                />
+            ) : activitySheet ? (
+                <ActivityListSheet
+                    activityType={activitySheet.type}
+                    activityData={activitySheet.data}
+                    character={character}
+                    inventory={inventory}
+                    isLoading={activitySheet.isLoading}
+                    error={activitySheet.error}
+                    executingId={executingActivityId}
+                    onExecute={executeActivity}
+                    onClose={() => setActivitySheet(null)}
+                />
+            ) : !isExploring && !showZonePicker && !showSafeHouse && !showTrading ? (
                 <div className="p-4 space-y-4">
                     <div className="space-y-3">
                         <button onClick={() => setShowZonePicker(true)} className="w-full card card-hover p-4 text-left flex items-start gap-4">
@@ -312,55 +352,6 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                 </div>
             )}
 
-            {selectedPoi && (
-                <PoiActionSheet
-                    poi={selectedPoi}
-                    onClose={() => setSelectedPoi(null)}
-                    onOpenActivity={openPoiActivity}
-                />
-            )}
-
-            {activitySheet && (
-                <ActivityListSheet
-                    activityType={activitySheet.type}
-                    activityData={activitySheet.data}
-                    character={character}
-                    inventory={inventory}
-                    isLoading={activitySheet.isLoading}
-                    error={activitySheet.error}
-                    executingId={executingActivityId}
-                    onExecute={executeActivity}
-                    onClose={() => setActivitySheet(null)}
-                />
-            )}
-
-            {showCrafting && (
-                <CraftingSheet
-                    playerId={playerId}
-                    inventory={inventory}
-                    onClose={() => setShowCrafting(false)}
-                    onUpdate={onUpdate}
-                    onNotify={notify}
-                />
-            )}
-
-            {showFaction && (
-                <FactionSheet
-                    playerId={playerId}
-                    onClose={() => setShowFaction(false)}
-                    onNotify={notify}
-                />
-            )}
-
-            {showCurrencyExchange && (
-                <CurrencyExchangeSheet
-                    playerId={playerId}
-                    character={character}
-                    onClose={() => setShowCurrencyExchange(false)}
-                    onUpdate={onUpdate}
-                    onNotify={notify}
-                />
-            )}
         </div>
     );
 }

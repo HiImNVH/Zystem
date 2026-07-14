@@ -204,8 +204,8 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4" onClick={onClose}>
-            <div className="card w-full sm:max-w-sm p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+        <div className="space-y-3">
+            <div>
                 <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="flex items-start gap-3 min-w-0">
                         <div className="flex-shrink-0 text-center">
@@ -331,7 +331,14 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4">
-                {filtered.length === 0 ? (
+                {selected ? (
+                    <ItemDetailSheet
+                        item={selected}
+                        playerId={playerId}
+                        onClose={() => setSelected(null)}
+                        onEquipped={() => onUpdate?.()}
+                    />
+                ) : filtered.length === 0 ? (
                     <div className="flex items-center justify-center h-full">
                         <div className="text-center max-w-[200px]">
                             <div className="text-3xl mb-3 opacity-20">0</div>
@@ -345,13 +352,6 @@ export default function InventoryPanel({ items, playerId, onUpdate }) {
                         : <InventoryGrid items={filtered} onSelect={setSelected} />
                 )}
             </div>
-
-            <ItemDetailSheet
-                item={selected}
-                playerId={playerId}
-                onClose={() => setSelected(null)}
-                onEquipped={() => onUpdate?.()}
-            />
         </div>
     );
 }

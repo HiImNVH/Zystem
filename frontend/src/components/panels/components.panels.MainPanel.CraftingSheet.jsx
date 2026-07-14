@@ -95,8 +95,8 @@ export default function CraftingSheet({ playerId, inventory, onClose, onUpdate, 
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
-            <div className="card w-full sm:max-w-3xl max-h-[88vh] overflow-hidden animate-slideup" onClick={event => event.stopPropagation()}>
+        <div className="p-4">
+            <div className="w-full overflow-hidden">
                 <div className="p-5 border-b border-border flex items-start justify-between gap-4">
                     <div>
                         <h3 className="font-semibold">Crafting</h3>
@@ -105,7 +105,7 @@ export default function CraftingSheet({ playerId, inventory, onClose, onUpdate, 
                     <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(300px,0.9fr)] max-h-[72vh]">
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(300px,0.9fr)]">
                     <div className="p-4 border-b md:border-b-0 md:border-r border-border overflow-y-auto">
                         <input
                             value={search}

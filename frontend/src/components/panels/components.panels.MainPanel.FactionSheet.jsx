@@ -76,8 +76,8 @@ export default function FactionSheet({ playerId, onClose, onNotify }) {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
-            <div className="card w-full sm:max-w-lg max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+        <div className="p-4">
+            <div className="w-full p-1">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <h3 className="font-semibold">Faction</h3>
                     <button onClick={onClose} className="text-textMuted hover:text-textPrimary">x</button>
@@ -156,5 +156,4 @@ export default function FactionSheet({ playerId, onClose, onNotify }) {
         </div>
     );
 }
-
 

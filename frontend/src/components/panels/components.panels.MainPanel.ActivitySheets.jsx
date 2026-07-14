@@ -137,8 +137,8 @@ export function ActivityListSheet({ activityType, activityData, character, inven
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
-            <div className="card w-full sm:max-w-lg max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+        <div className="p-4">
+            <div className="w-full p-1">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="min-w-0">
                         <h3 className="font-semibold">{titleMap[activityType]}</h3>
@@ -296,8 +296,8 @@ export function PoiActionSheet({ poi, onClose, onOpenActivity }) {
     if (!poi) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60" onClick={onClose}>
-            <div className="card w-full sm:max-w-lg max-h-[88vh] overflow-y-auto p-5 animate-slideup" onClick={event => event.stopPropagation()}>
+        <div className="p-4">
+            <div className="w-full p-1">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="min-w-0">
                         <h3 className="font-semibold truncate">{poi.display_name}</h3>
