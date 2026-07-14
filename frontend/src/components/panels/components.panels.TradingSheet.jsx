@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-    getNpcShops,
     getNpcShop,
     buyNpcShopItem,
     sellItemToNpc,
@@ -34,6 +33,29 @@ const SHOP_SELL_RULES = {
     salvage_yard: { categories: ['MATERIAL', 'BUILDING'], tags: ['Rubbish', 'Junk', 'Recyclable', 'Scrap', 'Broken', 'Plastic', 'Cloth', 'Glass'] },
     hunter_butcher: { categories: ['MATERIAL', 'FOOD'], tags: ['Bone', 'Meat', 'Animal', 'Hide', 'Fat', 'Organic', 'Trophy', 'Rotten', 'Claw', 'Fang'] },
 };
+
+const SHOP_DEFINITIONS = [
+    {
+        key: 'quartermaster',
+        name: 'Camp Quartermaster',
+        role: 'Weapons, gear, and tools',
+    },
+    {
+        key: 'provisioner',
+        name: 'Camp Provisioner',
+        role: 'Food and medicine',
+    },
+    {
+        key: 'salvage_yard',
+        name: 'Salvage Yard',
+        role: 'Resources and waste buyback',
+    },
+    {
+        key: 'hunter_butcher',
+        name: 'Hunter Butcher',
+        role: 'Meat, bones, and hides',
+    },
+];
 
 function hasAnyTag(item, tags) {
     const itemTags = Array.isArray(item?.tags) ? item.tags.map(tag => String(tag).toLowerCase()) : [];
@@ -74,7 +96,6 @@ function TradingItemCard({ item, actionLabel, isBusy, onAction, children }) {
 
 export default function TradingSheet({ playerId, character, inventory, onClose, onUpdate, onNotify }) {
     const [activeTab, setActiveTab] = useState('NPC');
-    const [npcShops, setNpcShops] = useState([]);
     const [activeShopKey, setActiveShopKey] = useState('quartermaster');
     const [npcShop, setNpcShop] = useState([]);
     const [marketListings, setMarketListings] = useState([]);
@@ -89,8 +110,11 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
         (inventory || []).filter(item => !item.is_equipped && !item.is_expired)
     ), [inventory]);
     const selectedShop = useMemo(() => (
-        npcShops.find(shop => shop.key === activeShopKey) || npcShops[0] || null
-    ), [npcShops, activeShopKey]);
+        SHOP_DEFINITIONS.find(shop => shop.key === activeShopKey) || SHOP_DEFINITIONS[0]
+    ), [activeShopKey]);
+    const visibleNpcShop = useMemo(() => (
+        npcShop.filter(item => !item.vendor_key || item.vendor_key === selectedShop?.key)
+    ), [npcShop, selectedShop]);
     const selectedShopSellableItems = useMemo(() => (
         sellableItems.filter(item => canShopBuyItem(item, selectedShop?.key))
     ), [sellableItems, selectedShop]);
@@ -99,16 +123,10 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
         setIsLoading(true);
         setError('');
         try {
-            const [shopsResult, shopResult, marketResult] = await Promise.all([
-                getNpcShops(),
-                getNpcShop(playerId, activeShopKey),
+            const [shopResult, marketResult] = await Promise.all([
+                getNpcShop(playerId),
                 getBlackMarketListings(playerId),
             ]);
-            const shops = shopsResult.data || [];
-            setNpcShops(shops);
-            if (shops.length > 0 && !shops.some(shop => shop.key === activeShopKey)) {
-                setActiveShopKey(shops[0].key);
-            }
             setNpcShop(shopResult.data || []);
             setMarketListings(marketResult.data || []);
         } catch (err) {
@@ -120,7 +138,7 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
 
     useEffect(() => {
         loadTradingData();
-    }, [playerId, activeShopKey]);
+    }, [playerId]);
 
     async function runTradeAction(config) {
         setBusyKey(config.busyKey);
@@ -166,7 +184,7 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
         return (
             <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
-                    {npcShops.map(shop => (
+                    {SHOP_DEFINITIONS.map(shop => (
                         <button
                             key={shop.key}
                             type="button"
@@ -209,8 +227,8 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
                 <div>
                     <h4 className="text-sm font-semibold mb-2">Shop Stock</h4>
                     <div className="space-y-2">
-                        {npcShop.length === 0 && <p className="text-sm text-textMuted">No stock available.</p>}
-                        {npcShop.map(item => (
+                        {visibleNpcShop.length === 0 && <p className="text-sm text-textMuted">No stock available.</p>}
+                        {visibleNpcShop.map(item => (
                             <TradingItemCard
                                 key={`${activeShopKey}:${item.code}`}
                                 item={item}
