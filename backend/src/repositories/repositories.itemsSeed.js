@@ -2,6 +2,7 @@
 
 const { gameDataDb } = require('./repositories.databaseDomains');
 const itemTaxonomyService = require('../services/services.itemTaxonomy');
+const itemAlphaSimplificationService = require('../services/services.itemAlphaSimplification');
 const dbPool = gameDataDb;
 
 const DEFAULT_DROP_WEIGHTS = {
@@ -36,7 +37,7 @@ const TAG_NAME_ALIASES = {
     smg: 'SMG',
 };
 
-const ITEM_TEMPLATES = [
+const RAW_ITEM_TEMPLATES = [
     {
         "name": "Metal Scrap/Ore",
         "tags": [
@@ -3562,6 +3563,8 @@ const ITEM_TEMPLATES = [
         "lifecycleNote": null
     }
 ];
+
+const ITEM_TEMPLATES = itemAlphaSimplificationService.simplifyItemTemplates(RAW_ITEM_TEMPLATES);
 
 function createItemCode(itemName) {
     return itemName

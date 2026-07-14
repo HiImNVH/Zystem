@@ -1,6 +1,7 @@
 // backend/src/repositories/repositories.designSeed.js
 
 const { gameDataDb } = require('./repositories.databaseDomains');
+const itemAlphaSimplificationService = require('../services/services.itemAlphaSimplification');
 const dbPool = gameDataDb;
 
 const LEVELING_RULES = [
@@ -1107,7 +1108,7 @@ const STAT_DEFINITIONS = [
     }
 ];
 
-const CRAFTING_RECIPES = [
+const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 1,
         "code": "METAL_INGOT",
@@ -6310,6 +6311,8 @@ const CRAFTING_RECIPES = [
         "requiredUseCaseTags": "Structure"
     }
 ];
+
+const CRAFTING_RECIPES = itemAlphaSimplificationService.simplifyCraftingRecipes(RAW_CRAFTING_RECIPES);
 
 async function seedLevelingRules() {
     const count = await dbPool.query('SELECT COUNT(*) FROM leveling_rules;');

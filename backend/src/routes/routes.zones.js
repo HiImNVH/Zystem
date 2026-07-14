@@ -249,7 +249,7 @@ const GATHER_NODE_BLUEPRINTS = {
         categoryLabel: 'Forage',
         actionType: 'FORAGE',
         lootFocus: ['food', 'seed', 'medicine'],
-        itemTags: ['Vegetable', 'Wild', 'Dandelion', 'Bramble', 'Seed', 'Plantable'],
+        itemTags: ['Vegetable', 'Fruit', 'Grain', 'Seed', 'Plantable'],
         weight: 1,
     },
     tree: {

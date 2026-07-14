@@ -43,6 +43,8 @@ const DIRECT_MATERIAL_TAGS = [
     'fiber',
     'cloth',
     'fabric',
+    'plantable',
+    'seed',
 ];
 
 function normalizeTaxonomyTags(tags) {
