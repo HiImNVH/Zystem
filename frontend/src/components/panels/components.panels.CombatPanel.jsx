@@ -139,8 +139,8 @@ function calculateEnemyDamage(config) {
 
 function EnemyPortrait({ enemy }) {
     return (
-        <div className="relative mx-auto w-40 h-40 rounded-full border border-border bg-gradient-to-b from-danger/25 to-surface flex items-center justify-center">
-            <div className="w-24 h-28 rounded-t-full rounded-b-3xl bg-elevated border border-danger/35 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.12)]">
+        <div className="relative mx-auto w-32 h-32 rounded-full border border-border bg-gradient-to-b from-danger/25 to-surface flex items-center justify-center">
+            <div className="w-20 h-24 rounded-t-full rounded-b-3xl bg-elevated border border-danger/35 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.12)]">
                 <div className="flex gap-5 mb-4">
                     <span className="w-2 h-2 rounded-full bg-danger" />
                     <span className="w-2 h-2 rounded-full bg-danger" />
@@ -266,9 +266,9 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
                 </div>
             </section>
 
-            <section className="min-h-0 flex-1 overflow-y-auto p-4 space-y-4">
+            <section className="min-h-0 flex-1 overflow-hidden p-3 space-y-3">
                 <EnemyPortrait enemy={enemy} />
-                <div className="card p-3 min-h-36">
+                <div className="card p-3">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-xs font-semibold text-textMuted">BATTLE LOG</p>
                         <p className="text-[10px] text-textMuted">Enemy hit {Math.round(enemyHitChance * 100)}%</p>
@@ -283,7 +283,7 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
                 </div>
             </section>
 
-            <section className="flex-shrink-0 border-t border-border bg-panel p-4 space-y-3">
+            <section className="flex-shrink-0 border-t border-border bg-panel p-3 space-y-3">
                 <div>
                     <div className="flex items-center justify-between text-[10px] font-semibold text-textMuted mb-1">
                         <span>PLAYER HP</span>

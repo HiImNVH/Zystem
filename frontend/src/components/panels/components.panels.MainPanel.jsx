@@ -27,7 +27,7 @@ import {
     isZoneLockedForPlayer,
 } from './components.panels.mainPanel.shared';
 
-export default function MainPanel({ playerId, character, zones, inventory, onUpdate }) {
+export default function MainPanel({ playerId, character, zones, inventory, onUpdate, onFocusModeChange }) {
     const [showZonePicker, setShowZonePicker] = useState(false);
     const [showCrafting, setShowCrafting] = useState(false);
     const [showFaction, setShowFaction] = useState(false);
@@ -38,6 +38,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     const [selectedPoi, setSelectedPoi] = useState(null);
     const [activitySheet, setActivitySheet] = useState(null);
     const [executingActivityId, setExecutingActivityId] = useState('');
+    const [isCombatFocused, setIsCombatFocused] = useState(false);
     const [notification, setNotification] = useState(null);
     const [poiRotationSlot, setPoiRotationSlot] = useState(getPoiRotationSlot);
 
@@ -46,6 +47,11 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
         return () => clearInterval(timerId);
     }, []);
 
+    useEffect(() => {
+        onFocusModeChange?.(isCombatFocused);
+        return () => onFocusModeChange?.(false);
+    }, [isCombatFocused, onFocusModeChange]);
+
     function notify(message, type) {
         setNotification({ message, type });
         setTimeout(() => setNotification(null), 3500);
@@ -53,6 +59,7 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
 
     async function openPoiActivity(poi, type) {
         setSelectedPoi(null);
+        setIsCombatFocused(false);
         setExecutingActivityId('');
         setActivitySheet({ type, poi, data: null, isLoading: true, error: '' });
         try {
@@ -133,35 +140,39 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
     ];
 
     return (
-        <div className="h-full overflow-y-auto">
-            <PlayerStatusBar character={character} />
+        <div className={`h-full ${isCombatFocused ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+            {!isCombatFocused && (
+                <>
+                    <PlayerStatusBar character={character} />
 
-            <div className={`relative min-h-28 bg-gradient-to-b ${banner.gradient} flex items-end p-4`}>
-                <span className="absolute top-3 right-4 text-2xl font-bold opacity-15">{banner.mark}</span>
-                <div>
-                    <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">
-                        {isExploring ? 'EXPLORING' : (showTrading ? 'TRADING' : (showSafeHouse ? 'SAFE HOUSE' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP')))}
-                    </span>
-                    <h1 className="text-xl font-bold">
-                        {isExploring ? currentZone.display_name : (showTrading ? 'Refugee Camp Trading' : (showSafeHouse ? 'Personal Home' : (isChoosingRoute ? 'Exploration Routes' : 'Refugee Camp')))}
-                    </h1>
-                    <p className="text-sm text-textSecondary mt-1">
-                        {isExploring
-                            ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${getZoneTagLabels(currentZone)} | ${currentPois.length} POIs`
-                            : (showTrading
-                                ? 'Buy supplies, sell loot, and manage black market listings inside camp.'
-                                : (showSafeHouse
-                                ? 'Rest, cook, craft, and manage the first version of your safe shelter.'
-                                : (isChoosingRoute
-                                ? 'Move outward from the camp edge toward distant high-risk zones.'
-                                : 'Manage your base, meet NPCs, then choose an area to explore.')))}
-                    </p>
-                </div>
-            </div>
+                    <div className={`relative min-h-28 bg-gradient-to-b ${banner.gradient} flex items-end p-4`}>
+                        <span className="absolute top-3 right-4 text-2xl font-bold opacity-15">{banner.mark}</span>
+                        <div>
+                            <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded bg-elevated text-cyan mb-2">
+                                {isExploring ? 'EXPLORING' : (showTrading ? 'TRADING' : (showSafeHouse ? 'SAFE HOUSE' : (isChoosingRoute ? 'ROUTES' : 'REFUGEE CAMP')))}
+                            </span>
+                            <h1 className="text-xl font-bold">
+                                {isExploring ? currentZone.display_name : (showTrading ? 'Refugee Camp Trading' : (showSafeHouse ? 'Personal Home' : (isChoosingRoute ? 'Exploration Routes' : 'Refugee Camp')))}
+                            </h1>
+                            <p className="text-sm text-textSecondary mt-1">
+                                {isExploring
+                                    ? `Lv.${currentZone.level_gap || currentZone.min_player_lv} | ${getZoneTagLabels(currentZone)} | ${currentPois.length} POIs`
+                                    : (showTrading
+                                        ? 'Buy supplies, sell loot, and manage black market listings inside camp.'
+                                        : (showSafeHouse
+                                        ? 'Rest, cook, craft, and manage the first version of your safe shelter.'
+                                        : (isChoosingRoute
+                                        ? 'Move outward from the camp edge toward distant high-risk zones.'
+                                        : 'Manage your base, meet NPCs, then choose an area to explore.')))}
+                            </p>
+                        </div>
+                    </div>
 
-            <NavigationLine items={navigationItems} />
+                    <NavigationLine items={navigationItems} />
+                </>
+            )}
 
-            {notification && (
+            {!isCombatFocused && notification && (
                 <div className={`mx-4 mt-3 p-2.5 rounded-lg text-sm animate-slideup ${
                     notification.type === 'success' ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
                 }`}>
@@ -207,7 +218,11 @@ export default function MainPanel({ playerId, character, zones, inventory, onUpd
                     error={activitySheet.error}
                     executingId={executingActivityId}
                     onExecute={executeActivity}
-                    onClose={() => setActivitySheet(null)}
+                    onCombatFocusChange={setIsCombatFocused}
+                    onClose={() => {
+                        setIsCombatFocused(false);
+                        setActivitySheet(null);
+                    }}
                 />
             ) : !isExploring && !showZonePicker && !showSafeHouse && !showTrading ? (
                 <div className="p-4 space-y-4">

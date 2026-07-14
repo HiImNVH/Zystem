@@ -60,7 +60,7 @@ function ActionResultDetails({ result }) {
 
 
 
-export function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, executingId }) {
+export function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, onCombatFocusChange, executingId }) {
     const [activeEnemy, setActiveEnemy] = useState(null);
     const [combatResult, setCombatResult] = useState(null);
     const [cooldownEndsAt, setCooldownEndsAt] = useState(0);
@@ -89,6 +89,11 @@ export function ActivityListSheet({ activityType, activityData, character, inven
         const timerId = setInterval(() => setNowMs(Date.now()), 250);
         return () => clearInterval(timerId);
     }, [cooldownEndsAt]);
+
+    useEffect(() => {
+        onCombatFocusChange?.(Boolean(activeEnemy));
+        return () => onCombatFocusChange?.(false);
+    }, [activeEnemy, onCombatFocusChange]);
 
     if (!activityType) return null;
 
@@ -136,6 +141,26 @@ export function ActivityListSheet({ activityType, activityData, character, inven
         setActiveEnemy(null);
     }
 
+    if (!isLoading && activityType === 'enemy' && activeEnemy) {
+        return (
+            <div className="h-full">
+                <CombatPanel
+                    character={character}
+                    inventory={inventory}
+                    combatRequest={{
+                        enemy: activeEnemy,
+                        zone: activityData?.zone,
+                        requestId: activeEnemy.id,
+                    }}
+                    isResolving={Boolean(executingId)}
+                    onBack={() => setActiveEnemy(null)}
+                    onVictory={() => resolveVictory(activeEnemy)}
+                    onDefeat={resolveDefeat}
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="p-4">
             <div className="w-full p-1">
@@ -179,22 +204,6 @@ export function ActivityListSheet({ activityType, activityData, character, inven
                         <ActionResultDetails result={resultData} />
                     </div>
                 )}
-                {!isLoading && activityType === 'enemy' && activeEnemy && (
-                    <CombatPanel
-                        character={character}
-                        inventory={inventory}
-                        combatRequest={{
-                            enemy: activeEnemy,
-                            zone: activityData?.zone,
-                            requestId: activeEnemy.id,
-                        }}
-                        isResolving={Boolean(executingId)}
-                        onBack={() => setActiveEnemy(null)}
-                        onVictory={() => resolveVictory(activeEnemy)}
-                        onDefeat={resolveDefeat}
-                    />
-                )}
-
                 {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && !activeEnemy && (
                     <div className="space-y-2">
                         {list.map(item => (

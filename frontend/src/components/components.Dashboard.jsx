@@ -23,10 +23,19 @@ const SIDE_TABS = [
 // Ham thuan render panel theo tab, tach ra module-level de khong bi tao lai
 // moi lan Dashboard re-render (tranh unmount/remount lam mat state cua panel con)
 function renderPanel(tab, ctx) {
-    const { playerId, character, zones, inventory, jobs, stats, loadAll, onLogout } = ctx;
+    const { playerId, character, zones, inventory, jobs, stats, loadAll, onLogout, onMainFocusModeChange } = ctx;
 
     if (tab === TAB.MAIN) {
-        return <MainPanel playerId={playerId} character={character} zones={zones} inventory={inventory} onUpdate={loadAll} />;
+        return (
+            <MainPanel
+                playerId={playerId}
+                character={character}
+                zones={zones}
+                inventory={inventory}
+                onUpdate={loadAll}
+                onFocusModeChange={onMainFocusModeChange}
+            />
+        );
     }
 
     if (tab === TAB.INVENTORY) {
@@ -77,13 +86,13 @@ function LeftViewport({ leftTab, onChangeLeftTab, ctx }) {
     );
 }
 
-function CenterViewport({ centerTab, onChangeCenterTab, ctx }) {
+function CenterViewport({ centerTab, onChangeCenterTab, ctx, hideBottomNav }) {
     return (
         <section className="workspace-pane workspace-pane-center">
             <div className="workspace-pane-body">
                 {renderPanel(centerTab, ctx)}
             </div>
-            <BottomNav activeTab={centerTab} onChangeTab={onChangeCenterTab} />
+            {!hideBottomNav && <BottomNav activeTab={centerTab} onChangeTab={onChangeCenterTab} />}
         </section>
     );
 }
@@ -106,6 +115,7 @@ export default function Dashboard({ initialCharacter, onLogout }) {
     const [jobs, setJobs]           = useState([]);
     const [leftTab, setLeftTab]     = useState(TAB.INVENTORY);
     const [centerTab, setCenterTab] = useState(TAB.MAIN);
+    const [isMainFocusMode, setIsMainFocusMode] = useState(false);
 
     const playerId = character?.id;
 
@@ -145,13 +155,14 @@ export default function Dashboard({ initialCharacter, onLogout }) {
         stats,
         loadAll,
         onLogout,
+        onMainFocusModeChange: setIsMainFocusMode,
     };
 
     return (
         <div className="h-screen bg-base text-textPrimary overflow-hidden">
             <div className="workspace-shell">
                 <LeftViewport leftTab={leftTab} onChangeLeftTab={setLeftTab} ctx={ctx} />
-                <CenterViewport centerTab={centerTab} onChangeCenterTab={setCenterTab} ctx={ctx} />
+                <CenterViewport centerTab={centerTab} onChangeCenterTab={setCenterTab} ctx={ctx} hideBottomNav={isMainFocusMode} />
                 <RightViewport character={character} />
             </div>
         </div>
