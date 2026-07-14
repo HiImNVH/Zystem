@@ -30,12 +30,6 @@ const FILTERS = [
 
 const EQUIPABLE_CATEGORIES = ['WEAPON', 'EQUIPMENT', 'TOOL'];
 const STAT_LABELS = { str:'STR', agi:'AGI', dex:'DEX', vit:'VIT', int:'INT', chr:'CHR' };
-const CUREL_BUFF_SUFFIX = {
-    durability_pct: '%',
-    action_speed_pct: '%',
-    yield_chance_pct: '%',
-    quality_power: '',
-};
 
 function formatExpiry(expiresAt) {
     if (!expiresAt) return null;
@@ -105,12 +99,6 @@ function groupItemsByCategory(items) {
     }
 
     return [...groups, otherGroup].filter(group => group.items.length > 0);
-}
-
-function getCurelBuffText(buff) {
-    const value = Number(buff?.value) || 0;
-    const suffix = CUREL_BUFF_SUFFIX[buff?.code] ?? '';
-    return `Lv.${buff?.level || 1} +${value}${suffix}`;
 }
 
 function InventoryGrid({ items, onSelect }) {
@@ -249,13 +237,11 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
 
                 {curelBuffs.length > 0 && (
                     <div className="card p-3 mb-3">
-                        <p className="text-textMuted text-xs mb-2">CUREL buffs</p>
-                        <div className="space-y-1">
+                        <div className="flex flex-wrap gap-1.5">
                             {curelBuffs.map(buff => (
-                                <p key={buff.code} className="text-xs text-textSecondary flex justify-between gap-3">
-                                    <span>{buff.label || buff.code}</span>
-                                    <span className="text-accent font-semibold">{getCurelBuffText(buff)}</span>
-                                </p>
+                                <span key={buff.code} className="text-[10px] px-2 py-0.5 rounded bg-elevated text-textSecondary">
+                                    {buff.label || buff.code}
+                                </span>
                             ))}
                         </div>
                     </div>
