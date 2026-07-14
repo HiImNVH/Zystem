@@ -2,7 +2,6 @@
 
 const { gameDataDb } = require('./repositories.databaseDomains');
 const itemTaxonomyService = require('../services/services.itemTaxonomy');
-const itemAlphaSimplificationService = require('../services/services.itemAlphaSimplification');
 const dbPool = gameDataDb;
 
 const DEFAULT_DROP_WEIGHTS = {
@@ -37,7 +36,7 @@ const TAG_NAME_ALIASES = {
     smg: 'SMG',
 };
 
-const RAW_ITEM_TEMPLATES = [
+const ITEM_TEMPLATES = [
     {
         "name": "Metal Scrap/Ore",
         "tags": [
@@ -209,13 +208,13 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Dandelion Seed",
+        "name": "Vegetable Seed",
         "tags": [
             "MATERIAL",
             "MATERIALS",
             "Plantable",
-            "Dandelion",
-            "Seed"
+            "Seed",
+            "Vegetable"
         ],
         "origin": "Gatherable",
         "levelGap": "Free by zone",
@@ -225,14 +224,14 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Wild Lettuce Seed",
+        "name": "Fruit Seed",
         "tags": [
             "MATERIAL",
             "MATERIALS",
             "Plantable",
-            "Wild",
-            "Lettuce",
-            "Seed"
+            "Seed",
+            "Fruit",
+            "Tree"
         ],
         "origin": "Gatherable",
         "levelGap": "Free by zone",
@@ -242,98 +241,13 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Feral Tomato Seed",
+        "name": "Grain Seed",
         "tags": [
             "MATERIAL",
             "MATERIALS",
             "Plantable",
-            "Feral",
-            "Tomato",
-            "Seed"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Pumpkin Seed",
-        "tags": [
-            "MATERIAL",
-            "MATERIALS",
-            "Plantable",
-            "Pumpkin",
-            "Seed"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Bramble Berry Seed",
-        "tags": [
-            "MATERIAL",
-            "MATERIALS",
-            "Plantable",
-            "Bramble",
-            "Berry",
-            "Seed"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Wild Wheat Seed",
-        "tags": [
-            "MATERIAL",
-            "MATERIALS",
-            "Plantable",
-            "Wild",
-            "Wheat",
-            "Seed"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Wild Oat Seed",
-        "tags": [
-            "MATERIAL",
-            "MATERIALS",
-            "Plantable",
-            "Wild",
-            "Oat",
-            "Seed"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Feral Corn Seed",
-        "tags": [
-            "MATERIAL",
-            "MATERIALS",
-            "Plantable",
-            "Feral",
-            "Corn",
-            "Seed"
+            "Seed",
+            "Grain"
         ],
         "origin": "Gatherable",
         "levelGap": "Free by zone",
@@ -667,17 +581,15 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Dandelion Greens",
+        "name": "Vegetable",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodRaw (Vegetable)",
             "FoodRaw",
-            "Vegetable",
-            "Dandelion",
-            "Greens",
             "Food",
-            "Raw"
+            "Raw",
+            "Vegetable"
         ],
         "origin": "Gatherable",
         "levelGap": "Free by zone",
@@ -687,97 +599,16 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Wild Lettuce",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Vegetable)",
-            "FoodRaw",
-            "Vegetable",
-            "Wild",
-            "Lettuce",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Feral Tomato",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Vegetable)",
-            "FoodRaw",
-            "Vegetable",
-            "Feral",
-            "Tomato",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Cellar Mushroom",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Vegetable)",
-            "FoodRaw",
-            "Vegetable",
-            "Cellar",
-            "Mushroom",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Overgrown Pumpkin",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Vegetable)",
-            "FoodRaw",
-            "Vegetable",
-            "Overgrown",
-            "Pumpkin",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Wild Apple",
+        "name": "Fruit",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodRaw (Fruit)",
             "FoodRaw",
-            "Fruit",
-            "Wild",
-            "Apple",
             "Food",
-            "Raw"
+            "Raw",
+            "Fruit",
+            "Tree"
         ],
         "origin": "Gatherable",
         "levelGap": "Free by zone",
@@ -787,97 +618,15 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Park Cherry",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Fruit)",
-            "FoodRaw",
-            "Fruit",
-            "Park",
-            "Cherry",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Overgrown Grape",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Fruit)",
-            "FoodRaw",
-            "Fruit",
-            "Overgrown",
-            "Grape",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Bramble Berry",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Fruit)",
-            "FoodRaw",
-            "Fruit",
-            "Bramble",
-            "Berry",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Alley Fig",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Fruit)",
-            "FoodRaw",
-            "Fruit",
-            "Alley",
-            "Fig",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Wild Wheat",
+        "name": "Grain",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodRaw (Grain)",
             "FoodRaw",
-            "Grain",
-            "Wild",
-            "Wheat",
             "Food",
-            "Raw"
+            "Raw",
+            "Grain"
         ],
         "origin": "Gatherable",
         "levelGap": "Free by zone",
@@ -887,58 +636,17 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Wild Oat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Grain)",
-            "FoodRaw",
-            "Grain",
-            "Wild",
-            "Oat",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Feral Corn",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Grain)",
-            "FoodRaw",
-            "Grain",
-            "Feral",
-            "Corn",
-            "Food",
-            "Raw"
-        ],
-        "origin": "Gatherable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Wild Wheat Flour",
+        "name": "Grain Flour",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodRaw (Flour)",
             "FoodRaw",
-            "Flour",
-            "Wild",
-            "Wheat",
             "Food",
             "Raw",
-            "Processed"
+            "Processed",
+            "Grain",
+            "Flour"
         ],
         "origin": "Craftable",
         "levelGap": "Free by zone",
@@ -948,75 +656,14 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Wild Oat Flour",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Flour)",
-            "FoodRaw",
-            "Flour",
-            "Wild",
-            "Oat",
-            "Food",
-            "Raw",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Feral Corn Flour",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodRaw (Flour)",
-            "FoodRaw",
-            "Flour",
-            "Feral",
-            "Corn",
-            "Food",
-            "Raw",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Dried Meat",
+        "name": "Cooked Meat",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodProcessed",
-            "Dried",
-            "Meat",
             "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Smoked Meat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Smoked",
-            "Meat",
-            "Food",
-            "Processed"
+            "Processed",
+            "Meat"
         ],
         "origin": "Craftable",
         "levelGap": "Free by zone",
@@ -1181,16 +828,15 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Pumpkin Seed Oil",
+        "name": "Seed Oil",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodProcessed",
-            "Pumpkin",
+            "Food",
+            "Processed",
             "Seed",
-            "Oil",
-            "Food",
-            "Processed"
+            "Oil"
         ],
         "origin": "Craftable",
         "levelGap": "Free by zone",
@@ -1200,387 +846,14 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Feral Corn Oil",
+        "name": "Cooked Vegetable",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodProcessed",
-            "Feral",
-            "Corn",
-            "Oil",
             "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Skewered Meat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Skewered",
-            "Meat",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Seasoned Skewered Meat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Seasoned",
-            "Skewered",
-            "Meat",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Steak",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Steak",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Seasoned Steak",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Seasoned",
-            "Steak",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Boiled Meat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Boiled",
-            "Meat",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Boiled Pumpkin",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Boiled",
-            "Pumpkin",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Dandelion Green Soup",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Dandelion",
-            "Green",
-            "Soup",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Cellar Mushroom Soup",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Cellar",
-            "Mushroom",
-            "Soup",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Meat Bone Soup",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Meat",
-            "Bone",
-            "Soup",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Meat Stew",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Meat",
-            "Stew",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Pumpkin Stew",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Pumpkin",
-            "Stew",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Meat Bone Noodle Soup",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Meat",
-            "Bone",
-            "Noodle",
-            "Soup",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Cellar Mushroom Noodle",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Cellar",
-            "Mushroom",
-            "Noodle",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Feral Tomato Noodle",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Feral",
-            "Tomato",
-            "Noodle",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Fried Meat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Fried",
-            "Meat",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Seasoned Fried Meat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Seasoned",
-            "Fried",
-            "Meat",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Deep Fried Meat",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Deep",
-            "Fried",
-            "Meat",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Fried Pumpkin",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Fried",
-            "Pumpkin",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Deep Fried Mushroom",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Deep",
-            "Fried",
-            "Mushroom",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Deep Fried Tomato",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Deep",
-            "Fried",
-            "Tomato",
-            "Food",
-            "Processed"
+            "Processed",
+            "Vegetable"
         ],
         "origin": "Craftable",
         "levelGap": "Free by zone",
@@ -1607,159 +880,14 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Meat Burger",
+        "name": "Fruit Dish",
         "tags": [
             "FOOD",
             "CONSUMABLES",
             "FoodProcessed",
-            "Meat",
-            "Burger",
             "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Meat Sandwich",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Meat",
-            "Sandwich",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Tomato Sandwich",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Tomato",
-            "Sandwich",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Mushroom Pizza",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Mushroom",
-            "Pizza",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Tomato Pizza",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Tomato",
-            "Pizza",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Meat Pizza",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Meat",
-            "Pizza",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Apple Cake",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Apple",
-            "Cake",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Cherry Cake",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Cherry",
-            "Cake",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Berry Cake",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Berry",
-            "Cake",
-            "Food",
-            "Processed"
+            "Processed",
+            "Fruit"
         ],
         "origin": "Craftable",
         "levelGap": "Free by zone",
@@ -1776,42 +904,6 @@ const RAW_ITEM_TEMPLATES = [
             "FoodProcessed",
             "Canned",
             "Meat",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Canned Tomato",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Canned",
-            "Tomato",
-            "Food",
-            "Processed"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Canned Pumpkin",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Canned",
-            "Pumpkin",
             "Food",
             "Processed"
         ],
@@ -1938,111 +1030,14 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
-        "name": "Apple Juice",
+        "name": "Vegetable Juice",
         "tags": [
             "FOOD",
             "CONSUMABLES",
-            "FoodProcessed",
-            "Apple",
-            "Juice",
+            "Drink",
             "Food",
             "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Grape Juice",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Grape",
-            "Juice",
-            "Food",
-            "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Tomato Juice",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Tomato",
-            "Juice",
-            "Food",
-            "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Berry Smoothie",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Berry",
-            "Smoothie",
-            "Food",
-            "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Fig Smoothie",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Fig",
-            "Smoothie",
-            "Food",
-            "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Cherry Smoothie",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Cherry",
-            "Smoothie",
-            "Food",
-            "Processed",
-            "Drink"
+            "Vegetable"
         ],
         "origin": "Craftable",
         "levelGap": "Free by zone",
@@ -2058,63 +1053,6 @@ const RAW_ITEM_TEMPLATES = [
             "CONSUMABLES",
             "FoodProcessed",
             "Coffee",
-            "Food",
-            "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Grape Wine",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Grape",
-            "Wine",
-            "Food",
-            "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Apple Wine",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Apple",
-            "Wine",
-            "Food",
-            "Processed",
-            "Drink"
-        ],
-        "origin": "Craftable",
-        "levelGap": "Free by zone",
-        "lifecycleModel": "None",
-        "baseDurability": 0,
-        "baseDurationHours": 0,
-        "lifecycleNote": null
-    },
-    {
-        "name": "Berry Wine",
-        "tags": [
-            "FOOD",
-            "CONSUMABLES",
-            "FoodProcessed",
-            "Berry",
-            "Wine",
             "Food",
             "Processed",
             "Drink"
@@ -3563,8 +2501,6 @@ const RAW_ITEM_TEMPLATES = [
         "lifecycleNote": null
     }
 ];
-
-const ITEM_TEMPLATES = itemAlphaSimplificationService.simplifyItemTemplates(RAW_ITEM_TEMPLATES);
 
 function createItemCode(itemName) {
     return itemName

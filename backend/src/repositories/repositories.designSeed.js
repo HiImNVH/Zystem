@@ -1,7 +1,6 @@
 // backend/src/repositories/repositories.designSeed.js
 
 const { gameDataDb } = require('./repositories.databaseDomains');
-const itemAlphaSimplificationService = require('../services/services.itemAlphaSimplification');
 const dbPool = gameDataDb;
 
 const LEVELING_RULES = [
@@ -1108,7 +1107,7 @@ const STAT_DEFINITIONS = [
     }
 ];
 
-const RAW_CRAFTING_RECIPES = [
+const CRAFTING_RECIPES = [
     {
         "recipeNumber": 1,
         "code": "METAL_INGOT",
@@ -1517,7 +1516,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 24,
         "code": "WILD_WHEAT_FLOUR",
-        "outputItem": "Wild Wheat Flour",
+        "outputItem": "Grain Flour",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1526,7 +1525,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Wild Wheat",
+                "tagQuery": "Food, Grain",
                 "quantity": 2
             }
         ],
@@ -1543,7 +1542,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 25,
         "code": "WILD_OAT_FLOUR",
-        "outputItem": "Wild Oat Flour",
+        "outputItem": "Grain Flour",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1552,7 +1551,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Wild Oat",
+                "tagQuery": "Food, Grain",
                 "quantity": 2
             }
         ],
@@ -1569,7 +1568,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 26,
         "code": "FERAL_CORN_FLOUR",
-        "outputItem": "Feral Corn Flour",
+        "outputItem": "Grain Flour",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1578,7 +1577,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Feral Corn",
+                "tagQuery": "Food, Grain",
                 "quantity": 2
             }
         ],
@@ -1595,7 +1594,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 27,
         "code": "DRIED_MEAT",
-        "outputItem": "Dried Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1626,7 +1625,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 28,
         "code": "SMOKED_MEAT",
-        "outputItem": "Smoked Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1906,7 +1905,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 38,
         "code": "PUMPKIN_SEED_OIL",
-        "outputItem": "Pumpkin Seed Oil",
+        "outputItem": "Seed Oil",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1915,7 +1914,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Pumpkin Seed",
+                "tagQuery": "Material, Vegetable Seed",
                 "quantity": 2
             }
         ],
@@ -1932,7 +1931,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 39,
         "code": "FERAL_CORN_OIL",
-        "outputItem": "Feral Corn Oil",
+        "outputItem": "Seed Oil",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1941,7 +1940,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Feral Corn",
+                "tagQuery": "Food, Grain",
                 "quantity": 2
             }
         ],
@@ -1958,7 +1957,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 40,
         "code": "SKEWERED_MEAT",
-        "outputItem": "Skewered Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -1984,7 +1983,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 41,
         "code": "SEASONED_SKEWERED_MEAT",
-        "outputItem": "Seasoned Skewered Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2015,7 +2014,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 42,
         "code": "STEAK",
-        "outputItem": "Steak",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2041,7 +2040,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 43,
         "code": "SEASONED_STEAK",
-        "outputItem": "Seasoned Steak",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2072,7 +2071,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 44,
         "code": "BOILED_MEAT",
-        "outputItem": "Boiled Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2103,7 +2102,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 45,
         "code": "BOILED_PUMPKIN",
-        "outputItem": "Boiled Pumpkin",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2112,7 +2111,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Overgrown Pumpkin",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 1
             },
             {
@@ -2134,7 +2133,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 46,
         "code": "DANDELION_GREEN_SOUP",
-        "outputItem": "Dandelion Green Soup",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2143,7 +2142,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Dandelion Greens",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -2165,7 +2164,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 47,
         "code": "CELLAR_MUSHROOM_SOUP",
-        "outputItem": "Cellar Mushroom Soup",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2174,7 +2173,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Cellar Mushroom",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -2196,7 +2195,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 48,
         "code": "MEAT_BONE_SOUP",
-        "outputItem": "Meat Bone Soup",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2227,7 +2226,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 49,
         "code": "MEAT_STEW",
-        "outputItem": "Meat Stew",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2263,7 +2262,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 50,
         "code": "PUMPKIN_STEW",
-        "outputItem": "Pumpkin Stew",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2272,7 +2271,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Overgrown Pumpkin",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -2299,7 +2298,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 51,
         "code": "MEAT_BONE_NOODLE_SOUP",
-        "outputItem": "Meat Bone Noodle Soup",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2335,7 +2334,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 52,
         "code": "CELLAR_MUSHROOM_NOODLE",
-        "outputItem": "Cellar Mushroom Noodle",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2349,7 +2348,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Cellar Mushroom",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 1
             },
             {
@@ -2371,7 +2370,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 53,
         "code": "FERAL_TOMATO_NOODLE",
-        "outputItem": "Feral Tomato Noodle",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2385,7 +2384,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Feral Tomato",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 1
             },
             {
@@ -2407,7 +2406,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 54,
         "code": "FRIED_MEAT",
-        "outputItem": "Fried Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2438,7 +2437,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 55,
         "code": "SEASONED_FRIED_MEAT",
-        "outputItem": "Seasoned Fried Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2474,7 +2473,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 56,
         "code": "DEEP_FRIED_MEAT",
-        "outputItem": "Deep Fried Meat",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2505,7 +2504,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 57,
         "code": "FRIED_PUMPKIN",
-        "outputItem": "Fried Pumpkin",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2514,7 +2513,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Overgrown Pumpkin",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 1
             },
             {
@@ -2536,7 +2535,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 58,
         "code": "DEEP_FRIED_MUSHROOM",
-        "outputItem": "Deep Fried Mushroom",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2545,7 +2544,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Cellar Mushroom",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -2567,7 +2566,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 59,
         "code": "DEEP_FRIED_TOMATO",
-        "outputItem": "Deep Fried Tomato",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2576,7 +2575,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Feral Tomato",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -2629,7 +2628,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 61,
         "code": "MEAT_BURGER",
-        "outputItem": "Meat Burger",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2660,7 +2659,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 62,
         "code": "MEAT_SANDWICH",
-        "outputItem": "Meat Sandwich",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2691,7 +2690,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 63,
         "code": "TOMATO_SANDWICH",
-        "outputItem": "Tomato Sandwich",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2705,7 +2704,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Feral Tomato",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 1
             }
         ],
@@ -2722,7 +2721,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 64,
         "code": "MUSHROOM_PIZZA",
-        "outputItem": "Mushroom Pizza",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2736,7 +2735,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Cellar Mushroom",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 1
             },
             {
@@ -2758,7 +2757,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 65,
         "code": "TOMATO_PIZZA",
-        "outputItem": "Tomato Pizza",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2772,7 +2771,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Food, Feral Tomato",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 1
             },
             {
@@ -2794,7 +2793,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 66,
         "code": "MEAT_PIZZA",
-        "outputItem": "Meat Pizza",
+        "outputItem": "Cooked Meat",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2830,7 +2829,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 67,
         "code": "APPLE_CAKE",
-        "outputItem": "Apple Cake",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2849,7 +2848,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, Wild Apple",
+                "tagQuery": "Food, Fruit",
                 "quantity": 1
             }
         ],
@@ -2866,7 +2865,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 68,
         "code": "CHERRY_CAKE",
-        "outputItem": "Cherry Cake",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2885,7 +2884,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, Park Cherry",
+                "tagQuery": "Food, Fruit",
                 "quantity": 1
             }
         ],
@@ -2902,7 +2901,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 69,
         "code": "BERRY_CAKE",
-        "outputItem": "Berry Cake",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2921,7 +2920,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 3,
-                "tagQuery": "Food, Bramble Berry",
+                "tagQuery": "Food, Fruit",
                 "quantity": 1
             }
         ],
@@ -2969,7 +2968,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 71,
         "code": "CANNED_TOMATO",
-        "outputItem": "Canned Tomato",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -2978,7 +2977,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Feral Tomato",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -3000,7 +2999,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 72,
         "code": "CANNED_PUMPKIN",
-        "outputItem": "Canned Pumpkin",
+        "outputItem": "Cooked Vegetable",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3009,7 +3008,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Overgrown Pumpkin",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -3186,7 +3185,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 78,
         "code": "APPLE_JUICE",
-        "outputItem": "Apple Juice",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3195,7 +3194,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Wild Apple",
+                "tagQuery": "Food, Fruit",
                 "quantity": 2
             }
         ],
@@ -3212,7 +3211,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 79,
         "code": "GRAPE_JUICE",
-        "outputItem": "Grape Juice",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3221,7 +3220,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Overgrown Grape",
+                "tagQuery": "Food, Fruit",
                 "quantity": 2
             }
         ],
@@ -3238,7 +3237,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 80,
         "code": "TOMATO_JUICE",
-        "outputItem": "Tomato Juice",
+        "outputItem": "Vegetable Juice",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3247,7 +3246,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Feral Tomato",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             }
         ],
@@ -3264,7 +3263,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 81,
         "code": "BERRY_SMOOTHIE",
-        "outputItem": "Berry Smoothie",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3273,7 +3272,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Bramble Berry",
+                "tagQuery": "Food, Fruit",
                 "quantity": 2
             },
             {
@@ -3295,7 +3294,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 82,
         "code": "FIG_SMOOTHIE",
-        "outputItem": "Fig Smoothie",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3304,7 +3303,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Alley Fig",
+                "tagQuery": "Food, Fruit",
                 "quantity": 2
             },
             {
@@ -3326,7 +3325,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 83,
         "code": "CHERRY_SMOOTHIE",
-        "outputItem": "Cherry Smoothie",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3335,7 +3334,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Park Cherry",
+                "tagQuery": "Food, Fruit",
                 "quantity": 2
             },
             {
@@ -3371,7 +3370,7 @@ const RAW_CRAFTING_RECIPES = [
             },
             {
                 "slotIndex": 2,
-                "tagQuery": "Material, Seed or Plantable",
+                "tagQuery": "Material, Seed",
                 "quantity": 1
             }
         ],
@@ -3388,7 +3387,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 85,
         "code": "GRAPE_WINE",
-        "outputItem": "Grape Wine",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3397,7 +3396,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Overgrown Grape",
+                "tagQuery": "Food, Fruit",
                 "quantity": 3
             },
             {
@@ -3419,7 +3418,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 86,
         "code": "APPLE_WINE",
-        "outputItem": "Apple Wine",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3428,7 +3427,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Wild Apple",
+                "tagQuery": "Food, Fruit",
                 "quantity": 3
             },
             {
@@ -3450,7 +3449,7 @@ const RAW_CRAFTING_RECIPES = [
     {
         "recipeNumber": 87,
         "code": "BERRY_WINE",
-        "outputItem": "Berry Wine",
+        "outputItem": "Fruit Dish",
         "outputCategory": "Food",
         "requiredJobCode": "cooking",
         "workstationAccess": "Cooking Station",
@@ -3459,7 +3458,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Bramble Berry",
+                "tagQuery": "Food, Fruit",
                 "quantity": 3
             },
             {
@@ -3588,7 +3587,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Food, Cellar Mushroom",
+                "tagQuery": "Food, Vegetable",
                 "quantity": 2
             },
             {
@@ -3619,7 +3618,7 @@ const RAW_CRAFTING_RECIPES = [
         "inputs": [
             {
                 "slotIndex": 1,
-                "tagQuery": "Material, Dandelion Seed or Wild Lettuce Seed",
+                "tagQuery": "Material, Vegetable Seed or Vegetable Seed",
                 "quantity": 2
             },
             {
@@ -6311,8 +6310,6 @@ const RAW_CRAFTING_RECIPES = [
         "requiredUseCaseTags": "Structure"
     }
 ];
-
-const CRAFTING_RECIPES = itemAlphaSimplificationService.simplifyCraftingRecipes(RAW_CRAFTING_RECIPES);
 
 async function seedLevelingRules() {
     const count = await dbPool.query('SELECT COUNT(*) FROM leveling_rules;');
