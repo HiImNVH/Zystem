@@ -419,6 +419,79 @@ const ITEM_TEMPLATES = [
         "lifecycleNote": null
     },
     {
+        "name": "Infected Tissue",
+        "tags": [
+            "MATERIAL",
+            "MATERIALS",
+            "Monster Part",
+            "Monster",
+            "Zombie",
+            "Organic",
+            "Rotten",
+            "Trophy"
+        ],
+        "origin": "Loot-only",
+        "levelGap": "Free by zone",
+        "lifecycleModel": "None",
+        "baseDurability": 0,
+        "baseDurationHours": 0,
+        "lifecycleNote": null
+    },
+    {
+        "name": "Cracked Bone",
+        "tags": [
+            "MATERIAL",
+            "MATERIALS",
+            "Monster Part",
+            "Animal",
+            "Bone",
+            "Organic",
+            "Trophy"
+        ],
+        "origin": "Loot-only",
+        "levelGap": "Free by zone",
+        "lifecycleModel": "None",
+        "baseDurability": 0,
+        "baseDurationHours": 0,
+        "lifecycleNote": null
+    },
+    {
+        "name": "Torn Hide",
+        "tags": [
+            "MATERIAL",
+            "MATERIALS",
+            "Monster Part",
+            "Animal",
+            "Hide",
+            "Organic",
+            "Trophy"
+        ],
+        "origin": "Loot-only",
+        "levelGap": "Free by zone",
+        "lifecycleModel": "None",
+        "baseDurability": 0,
+        "baseDurationHours": 0,
+        "lifecycleNote": null
+    },
+    {
+        "name": "Mutated Claw",
+        "tags": [
+            "MATERIAL",
+            "MATERIALS",
+            "Monster Part",
+            "Monster",
+            "Claw",
+            "Organic",
+            "Trophy"
+        ],
+        "origin": "Loot-only",
+        "levelGap": "Free by zone",
+        "lifecycleModel": "None",
+        "baseDurability": 0,
+        "baseDurationHours": 0,
+        "lifecycleNote": null
+    },
+    {
         "name": "Wooden Handle",
         "tags": [
             "MATERIAL",

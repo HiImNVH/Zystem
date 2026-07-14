@@ -12,7 +12,7 @@ const ACTION_DROP_POOL = {
     HUNT:    ['MATERIAL'],
     FORAGE:  ['MATERIAL'],
     EXPLORE: ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
-    BATTLE:  ['MATERIAL', 'WEAPON', 'EQUIPMENT', 'TOOL'],
+    BATTLE:  ['MATERIAL', 'FOOD'],
     SWEEP:   ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
     DUNGEON: ['MATERIAL', 'FOOD', 'MEDICINE', 'WEAPON', 'EQUIPMENT', 'TOOL'],
     CRAFT:   ['WEAPON', 'EQUIPMENT', 'TOOL', 'BUILDING'],
@@ -21,9 +21,24 @@ const ACTION_DROP_POOL = {
 
 const ACTION_DROP_ORIGINS = {
     CRAFT: ['Craftable'],
+    BATTLE: ['Gatherable', 'Loot-only', 'Craftable'],
 };
 
 const DEFAULT_DROP_ORIGINS = ['Gatherable', 'Loot-only'];
+const BATTLE_DROP_TAGS = [
+    'bone',
+    'meat',
+    'animal',
+    'hide',
+    'fat',
+    'organic',
+    'trophy',
+    'rotten',
+    'claw',
+    'fang',
+    'zombie',
+    'monster',
+];
 
 function calculateDropCount(actionType, durationSeconds) {
     const baseCount = {
@@ -222,15 +237,30 @@ async function processLootDrop(playerId, claimedAction) {
     const zoneMinLevel = claimedAction.zone_min_level || 1;
     const dropCount = calculateDropCount(actionType, claimedAction.actual_duration_s);
     const dropItemLevel = Math.max(1, parseInt(claimedAction.drop_item_level || zoneMinLevel) || 1);
-    const candidates = await getCandidateTemplates({
+    const battleTagFilters = actionType === 'BATTLE' && !(claimedAction.tag_filter || []).length
+        ? BATTLE_DROP_TAGS
+        : claimedAction.tag_filter || [];
+    let candidates = await getCandidateTemplates({
         categories,
         zoneMinLevel,
         origins: ACTION_DROP_ORIGINS[actionType],
         maxLevelOffset: claimedAction.max_level_offset ?? 5,
         allowAboveMapLevel: claimedAction.allow_above_map_level !== false,
         includeFlexibleTemplates: claimedAction.include_flexible_templates === true,
-        tagFilters: claimedAction.tag_filter || [],
+        tagFilters: battleTagFilters,
     });
+
+    if (candidates.length === 0 && battleTagFilters.length > 0) {
+        candidates = await getCandidateTemplates({
+            categories,
+            zoneMinLevel,
+            origins: ACTION_DROP_ORIGINS[actionType],
+            maxLevelOffset: claimedAction.max_level_offset ?? 5,
+            allowAboveMapLevel: claimedAction.allow_above_map_level !== false,
+            includeFlexibleTemplates: claimedAction.include_flexible_templates === true,
+            tagFilters: [],
+        });
+    }
 
     if (candidates.length === 0) {
         return { items_dropped: [] };

@@ -111,8 +111,11 @@ export async function exchangeCurrency(playerId, currency, quantity, side) {
     return handleResponse(res);
 }
 
-export async function getNpcShop() {
-    const res = await fetch(`${BASE_URL}/api/trading/npc-shop`, { headers: getHeaders() });
+export async function getNpcShop(playerId) {
+    const path = playerId
+        ? `/api/trading/npc-shop/${playerId}`
+        : '/api/trading/npc-shop';
+    const res = await fetch(`${BASE_URL}${path}`, { headers: getHeaders() });
     return handleResponse(res);
 }
 
@@ -130,6 +133,15 @@ export async function sellItemToNpc(playerId, itemId) {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify({ playerId, itemId })
+    });
+    return handleResponse(res);
+}
+
+export async function recycleWasteItems(playerId) {
+    const res = await fetch(`${BASE_URL}/api/trading/npc-shop/recycle`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ playerId })
     });
     return handleResponse(res);
 }

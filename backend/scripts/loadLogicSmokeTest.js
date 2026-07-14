@@ -172,7 +172,7 @@ function runPureLogicChecks(modulesByPath) {
     assertExportedFunction(playerEvents, 'getPlayerEvents');
     assertExportedFunction(playerEvents, 'markPlayerEventsRead');
 
-    assert.equal(itemsSeed.ITEM_TEMPLATES.length, 192);
+    assert.equal(itemsSeed.ITEM_TEMPLATES.length, 196);
     assert.deepEqual(
         itemsSeed.normalizeItemTags(['FOOD', 'CONSUMABLES', 'FoodProcessed', 'FoodRaw (Fruit)'], 'FOOD'),
         ['Food', 'Processed', 'Raw', 'Fruit']

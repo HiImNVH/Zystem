@@ -5,6 +5,7 @@ import {
     getNpcShop,
     buyNpcShopItem,
     sellItemToNpc,
+    recycleWasteItems,
     getBlackMarketListings,
     listBlackMarketItem,
     buyBlackMarketListing,
@@ -24,6 +25,22 @@ function getItemTitle(item) {
 function getItemTags(item) {
     if (!Array.isArray(item?.tags)) return '';
     return item.tags.slice(0, 4).join(' | ');
+}
+
+function groupItemsByVendor(items) {
+    return (items || []).reduce((groups, item) => {
+        const key = item.vendor_key || 'camp';
+        if (!groups[key]) {
+            groups[key] = {
+                key,
+                name: item.vendor_name || 'Camp Merchant',
+                role: item.vendor_role || 'General supplies',
+                items: [],
+            };
+        }
+        groups[key].items.push(item);
+        return groups;
+    }, {});
 }
 
 function TradingItemCard({ item, actionLabel, isBusy, onAction, children }) {
@@ -70,7 +87,7 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
         setError('');
         try {
             const [shopResult, marketResult] = await Promise.all([
-                getNpcShop(),
+                getNpcShop(playerId),
                 getBlackMarketListings(playerId),
             ]);
             setNpcShop(shopResult.data || []);
@@ -116,32 +133,70 @@ export default function TradingSheet({ playerId, character, inventory, onClose, 
         });
     }
 
+    function handleRecycleWaste() {
+        runTradeAction({
+            busyKey: 'npc:recycle',
+            action: () => recycleWasteItems(playerId),
+            successMessage: result => (
+                `Processed ${result.data.items_sold} item(s) for ${formatMoney(result.data.price_money)} Money.`
+            ),
+        });
+    }
+
     function renderNpcShop() {
+        const vendorGroups = Object.values(groupItemsByVendor(npcShop));
+
         return (
             <div className="space-y-4">
-                <div>
-                    <h4 className="text-sm font-semibold mb-2">Camp Merchant</h4>
-                    <div className="space-y-2">
-                        {npcShop.map(item => (
-                            <TradingItemCard
-                                key={item.code}
-                                item={item}
-                                actionLabel={`Buy ${formatMoney(item.npc_buy_price)}`}
-                                isBusy={busyKey === `npc:buy:${item.code}`}
-                                onAction={() => runTradeAction({
-                                    busyKey: `npc:buy:${item.code}`,
-                                    action: () => buyNpcShopItem(playerId, item.code),
-                                    successMessage: result => `Bought ${result.data.item_name}.`,
-                                })}
-                            >
-                                <p className="text-[11px] text-textMuted mt-1">Price: {formatMoney(item.npc_buy_price)} Money</p>
-                            </TradingItemCard>
-                        ))}
+                <div className="card p-3">
+                    <div className="flex items-start justify-between gap-3">
+                        <div>
+                            <h4 className="text-sm font-semibold">Waste Processing</h4>
+                            <p className="text-[11px] text-textMuted mt-1">
+                                Salvage junk, scrap, recyclable parts, and recipe-free monster trophies.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleRecycleWaste}
+                            disabled={busyKey === 'npc:recycle'}
+                            className="btn-primary text-xs px-3 py-2 flex-shrink-0"
+                        >
+                            {busyKey === 'npc:recycle' ? 'Working...' : 'Process All'}
+                        </button>
                     </div>
                 </div>
 
+                {vendorGroups.map(group => (
+                    <div key={group.key}>
+                        <div className="mb-2">
+                            <h4 className="text-sm font-semibold">{group.name}</h4>
+                            <p className="text-[11px] text-textMuted mt-1">{group.role}</p>
+                        </div>
+                        <div className="space-y-2">
+                            {group.items.map(item => (
+                                <TradingItemCard
+                                    key={`${group.key}:${item.code}`}
+                                    item={item}
+                                    actionLabel={`Buy ${formatMoney(item.npc_buy_price)}`}
+                                    isBusy={busyKey === `npc:buy:${item.code}`}
+                                    onAction={() => runTradeAction({
+                                        busyKey: `npc:buy:${item.code}`,
+                                        action: () => buyNpcShopItem(playerId, item.code),
+                                        successMessage: result => `Bought ${result.data.item_name}.`,
+                                    })}
+                                >
+                                    <p className="text-[11px] text-textMuted mt-1">
+                                        Price: {formatMoney(item.npc_buy_price)} Money
+                                    </p>
+                                </TradingItemCard>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+
                 <div>
-                    <h4 className="text-sm font-semibold mb-2">Sell to Merchant</h4>
+                    <h4 className="text-sm font-semibold mb-2">Sell to Professionals</h4>
                     <div className="space-y-2">
                         {sellableItems.length === 0 && <p className="text-sm text-textMuted">No sellable items.</p>}
                         {sellableItems.slice(0, 24).map(item => (

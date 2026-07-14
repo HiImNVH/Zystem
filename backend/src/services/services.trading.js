@@ -5,18 +5,41 @@ const craftingService = require('./services.crafting');
 const itemStatsService = require('./services.itemStats');
 const itemLifecycleService = require('./services.itemLifecycle');
 
-const NPC_SHOP_CODES = [
-    'BANDAGE',
-    'FIRST_AID_KIT',
-    'BREAD',
-    'MINERAL_WATER',
-    'WATER_BOILED_FILTERED',
-    'AXE',
-    'PICKAXE',
-    'WOOD',
-    'STONE',
-    'METAL_SCRAP_ORE',
+const NPC_VENDOR_CONFIGS = [
+    {
+        key: 'quartermaster',
+        name: 'Camp Quartermaster',
+        role: 'Weapons, gear, and tools',
+        categories: ['WEAPON', 'EQUIPMENT', 'TOOL'],
+        sellLimit: 12,
+    },
+    {
+        key: 'provisioner',
+        name: 'Camp Provisioner',
+        role: 'Food and medicine',
+        categories: ['FOOD', 'MEDICINE'],
+        sellLimit: 12,
+    },
+    {
+        key: 'salvage_yard',
+        name: 'Salvage Yard',
+        role: 'Resources and waste buyback',
+        categories: ['MATERIAL', 'BUILDING'],
+        sellLimit: 16,
+    },
+    {
+        key: 'hunter_butcher',
+        name: 'Hunter Butcher',
+        role: 'Meat, bones, and hides',
+        categories: ['MATERIAL', 'FOOD'],
+        sellLimit: 10,
+        tagHints: ['Bone', 'Meat', 'Animal', 'Hide', 'Fat'],
+    },
 ];
+
+const SHOP_ORIGINS = ['Starter', 'Gatherable', 'Loot-only', 'Craftable'];
+const WASTE_TAGS = ['Rubbish', 'Junk', 'Recyclable', 'Scrap', 'Broken', 'Plastic', 'Cloth', 'Glass'];
+const HUNTER_TAGS = ['Bone', 'Meat', 'Animal', 'Hide', 'Fat', 'Organic', 'Trophy', 'Rotten', 'Claw', 'Fang'];
 
 const CATEGORY_VALUE_MULTIPLIER = {
     WEAPON: 18,
@@ -42,6 +65,25 @@ const NPC_MARKUP_RATE = 1.35;
 const NPC_BUYBACK_RATE = 0.25;
 const MARKET_MIN_RATE = 0.25;
 const MARKET_MAX_RATE = 5;
+
+function normalizeTags(tags) {
+    return Array.isArray(tags) ? tags.map(tag => String(tag || '')) : [];
+}
+
+function hasAnyTag(item, tagList) {
+    const tags = normalizeTags(item?.tags).map(tag => tag.toLowerCase());
+    return tagList.some(tag => tags.includes(String(tag).toLowerCase()));
+}
+
+function getNpcVendorForItem(item) {
+    const category = String(item?.category || item?.template_category || '').toUpperCase();
+    if (hasAnyTag(item, HUNTER_TAGS)) return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'hunter_butcher');
+    if (hasAnyTag(item, WASTE_TAGS) || ['MATERIAL', 'BUILDING'].includes(category)) {
+        return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'salvage_yard');
+    }
+    if (['FOOD', 'MEDICINE'].includes(category)) return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'provisioner');
+    return NPC_VENDOR_CONFIGS.find(vendor => vendor.key === 'quartermaster');
+}
 
 function parsePositiveInt(value) {
     const number = Math.floor(Number(value));
@@ -77,7 +119,11 @@ function getNpcBuyPrice(item) {
 }
 
 function getNpcSellPrice(item) {
-    return Math.max(1, Math.floor(calculateBaseValue(item) * NPC_BUYBACK_RATE));
+    const vendor = getNpcVendorForItem(item);
+    const category = String(item?.category || item?.template_category || '').toUpperCase();
+    const wasteBonus = vendor?.key === 'salvage_yard' && (hasAnyTag(item, WASTE_TAGS) || category === 'MATERIAL') ? 1.25 : 1;
+    const hunterBonus = vendor?.key === 'hunter_butcher' && hasAnyTag(item, HUNTER_TAGS) ? 1.35 : 1;
+    return Math.max(1, Math.floor(calculateBaseValue(item) * NPC_BUYBACK_RATE * wasteBonus * hunterBonus));
 }
 
 function getMarketBounds(item) {
@@ -140,21 +186,68 @@ async function updateWalletMoney(config) {
     return nextMoney.toString();
 }
 
-async function getNpcShopCatalog() {
-    const result = await dbPool.query(`
-        SELECT id, code, display_name, category, tags, item_level, lifecycle_model,
-               base_durability, base_duration_hours, is_stackable, max_stack
-        FROM item_templates
-        WHERE code = ANY($1::TEXT[])
-        ORDER BY array_position($1::TEXT[], code);
-    `, [NPC_SHOP_CODES]);
+async function getPlayerLevel(playerId) {
+    if (!playerId) return 1;
+    const result = await dbPool.query(`SELECT player_level FROM players WHERE id = $1 LIMIT 1;`, [playerId]);
+    return Math.max(1, parseInt(result.rows[0]?.player_level) || 1);
+}
 
-    return result.rows.map(row => decorateMarketItem({
+function decorateNpcCatalogItem(row, vendor) {
+    return decorateMarketItem({
         ...row,
+        vendor_key: vendor.key,
+        vendor_name: vendor.name,
+        vendor_role: vendor.role,
         rarity: 'COMMON',
-        item_power: craftingService.calculateItemPower(row.item_level || 1, 'COMMON'),
+        item_power: craftingService.calculateItemPower(row.shop_item_level || row.item_level || 1, 'COMMON'),
+        item_level: row.shop_item_level || row.item_level || 1,
         quantity: 1,
-    }));
+    });
+}
+
+async function getNpcShopCatalog(playerId) {
+    const playerLevel = await getPlayerLevel(playerId);
+    const catalog = [];
+    const originPlaceholders = SHOP_ORIGINS.map((_, index) => `$${index + 3}`).join(', ');
+
+    for (const vendor of NPC_VENDOR_CONFIGS) {
+        const result = await dbPool.query(`
+            SELECT DISTINCT ON (code)
+                   id, code, display_name, category, tags, item_level, lifecycle_model,
+                   base_durability, base_duration_hours, is_stackable, max_stack,
+                   $1::INT AS shop_item_level
+            FROM item_templates
+            WHERE category = ANY($2::TEXT[])
+              AND origin = ANY(ARRAY[${originPlaceholders}])
+              AND item_level <= $1
+              AND (
+                  $${SHOP_ORIGINS.length + 3}::TEXT[] = ARRAY[]::TEXT[]
+                  OR EXISTS (
+                      SELECT 1
+                      FROM UNNEST(tags) AS item_tag
+                      WHERE item_tag = ANY($${SHOP_ORIGINS.length + 3}::TEXT[])
+                  )
+              )
+            ORDER BY code, item_level DESC
+            LIMIT $${SHOP_ORIGINS.length + 4};
+        `, [playerLevel, vendor.categories, ...SHOP_ORIGINS, vendor.tagHints || [], vendor.sellLimit]);
+        catalog.push(...result.rows.map(row => decorateNpcCatalogItem(row, vendor)));
+    }
+
+    return catalog.sort((a, b) => (
+        a.vendor_key.localeCompare(b.vendor_key) ||
+        String(a.category).localeCompare(String(b.category)) ||
+        String(a.display_name).localeCompare(String(b.display_name))
+    ));
+}
+
+async function isTemplateSoldByNpc(config) {
+    const playerLevel = await getPlayerLevel(config.playerId);
+    const catalog = await getNpcShopCatalog(config.playerId);
+    return catalog.some(item => (
+        item.code === String(config.templateCode).toUpperCase() &&
+        parseInt(item.item_level) <= playerLevel
+    ));
 }
 
 function buildCreatedItem(config) {
@@ -187,16 +280,20 @@ async function buyNpcShopItem(config) {
     try {
         await client.query('BEGIN');
 
+        const isSold = await isTemplateSoldByNpc(config);
+        if (!isSold) throw new Error('This item is not sold by the camp shop.');
+
         const templateResult = await client.query(`
             SELECT id, code, display_name, category, tags, item_level, lifecycle_model,
                    base_durability, base_duration_hours, is_stackable, max_stack
             FROM item_templates
-            WHERE code = $1 AND code = ANY($2::TEXT[])
+            WHERE code = $1
             FOR SHARE;
-        `, [String(config.templateCode).toUpperCase(), NPC_SHOP_CODES]);
+        `, [String(config.templateCode).toUpperCase()]);
         if (templateResult.rows.length === 0) throw new Error('This item is not sold by the camp shop.');
 
-        const template = templateResult.rows[0];
+        const playerLevel = await getPlayerLevel(config.playerId);
+        const template = { ...templateResult.rows[0], item_level: playerLevel };
         const priceMoney = getNpcBuyPrice({
             ...template,
             rarity: 'COMMON',
@@ -279,6 +376,7 @@ async function sellItemToNpc(config) {
         await client.query('BEGIN');
         const item = await getOwnedItemForSale({ client, playerId: config.playerId, itemId: config.itemId });
         const priceMoney = getNpcSellPrice(item);
+        const vendor = getNpcVendorForItem(item);
         const wallet = await lockWallet({ client, playerId: config.playerId });
 
         await client.query(`DELETE FROM items WHERE id = $1;`, [config.itemId]);
@@ -287,13 +385,73 @@ async function sellItemToNpc(config) {
             wallet,
             deltaMoney: priceMoney,
             transactionType: 'NPC_SHOP_SELL',
-            note: `Sold ${item.display_name} to Refugee Camp.`,
+            note: `Sold ${item.display_name} to ${vendor?.name || 'Refugee Camp'}.`,
         });
 
         await client.query('COMMIT');
         return {
             item_name: item.display_name,
             price_money: priceMoney,
+            vendor_name: vendor?.name || 'Refugee Camp',
+        };
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+
+async function recycleWasteItems(config) {
+    if (!config?.playerId) throw new Error('Missing trading parameters.');
+
+    const client = await dbPool.connect();
+    try {
+        await client.query('BEGIN');
+        const result = await client.query(`
+            SELECT i.*, it.code, it.display_name, it.category, it.tags, it.lifecycle_model,
+                   it.base_duration_hours, it.is_stackable, it.max_stack
+            FROM items i
+            JOIN item_templates it ON it.id = i.template_id
+            WHERE i.owner_player_id = $1
+              AND i.is_equipped = FALSE
+              AND (
+                  EXISTS (
+                      SELECT 1 FROM UNNEST(it.tags) AS item_tag
+                      WHERE item_tag = ANY($2::TEXT[])
+                  )
+                  OR (
+                      it.category IN ('MATERIAL', 'BUILDING')
+                      AND it.origin = 'Loot-only'
+                      AND NOT EXISTS (
+                          SELECT 1
+                          FROM recipe_ingredients ingredient
+                          WHERE ingredient.material_template_id = it.id
+                      )
+                  )
+              )
+            FOR UPDATE;
+        `, [config.playerId, WASTE_TAGS]);
+
+        const recyclableItems = result.rows.filter(item => !item.expires_at || !itemLifecycleService.isExpired(item.expires_at));
+        if (recyclableItems.length === 0) throw new Error('No recyclable waste or unused materials found.');
+
+        const totalMoney = recyclableItems.reduce((total, item) => total + getNpcSellPrice(item), 0);
+        const wallet = await lockWallet({ client, playerId: config.playerId });
+        await client.query(`DELETE FROM items WHERE id = ANY($1::UUID[]);`, [recyclableItems.map(item => item.id)]);
+        await updateWalletMoney({
+            client,
+            wallet,
+            deltaMoney: totalMoney,
+            transactionType: 'NPC_RECYCLE_SELL',
+            note: `Recycled ${recyclableItems.length} unused material item(s) at Salvage Yard.`,
+        });
+
+        await client.query('COMMIT');
+        return {
+            items_sold: recyclableItems.length,
+            price_money: totalMoney,
+            vendor_name: 'Salvage Yard',
         };
     } catch (error) {
         await client.query('ROLLBACK');
@@ -482,11 +640,12 @@ async function cancelBlackMarketListing(config) {
 }
 
 module.exports = {
-    NPC_SHOP_CODES,
+    NPC_VENDOR_CONFIGS,
     MARKET_TAX_RATE,
     getNpcShopCatalog,
     buyNpcShopItem,
     sellItemToNpc,
+    recycleWasteItems,
     getBlackMarketListings,
     listBlackMarketItem,
     buyBlackMarketListing,

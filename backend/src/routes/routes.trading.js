@@ -5,9 +5,18 @@ const tradingRouter = express.Router();
 const tradingService = require('../services/services.trading');
 const { verifyToken, verifyPlayerOwnership } = require('../middleware/middleware.auth');
 
+tradingRouter.get('/npc-shop/:playerId', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
+    try {
+        const catalog = await tradingService.getNpcShopCatalog(req.params.playerId);
+        return res.json({ success: true, data: catalog });
+    } catch (error) {
+        next(error);
+    }
+});
+
 tradingRouter.get('/npc-shop', verifyToken, async (req, res, next) => {
     try {
-        const catalog = await tradingService.getNpcShopCatalog();
+        const catalog = await tradingService.getNpcShopCatalog(req.query.playerId);
         return res.json({ success: true, data: catalog });
     } catch (error) {
         next(error);
@@ -37,6 +46,20 @@ tradingRouter.post('/npc-shop/sell', verifyToken, verifyPlayerOwnership, async (
     try {
         const result = await tradingService.sellItemToNpc({ playerId, itemId });
         return res.json({ success: true, message: 'Item sold successfully.', data: result });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
+    }
+});
+
+tradingRouter.post('/npc-shop/recycle', verifyToken, verifyPlayerOwnership, async (req, res, next) => {
+    const { playerId } = req.body;
+    if (!playerId) {
+        return res.status(400).json({ success: false, message: 'Missing parameters: playerId.' });
+    }
+
+    try {
+        const result = await tradingService.recycleWasteItems({ playerId });
+        return res.json({ success: true, message: 'Waste processed successfully.', data: result });
     } catch (error) {
         return res.status(400).json({ success: false, message: error.message });
     }
