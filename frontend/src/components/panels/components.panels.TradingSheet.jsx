@@ -11,6 +11,10 @@ import {
     buyBlackMarketListing,
     cancelBlackMarketListing,
 } from '../../api/api.game';
+import {
+    getItemIconPath,
+    getItemRarityIconFill,
+} from './components.panels.mainPanel.shared';
 
 function formatMoney(value) {
     return (parseInt(value) || 0).toLocaleString();
@@ -70,14 +74,35 @@ function canShopBuyItem(item, shopKey) {
     return rule.categories.includes(category) || hasAnyTag(item, rule.tags);
 }
 
+function TradingItemIcon({ item }) {
+    const iconPath = getItemIconPath(item);
+    const fillClass = getItemRarityIconFill(item);
+
+    return (
+        <span className="w-10 h-10 rounded bg-elevated flex items-center justify-center flex-shrink-0">
+            <span
+                className={`w-8 h-8 ${fillClass} block`}
+                style={{
+                    WebkitMask: `url("${iconPath}") center / contain no-repeat`,
+                    mask: `url("${iconPath}") center / contain no-repeat`,
+                }}
+                aria-hidden="true"
+            />
+        </span>
+    );
+}
+
 function TradingItemCard({ item, actionLabel, isBusy, onAction, children }) {
     return (
         <div className="card p-3">
             <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                    <p className="text-sm font-semibold truncate">{getItemTitle(item)}</p>
-                    <p className="text-[11px] text-textMuted mt-1 truncate">{getItemTags(item)}</p>
-                    {children}
+                <div className="flex items-start gap-3 min-w-0">
+                    <TradingItemIcon item={item} />
+                    <div className="min-w-0">
+                        <p className="text-sm font-semibold truncate">{getItemTitle(item)}</p>
+                        <p className="text-[11px] text-textMuted mt-1 truncate">{getItemTags(item)}</p>
+                        {children}
+                    </div>
                 </div>
                 {actionLabel && (
                     <button

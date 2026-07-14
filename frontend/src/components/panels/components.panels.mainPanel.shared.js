@@ -101,6 +101,104 @@ export const ITEM_RARITY_TEXT = {
     LEGENDARY: 'text-accent',
 };
 
+export const ITEM_RARITY_ICON_FILL = {
+    COMMON: 'bg-textSecondary',
+    UNCOMMON: 'bg-gradient-to-br from-success to-emerald-300',
+    RARE: 'bg-gradient-to-br from-cyan to-sky-300',
+    EPIC: 'bg-gradient-to-br from-purple-400 to-fuchsia-300',
+    LEGENDARY: 'bg-gradient-to-br from-accent to-yellow-200',
+};
+
+export const ITEM_ICON_RULES = [
+    { tokens: ['bandage'], icon: 'bandage' },
+    { tokens: ['medicine', 'medical', 'first aid', 'potion'], icon: 'medicine' },
+    { tokens: ['battery'], icon: 'battery' },
+    { tokens: ['electronics', 'electronic', 'circuit', 'wire'], icon: 'electronics' },
+    { tokens: ['plastic'], icon: 'plastic' },
+    { tokens: ['metal', 'ingot', 'steel', 'iron'], icon: 'metal' },
+    { tokens: ['scrap', 'recyclable'], icon: 'scrap' },
+    { tokens: ['wood', 'timber', 'branch', 'handle'], icon: 'wood' },
+    { tokens: ['ore', 'mineral', 'gemstone'], icon: 'ore' },
+    { tokens: ['stone', 'rock'], icon: 'stone' },
+    { tokens: ['cloth', 'fabric'], icon: 'cloth' },
+    { tokens: ['leather'], icon: 'leather' },
+    { tokens: ['bread'], icon: 'bread' },
+    { tokens: ['meat'], icon: 'meat' },
+    { tokens: ['fish'], icon: 'fish' },
+    { tokens: ['berry', 'berries', 'bramble'], icon: 'berry' },
+    { tokens: ['corn'], icon: 'corn' },
+    { tokens: ['wheat', 'grain'], icon: 'wheat' },
+    { tokens: ['mushroom'], icon: 'mushroom' },
+    { tokens: ['food', 'edible', 'canned'], icon: 'food' },
+    { tokens: ['water', 'salt'], icon: 'water' },
+    { tokens: ['chemical', 'acid'], icon: 'chemical' },
+    { tokens: ['fuel'], icon: 'fuel' },
+    { tokens: ['oil', 'fat'], icon: 'oil' },
+    { tokens: ['glass'], icon: 'glass' },
+    { tokens: ['pickaxe', 'pick'], icon: 'pickaxe' },
+    { tokens: ['hammer'], icon: 'hammer' },
+    { tokens: ['axe'], icon: 'axe' },
+    { tokens: ['tool'], icon: 'tool' },
+    { tokens: ['dagger', 'knife'], icon: 'dagger' },
+    { tokens: ['bow', 'harpoon'], icon: 'bow' },
+    { tokens: ['gun', 'rifle', 'shotgun'], icon: 'gun' },
+    { tokens: ['weapon', 'sword'], icon: 'weapon' },
+    { tokens: ['ammo', 'bullet'], icon: 'ammo' },
+    { tokens: ['helmet', 'head'], icon: 'helmet' },
+    { tokens: ['shield'], icon: 'shield' },
+    { tokens: ['backpack'], icon: 'backpack' },
+    { tokens: ['armor', 'gear', 'equipment', 'vest'], icon: 'armor' },
+    { tokens: ['building', 'structure'], icon: 'building' },
+    { tokens: ['container', 'crate', 'box'], icon: 'container' },
+    { tokens: ['rubbish', 'junk'], icon: 'rubbish' },
+    { tokens: ['bone'], icon: 'bone' },
+    { tokens: ['claw', 'fang'], icon: 'claw' },
+    { tokens: ['hide'], icon: 'hide' },
+    { tokens: ['zombie', 'tissue', 'rotten'], icon: 'zombie' },
+    { tokens: ['seed', 'plantable'], icon: 'seed' },
+];
+
+export const ITEM_CATEGORY_ICONS = {
+    RUBBISH: 'rubbish',
+    MATERIAL: 'scrap',
+    WEAPON: 'weapon',
+    AMMO: 'ammo',
+    EQUIPMENT: 'armor',
+    TOOL: 'tool',
+    BUILDING: 'building',
+    FOOD: 'food',
+    MEDICINE: 'medicine',
+};
+
+export function getItemText(itemOrCategory, tags = []) {
+    const item = typeof itemOrCategory === 'object' ? itemOrCategory : null;
+    const category = item ? item.category : itemOrCategory;
+    const itemTags = item ? item.tags : tags;
+
+    return [
+        item?.display_name,
+        category,
+        ...(Array.isArray(itemTags) ? itemTags : []),
+    ].join(' ').toLowerCase();
+}
+
+export function getItemIconKey(itemOrCategory, tags = []) {
+    const item = typeof itemOrCategory === 'object' ? itemOrCategory : null;
+    const category = item ? item.category : itemOrCategory;
+    const text = getItemText(itemOrCategory, tags);
+    const match = ITEM_ICON_RULES.find(entry => entry.tokens.some(token => text.includes(token)));
+
+    return match?.icon || ITEM_CATEGORY_ICONS[String(category || '').toUpperCase()] || 'generic';
+}
+
+export function getItemIconPath(itemOrCategory, tags = []) {
+    return `/assets/item-icons/${getItemIconKey(itemOrCategory, tags)}.svg`;
+}
+
+export function getItemRarityIconFill(item) {
+    return ITEM_RARITY_ICON_FILL[String(item?.rarity || 'COMMON').toUpperCase()] || ITEM_RARITY_ICON_FILL.COMMON;
+}
+
 export const GENERIC_INGREDIENT_TOKENS = new Set([
     'and', 'any', 'the', 'with', 'material', 'materials', 'processed',
     'recyclable', 'scrap', 'item', 'items', 'ingredient', 'ingredients',
@@ -133,12 +231,7 @@ export function itemMatchesIngredient(item, tagQuery) {
 export function getItemMark(itemOrCategory, tags = []) {
     const item = typeof itemOrCategory === 'object' ? itemOrCategory : null;
     const category = item ? item.category : itemOrCategory;
-    const itemTags = item ? item.tags : tags;
-    const text = [
-        item?.display_name,
-        category,
-        ...(Array.isArray(itemTags) ? itemTags : []),
-    ].join(' ').toLowerCase();
+    const text = getItemText(itemOrCategory, tags);
     const match = ITEM_TAG_MARKS.find(entry => entry.tokens.some(token => text.includes(token)));
     return match?.mark || ITEM_CATEGORY_MARKS[String(category || '').toUpperCase()] || 'IT';
 }

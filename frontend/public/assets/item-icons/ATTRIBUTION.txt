@@ -1,0 +1,5 @@
+Game item icons derived from Game-icons.net SVG icons.
+License: CC BY 3.0.
+Source: https://game-icons.net/ and https://github.com/game-icons/icons
+Authors include Lorc, Delapouite, DarkZaitzev, Carl Olsen, Caro Asercion, and contributors.
+Local files are used as monochrome masks with rarity gradients in Zystem.

@@ -2,6 +2,11 @@
 
 import { useState } from 'react';
 import { equipItem, useFoodItem } from '../../api/api.game';
+import {
+    getItemIconPath,
+    getItemMark,
+    getItemRarityIconFill,
+} from './components.panels.mainPanel.shared';
 
 const RARITY_COLORS = {
     COMMON:    { ring: 'ring-border', text: 'text-textMuted' },
@@ -9,37 +14,6 @@ const RARITY_COLORS = {
     RARE:      { ring: 'ring-cyan/40', text: 'text-cyan' },
     EPIC:      { ring: 'ring-purple-400/40', text: 'text-purple-400' },
     LEGENDARY: { ring: 'ring-accent/50', text: 'text-accent' },
-};
-
-const TAG_MARKS = [
-    { tokens: ['medicine', 'medical', 'first aid', 'bandage'], mark: '??' },
-    { tokens: ['electronics', 'electronic', 'circuit', 'battery', 'wire'], mark: '??' },
-    { tokens: ['plastic'], mark: '??' },
-    { tokens: ['metal', 'scrap metal', 'steel', 'iron'], mark: '??' },
-    { tokens: ['wood', 'timber', 'branch'], mark: '??' },
-    { tokens: ['stone', 'rock', 'ore', 'mineral'], mark: '??' },
-    { tokens: ['cloth', 'fabric', 'leather'], mark: '??' },
-    { tokens: ['food', 'meat', 'edible', 'canned', 'grain'], mark: '??' },
-    { tokens: ['water', 'salt'], mark: '??' },
-    { tokens: ['chemical', 'fuel', 'acid'], mark: '??' },
-    { tokens: ['glass'], mark: '??' },
-    { tokens: ['tool'], mark: '??' },
-    { tokens: ['weapon'], mark: '???' },
-    { tokens: ['armor', 'gear', 'equipment'], mark: '???' },
-    { tokens: ['building', 'container'], mark: '??' },
-    { tokens: ['rubbish', 'junk', 'recyclable'], mark: '??' },
-];
-
-const CATEGORY_MARKS = {
-    RUBBISH: '??',
-    MATERIAL: '??',
-    WEAPON: '???',
-    AMMO: 'AM',
-    EQUIPMENT: '???',
-    TOOL: '??',
-    BUILDING: '??',
-    FOOD: '??',
-    MEDICINE: 'MD',
 };
 
 const FILTERS = [
@@ -73,20 +47,26 @@ function formatExpiry(expiresAt) {
     });
 }
 
-function getItemMark(item) {
-    const text = [
-        item?.display_name,
-        item?.category,
-        ...(Array.isArray(item?.tags) ? item.tags : []),
-    ].join(' ').toLowerCase();
-    const match = TAG_MARKS.find(entry => entry.tokens.some(token => text.includes(token)));
-    return match?.mark || CATEGORY_MARKS[String(item?.category || '').toUpperCase()] || 'IT';
+function ItemIcon({ item, sizeClass = 'w-9 h-9' }) {
+    const iconPath = getItemIconPath(item);
+    const fillClass = getItemRarityIconFill(item);
+
+    return (
+        <span
+            className={`${sizeClass} ${fillClass} block`}
+            style={{
+                WebkitMask: `url("${iconPath}") center / contain no-repeat`,
+                mask: `url("${iconPath}") center / contain no-repeat`,
+            }}
+            aria-hidden="true"
+            title={getItemMark(item)}
+        />
+    );
 }
 
 function ItemTile({ item, onSelect }) {
     const rarity = (item.rarity || 'COMMON').toUpperCase();
     const style = RARITY_COLORS[rarity] || RARITY_COLORS.COMMON;
-    const mark = getItemMark(item);
 
     return (
         <button
@@ -99,7 +79,9 @@ function ItemTile({ item, onSelect }) {
             {item.is_expired && (
                 <span className="absolute top-1 left-1 text-[8px] font-bold text-danger">OLD</span>
             )}
-            <span className="w-9 h-9 rounded bg-elevated flex items-center justify-center text-xs font-bold text-textSecondary">{mark}</span>
+            <span className="w-10 h-10 rounded bg-elevated flex items-center justify-center">
+                <ItemIcon item={item} />
+            </span>
             <span className={`text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</span>
         </button>
     );
@@ -209,8 +191,8 @@ function ItemDetailSheet({ item, playerId, onClose, onEquipped }) {
                 <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="flex items-start gap-3 min-w-0">
                         <div className="flex-shrink-0 text-center">
-                            <div className="w-14 h-14 rounded-lg bg-elevated flex items-center justify-center text-xs font-bold text-accent">
-                                {getItemMark(item)}
+                            <div className="w-14 h-14 rounded-lg bg-elevated flex items-center justify-center">
+                                <ItemIcon item={item} sizeClass="w-11 h-11" />
                             </div>
                             <p className={`mt-1 text-[10px] font-mono font-semibold ${style.text}`}>Lv.{item.item_level || 1}</p>
                         </div>
