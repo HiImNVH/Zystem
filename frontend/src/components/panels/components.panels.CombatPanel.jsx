@@ -137,10 +137,10 @@ function calculateEnemyDamage(config) {
     };
 }
 
-function EnemyPortrait({ enemy }) {
+function EnemyPortrait({ enemy, className = 'w-32 h-32', bodyClassName = 'w-20 h-24' }) {
     return (
-        <div className="relative mx-auto w-32 h-32 rounded-full border border-border bg-gradient-to-b from-danger/25 to-surface flex items-center justify-center">
-            <div className="w-20 h-24 rounded-t-full rounded-b-3xl bg-elevated border border-danger/35 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.12)]">
+        <div className={`relative mx-auto rounded-full border border-border bg-gradient-to-b from-danger/25 to-surface flex items-center justify-center ${className}`}>
+            <div className={`rounded-t-full rounded-b-3xl bg-elevated border border-danger/35 flex flex-col items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.12)] ${bodyClassName}`}>
                 <div className="flex gap-5 mb-4">
                     <span className="w-2 h-2 rounded-full bg-danger" />
                     <span className="w-2 h-2 rounded-full bg-danger" />
@@ -238,19 +238,19 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
 
     return (
         <div className="h-full flex flex-col bg-base">
-            <section className="flex-shrink-0 border-b border-border bg-panel p-4">
+            <section className="flex-shrink-0 border-b border-border bg-panel p-3">
                 <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                         <p className="text-[10px] font-semibold text-textMuted">MONSTER</p>
-                        <h2 className="text-xl font-bold truncate">{enemy.name}</h2>
+                        <h2 className="text-lg font-bold truncate">{enemy.name}</h2>
                         <p className="text-xs text-textMuted mt-1">Lv.{enemy.level} | {enemy.rank}</p>
                     </div>
                     {onBack ? (
-                        <button type="button" onClick={onBack} className="btn-secondary px-3 py-2 text-xs">
+                        <button type="button" onClick={onBack} className="btn-secondary px-3 py-1.5 text-xs">
                             Back
                         </button>
                     ) : (
-                        <button type="button" onClick={resetEnemy} className="btn-secondary px-3 py-2 text-xs">
+                        <button type="button" onClick={resetEnemy} className="btn-secondary px-3 py-1.5 text-xs">
                             New Target
                         </button>
                     )}
@@ -266,16 +266,22 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
                 </div>
             </section>
 
-            <section className="min-h-0 flex-1 overflow-hidden p-3 space-y-3">
-                <EnemyPortrait enemy={enemy} />
-                <div className="card p-3">
-                    <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-semibold text-textMuted">BATTLE LOG</p>
-                        <p className="text-[10px] text-textMuted">Enemy hit {Math.round(enemyHitChance * 100)}%</p>
-                    </div>
-                    <div className="space-y-2">
-                        {logs.map((log, index) => (
-                            <p key={`${log}-${index}`} className={index === 0 ? 'text-sm text-textPrimary' : 'text-xs text-textMuted'}>
+            <section className="relative min-h-0 flex-1 overflow-hidden bg-gradient-to-b from-base via-surface/25 to-base">
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <EnemyPortrait
+                        enemy={enemy}
+                        className="w-56 h-56 opacity-80"
+                        bodyClassName="w-32 h-40"
+                    />
+                </div>
+                <div className="absolute left-3 right-3 top-3 flex items-center justify-between text-[10px] text-textMuted">
+                    <span className="font-semibold">BATTLE LOG</span>
+                    <span>Enemy hit {Math.round(enemyHitChance * 100)}%</span>
+                </div>
+                <div className="absolute left-3 right-3 bottom-3 rounded-lg border border-border/80 bg-base/55 px-3 py-2 backdrop-blur-sm">
+                    <div className="space-y-1">
+                        {logs.slice(0, 3).map((log, index) => (
+                            <p key={`${log}-${index}`} className={index === 0 ? 'text-sm text-textPrimary truncate' : 'text-xs text-textMuted truncate'}>
                                 {log}
                             </p>
                         ))}
@@ -283,7 +289,7 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
                 </div>
             </section>
 
-            <section className="flex-shrink-0 border-t border-border bg-panel p-3 space-y-3">
+            <section className="flex-shrink-0 border-t border-border bg-panel p-2.5 space-y-2.5">
                 <div>
                     <div className="flex items-center justify-between text-[10px] font-semibold text-textMuted mb-1">
                         <span>PLAYER HP</span>
@@ -295,7 +301,7 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
                 </div>
 
                 <div>
-                    <div className="relative h-5 overflow-hidden rounded border border-border bg-surface">
+                    <div className="relative h-4 overflow-hidden rounded border border-border bg-surface">
                         <div className="absolute inset-0 flex">
                             {HIT_ZONES.map(zone => (
                                 <div
@@ -319,7 +325,7 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
                             type="button"
                             onClick={() => handleAction(action)}
                             disabled={enemyHp <= 0 || playerHp <= 0 || combatStatus !== 'fighting' || isResolving}
-                            className="card card-hover p-3 text-left disabled:opacity-50"
+                            className="card card-hover p-2.5 text-left disabled:opacity-50"
                         >
                             <span className="text-[10px] font-bold text-accent block">{action.mark}</span>
                             <span className="text-sm font-semibold block mt-1">{action.label}</span>
