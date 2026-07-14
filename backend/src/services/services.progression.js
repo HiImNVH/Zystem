@@ -7,17 +7,18 @@ const characterRepository = require('../repositories/repositories.character');
 const playerEventsService = require('./services.playerEvents');
 const { autoUnlockFreeSkills } = require('../repositories/repositories.skillsSeed');
 
-// Cong thuc EXP can de len cap theo Balance Sheet: 0.7L^3 + 20L^2 + 100L + 50
+const MAX_LEVEL = 40;
+
 function calculateExpRequired(targetLevel) {
     if (!targetLevel || targetLevel < 1) return 0;
-    const L = targetLevel;
-    return Math.floor(0.7 * Math.pow(L, 3) + 20 * Math.pow(L, 2) + 100 * L + 50);
+    const level = targetLevel;
+    return Math.floor((0.7 * (level ** 3)) + (20 * (level ** 2)) + (50 * level) + 100);
 }
 
 function calculateSkillExpRequired(targetLevel) {
     if (!targetLevel || targetLevel < 1) return 0;
-    const L = targetLevel;
-    return Math.floor(15 * Math.pow(L, 2) + 50 * L + 100);
+    const level = targetLevel;
+    return Math.floor((0.5 * (level ** 2)) + (50 * level) + 100);
 }
 
 // Tinh tong EXP tich luy can de dat den mot cap nhat dinh
@@ -32,7 +33,7 @@ function calculateTotalExpForLevel(targetLevel) {
 // Tinh cap do hien tai dua tren tong EXP tich luy
 function calculateLevelFromExp(totalExp) {
     let level = 1;
-    while (level < 80) {
+    while (level < MAX_LEVEL) {
         const expNeeded = calculateExpRequired(level);
         if (totalExp < expNeeded) break;
         totalExp -= expNeeded;
@@ -66,7 +67,7 @@ async function processPlayerExpGain(playerId, expAmount) {
     if (!character) return null;
 
     const currentLevel = character.player_level;
-    const maxLevel = 80; // Cap Alpha max la 60, nhung DB cho phep 80
+    const maxLevel = MAX_LEVEL;
 
     if (currentLevel >= maxLevel) {
         console.log(`[INFO] Nhan vat ${playerId} da dat cap toi da ${maxLevel}. Khong tiep nhan EXP.`);

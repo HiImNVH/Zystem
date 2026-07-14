@@ -350,7 +350,7 @@ itemsRouter.post('/craft', verifyToken, async (req, res, next) => {
         }
 
         const recipe = recipeResult.rows[0];
-        let craftJobLevel = 80;
+        let craftJobLevel = 40;
         if (recipe.required_job_code) {
             const jobResult = await client.query(`
                 SELECT pj.job_level

@@ -114,7 +114,7 @@ async function initializeDatabaseSchema() {
                 id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                 account_id UUID REFERENCES accounts(id) ON DELETE CASCADE,
                 character_name VARCHAR(50) NOT NULL UNIQUE,
-                player_level SMALLINT DEFAULT 1 CHECK (player_level BETWEEN 1 AND 80),
+                player_level SMALLINT DEFAULT 1 CHECK (player_level BETWEEN 1 AND 40),
                 current_exp BIGINT DEFAULT 0,
                 skill_points INT DEFAULT 0,
                 base_str NUMERIC(8,2) DEFAULT 10,
@@ -174,6 +174,12 @@ async function initializeDatabaseSchema() {
                 settings JSONB NOT NULL DEFAULT '{}'::JSONB,
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
+        `);
+        await client.query(`ALTER TABLE players DROP CONSTRAINT IF EXISTS players_player_level_check;`);
+        await client.query(`
+            ALTER TABLE players
+            ADD CONSTRAINT players_player_level_check
+            CHECK (player_level BETWEEN 1 AND 40) NOT VALID;
         `);
 
         // ============================================================
@@ -421,6 +427,8 @@ async function initializeDatabaseSchema() {
                 display_name VARCHAR(100) NOT NULL,
                 category VARCHAR(30) NOT NULL,
                 tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+                icon_url TEXT,
+                level_rule VARCHAR(40),
                 description TEXT,
                 note TEXT,
                 origin VARCHAR(30) DEFAULT 'Gatherable',
@@ -472,6 +480,8 @@ async function initializeDatabaseSchema() {
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
+        await client.query(`ALTER TABLE item_templates ADD COLUMN IF NOT EXISTS icon_url TEXT;`);
+        await client.query(`ALTER TABLE item_templates ADD COLUMN IF NOT EXISTS level_rule VARCHAR(40);`);
         await client.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS item_level SMALLINT;`);
         await client.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;`);
         await client.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS curel_buffs JSONB NOT NULL DEFAULT '[]'::JSONB;`);

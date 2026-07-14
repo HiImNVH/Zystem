@@ -6477,11 +6477,9 @@ async function seedCraftingRecipes() {
 async function seedDesignDatabase() {
     console.log('[INFO] Dang nap database thiet ke tu Zystem_ Data_design.xlsx...');
     try {
-        await seedLevelingRules();
         await seedCurelRules();
         await seedItemTypeRules();
         await seedStatDefinitions();
-        await seedCraftingRecipes();
         console.log('[SUCCESS] Da nap database thiet ke hoan chinh.');
         return true;
     } catch (error) {

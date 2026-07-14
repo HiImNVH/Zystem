@@ -7,9 +7,11 @@ const http = require('http');
 
 const { initializeDatabaseSchema } = require('./repositories/repositories.database');
 const { seedJobsSeedTable } = require('./repositories/repositories.jobsSeed');
-const { seedItemTemplatesAndRecipes } = require('./repositories/repositories.itemsSeed');
 const { seedSkillTree } = require('./repositories/repositories.skillsSeed');
 const { seedDesignDatabase } = require('./repositories/repositories.designSeed');
+const { seedWorkbookCatalog } = require('./repositories/repositories.workbookCatalogSeed');
+const { seedWorkbookProgression } = require('./repositories/repositories.workbookProgressionSeed');
+const { seedWorkbookWorld } = require('./repositories/repositories.workbookWorldSeed');
 const { globalErrorHandler, notFoundHandler } = require('./middleware/middleware.errorHandler');
 const { globalLimiter } = require('./middleware/middleware.rateLimit');
 const { initializeSocketServer } = require('./sockets/sockets.io');
@@ -119,8 +121,10 @@ async function bootUpWebApplication() {
     }
 
     await seedJobsSeedTable();
-    await seedItemTemplatesAndRecipes();
     await seedDesignDatabase();
+    await seedWorkbookCatalog();
+    await seedWorkbookProgression();
+    await seedWorkbookWorld();
     await seedSkillTree();
 
     httpServer.listen(serverPort, () => {

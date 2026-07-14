@@ -57,9 +57,12 @@ function runPureLogicChecks(modulesByPath) {
     const curelPower = modulesByPath['src/services/services.curelPower.js'];
     const itemLifecycle = modulesByPath['src/services/services.itemLifecycle.js'];
     const playerEvents = modulesByPath['src/services/services.playerEvents.js'];
+    const poiRotation = modulesByPath['src/services/services.poiRotation.js'];
     const designSeed = modulesByPath['src/repositories/repositories.designSeed.js'];
-    const itemsSeed = modulesByPath['src/repositories/repositories.itemsSeed.js'];
     const skillsSeed = modulesByPath['src/repositories/repositories.skillsSeed.js'];
+    const workbookItems = modulesByPath['src/repositories/repositories.workbookItems.js'];
+    const workbookRecipes = modulesByPath['src/repositories/repositories.workbookRecipes.js'];
+    const workbookWorld = modulesByPath['src/repositories/repositories.workbookWorld.js'];
 
     assertExportedFunction(combat, 'calculateMaxHp');
     assert.equal(combat.calculateMaxHp({ vit: 10, str: 4, playerLevel: 2 }), 162);
@@ -101,6 +104,11 @@ function runPureLogicChecks(modulesByPath) {
         category: 'MATERIAL',
         tags: ['Wood'],
     }, 'Processed material, Charcoal'), false);
+    assert.equal(crafting.itemMatchesIngredientQuery({
+        display_name: 'Metal Scrap',
+        category: 'MISC',
+        tags: ['Material', 'Metal', 'Scrap'],
+    }, 'ITEM:Metal Ore'), false);
 
     assertExportedFunction(itemStats, 'calculateBaseStatValue');
     assert.equal(itemStats.calculateBaseStatValue(21), 63);
@@ -119,7 +127,8 @@ function runPureLogicChecks(modulesByPath) {
 
     assertExportedFunction(progression, 'calculateExpRequired');
     assert.equal(progression.calculateExpRequired(1), 170);
-    assert.equal(progression.calculateSkillExpRequired(1), 165);
+    assert.equal(progression.calculateExpRequired(2), 285);
+    assert.equal(progression.calculateSkillExpRequired(1), 150);
     assert.equal(progression.calculateLevelFromExp(0), 1);
 
     assertExportedFunction(character, 'calculateStartingJobBonus');
@@ -172,15 +181,36 @@ function runPureLogicChecks(modulesByPath) {
     assertExportedFunction(playerEvents, 'getPlayerEvents');
     assertExportedFunction(playerEvents, 'markPlayerEventsRead');
 
-    assert.equal(itemsSeed.ITEM_TEMPLATES.length, 140);
-    assert.deepEqual(
-        itemsSeed.normalizeItemTags(['FOOD', 'CONSUMABLES', 'FoodProcessed', 'FoodRaw (Fruit)'], 'FOOD'),
-        ['Food', 'Processed', 'Raw', 'Fruit']
+    assert.equal(workbookItems.WORKBOOK_ITEM_TEMPLATES.length, 124);
+    assert.equal(workbookRecipes.WORKBOOK_CRAFTING_RECIPES.length, 60);
+    assert.equal(workbookWorld.WORKBOOK_WORLD_DATA.zones.length, 11);
+    assert.equal(workbookWorld.WORKBOOK_WORLD_DATA.pois.length, 52);
+    assert.equal(workbookWorld.WORKBOOK_WORLD_DATA.rooms.length, 90);
+    const workbookItemNames = new Set(workbookItems.WORKBOOK_ITEM_TEMPLATES.map(item => item.name));
+    assert.equal(workbookItemNames.size, workbookItems.WORKBOOK_ITEM_TEMPLATES.length);
+    assert.equal(
+        new Set(workbookRecipes.WORKBOOK_CRAFTING_RECIPES.map(recipe => recipe.code)).size,
+        workbookRecipes.WORKBOOK_CRAFTING_RECIPES.length
     );
-    assert.deepEqual(
-        itemsSeed.normalizeItemTags(['MATERIAL', 'MATERIALS', 'Metal (Raw)', 'Metal', 'Raw'], 'MATERIAL'),
-        ['Material', 'Metal', 'Raw']
-    );
+    for (const recipe of workbookRecipes.WORKBOOK_CRAFTING_RECIPES) {
+        assert.ok(workbookItemNames.has(recipe.outputItem), `Thieu output item ${recipe.outputItem}`);
+        assert.ok(recipe.inputs.every(input => workbookItemNames.has(input.tagQuery.slice(5))));
+    }
+    for (const zone of workbookWorld.WORKBOOK_WORLD_DATA.zones.filter(zone => zone.tags.length)) {
+        const eligiblePois = workbookWorld.WORKBOOK_WORLD_DATA.pois.filter(poi => (
+            poi.compatibleZoneTags.some(tag => zone.tags.includes(tag))
+        ));
+        assert.ok(eligiblePois.length >= 5, `${zone.code} phai co it nhat 5 POI du dieu kien`);
+    }
+    const poiPool = Array.from({ length: 8 }, (_, index) => ({ code: `POI_${index}` }));
+    const rotation = poiRotation.selectRotatingPois({
+        zoneCode: 'ZONE_TEST',
+        pois: poiPool,
+        currentTime: new Date('2026-01-01T00:01:00Z'),
+    });
+    assert.equal(rotation.pois.length, 5);
+    assert.equal(rotation.rotation.interval_minutes, 15);
+    assert.equal(rotation.rotation.eligible_count, 8);
     assert.equal(itemStats.getCurelBuffLineCount('COMMON'), 0);
     assert.equal(itemStats.getCurelBuffLineCount('UNCOMMON'), 1);
     assert.equal(itemStats.getCurelBuffLineCount('RARE'), 2);
@@ -190,7 +220,6 @@ function runPureLogicChecks(modulesByPath) {
     assert.equal(skillsSeed.ALL_SKILLS.length, 114);
     assert.ok(skillsSeed.ALL_SKILLS.every(skill => skill.desc && skill.effectType), 'Moi skill phai co mo ta va effect ro rang');
     assert.equal(skillsSeed.ALL_SKILLS.reduce((total, skill) => total + skill.sp, 0), 284);
-    assert.equal(designSeed.CRAFTING_RECIPES.length, 161);
     assert.equal(designSeed.LEVELING_RULES.length, 40);
     assert.equal(designSeed.CUREL_RARITY_WEIGHTS.length, 41);
 }

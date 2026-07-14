@@ -4,6 +4,7 @@ const { dbPool } = require('../repositories/repositories.database');
 const characterRepository = require('../repositories/repositories.character');
 const walletRepository = require('../repositories/repositories.wallet');
 const characterService = require('./services.character');
+const poiRotationService = require('./services.poiRotation');
 const {
     ensurePlayerDefaultJobs,
     autoUnlockFreeSkills,
@@ -53,7 +54,8 @@ async function getZoneLayer() {
         SELECT z.id, z.code, z.display_name, z.zone_type, z.biome, z.zone_tags,
                z.level_gap, z.world_stage, z.map_role, z.min_player_lv,
                z.base_duration_s, z.infection_risk, z.radiation_risk,
-               COUNT(wp.id)::INT AS poi_count
+               COUNT(wp.id)::INT AS poi_count,
+               LEAST(COUNT(wp.id), 5)::INT AS visible_poi_count
         FROM zones z
         LEFT JOIN world_pois wp ON wp.zone_id = z.id
         WHERE z.is_active = TRUE
@@ -106,10 +108,16 @@ async function getPoiLayerByZone(zoneCode) {
         ORDER BY wp.display_name ASC;
     `, [zone.id]);
 
+    const rotationResult = poiRotationService.selectRotatingPois({
+        zoneCode: zone.code,
+        pois: poisResult.rows,
+    });
+
     return {
         layer: 'POI',
         zone,
-        pois: poisResult.rows,
+        pois: rotationResult.pois,
+        poi_rotation: rotationResult.rotation,
     };
 }
 

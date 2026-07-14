@@ -9,6 +9,7 @@ const lootService = require('../services/services.loot');
 const progressionService = require('../services/services.progression');
 const playerEventsService = require('../services/services.playerEvents');
 const walletRepository = require('../repositories/repositories.wallet');
+const poiRotationService = require('../services/services.poiRotation');
 
 const ACTION_RESOURCE_RULES = {
     EXPLORE: { energyPerUnit: 8 },
@@ -66,21 +67,24 @@ function buildFallbackActivityTag(config) {
     };
 }
 
-function resolvePoiActivityTags() {
+function resolvePoiActivityTags(gameplayTags) {
+    const tags = Array.isArray(gameplayTags) ? gameplayTags : [];
+    const findTag = tagTypes => tags.find(tag => tagTypes.includes(tag.tag_type));
+
     return {
-        enemy: buildFallbackActivityTag({
+        enemy: findTag(['BATTLE', 'SKIRMISH']) || buildFallbackActivityTag({
             tagType: 'BATTLE',
             actionType: 'BATTLE',
             lootFocus: ['gear', 'salvage'],
             monsterProfile: null,
         }),
-        gather: buildFallbackActivityTag({
+        gather: findTag(['EXPLORATION']) || buildFallbackActivityTag({
             tagType: 'EXPLORATION',
             actionType: 'EXPLORE',
             lootFocus: ['salvage', 'food'],
             monsterProfile: null,
         }),
-        sweep: buildFallbackActivityTag({
+        sweep: findTag(['SWEEP', 'DUNGEON']) || buildFallbackActivityTag({
             tagType: 'SWEEP',
             actionType: 'SWEEP',
             lootFocus: ['salvage', 'gear'],
@@ -687,10 +691,18 @@ zonesRouter.get('/', async (req, res, next) => {
 
         return res.json({
             success: true,
-            data: zones.map(zone => ({
-                ...zone,
-                pois: poisByZone[zone.id] || [],
-            }))
+            data: zones.map(zone => {
+                const rotationResult = poiRotationService.selectRotatingPois({
+                    zoneCode: zone.code,
+                    pois: poisByZone[zone.id] || [],
+                });
+
+                return {
+                    ...zone,
+                    pois: rotationResult.pois,
+                    poi_rotation: rotationResult.rotation,
+                };
+            })
         });
     } catch (error) {
         next(error);
@@ -751,7 +763,7 @@ zonesRouter.get('/pois/:poiId/activities', async (req, res, next) => {
             radiation_risk: poi.radiation_risk,
         };
 
-        const activityTags = resolvePoiActivityTags();
+        const activityTags = resolvePoiActivityTags(poi.gameplay_tags);
         const baseDuration = Math.max(30, parseInt(poi.base_duration_s || zone.base_duration_s) || 60);
         const enemyMonsters = await findMonstersByProfile(activityTags.enemy.monster_profile);
         const gatherRooms = await findPoiRooms(poi.id);
@@ -1047,7 +1059,20 @@ zonesRouter.get('/:code', async (req, res, next) => {
             ORDER BY wp.display_name ASC;
         `, [result.rows[0].id]);
 
-        return res.json({ success: true, data: { ...result.rows[0], pois: poiResult.rows } });
+        const zone = result.rows[0];
+        const rotationResult = poiRotationService.selectRotatingPois({
+            zoneCode: zone.code,
+            pois: poiResult.rows,
+        });
+
+        return res.json({
+            success: true,
+            data: {
+                ...zone,
+                pois: rotationResult.pois,
+                poi_rotation: rotationResult.rotation,
+            },
+        });
     } catch (error) {
         next(error);
     }

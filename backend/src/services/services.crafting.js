@@ -91,6 +91,12 @@ function getIngredientQueryTokens(tagQuery) {
 }
 
 function itemMatchesIngredientQuery(item, tagQuery) {
+    const normalizedQuery = String(tagQuery || '').trim();
+    if (normalizedQuery.toLowerCase().startsWith('item:')) {
+        const expectedItemName = normalizeSearchText(normalizedQuery.slice(5));
+        return normalizeSearchText(item?.display_name) === expectedItemName;
+    }
+
     const tokens = getIngredientQueryTokens(tagQuery);
     if (tokens.length === 0) return true;
 
@@ -115,7 +121,7 @@ function calculateOutputItemLevel(craftJobLevel, materialItemLevel) {
 }
 
 function clampItemLevel(itemLevel) {
-    return Math.min(Math.max(Math.floor(Number(itemLevel) || 1), 1), 80);
+    return Math.min(Math.max(Math.floor(Number(itemLevel) || 1), 1), 40);
 }
 
 function parseMainMaterialSlots(mainMaterialSlots) {
