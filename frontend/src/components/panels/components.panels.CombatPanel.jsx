@@ -169,19 +169,37 @@ function getActionTiming(action, weaponProfile) {
     return { hitCount, travelMs };
 }
 
+function createMarkerOffsets(hitCount) {
+    if (hitCount <= 1) return [80 + Math.random() * 220];
+
+    const windowMs = 360 + hitCount * 260 + Math.random() * 560;
+    for (let attempt = 0; attempt < 24; attempt += 1) {
+        const offsets = Array.from({ length: hitCount }, () => 70 + Math.random() * windowMs)
+            .sort((a, b) => a - b);
+        const hasSafeGap = offsets.every((offset, index) => (
+            index === 0 || offset - offsets[index - 1] >= SAFE_MARKER_GAP_MIN_MS
+        ));
+        if (hasSafeGap) return offsets;
+    }
+
+    let nextOffset = 80 + Math.random() * 140;
+    return Array.from({ length: hitCount }, () => {
+        const offset = nextOffset;
+        nextOffset += SAFE_MARKER_GAP_MIN_MS + Math.random() * SAFE_MARKER_GAP_RANGE_MS;
+        return offset;
+    });
+}
+
 function createRhythmRun(action, weaponProfile) {
     const timing = getActionTiming(action, weaponProfile);
     const travelMs = clamp(timing.travelMs + (Math.random() * 420 - 190), 900, 1650);
-    let nextOffset = 80 + Math.random() * 180;
-    const markers = Array.from({ length: timing.hitCount }, (_, index) => {
-        const marker = {
-            id: `${action.code}-${index}-${Math.random().toString(36).slice(2)}`,
-            startOffset: Math.round(nextOffset),
-        };
-        nextOffset += SAFE_MARKER_GAP_MIN_MS + Math.random() * SAFE_MARKER_GAP_RANGE_MS;
-        return marker;
-    });
-    const totalMs = Math.max(...markers.map(marker => marker.startOffset)) + travelMs + 80;
+    const offsets = createMarkerOffsets(timing.hitCount);
+    const markers = offsets.map((offset, index) => ({
+        id: `${action.code}-${index}-${Math.random().toString(36).slice(2)}`,
+        startOffset: Math.round(offset),
+        travelMs: clamp(travelMs + (Math.random() * 360 - 180), 850, 1700),
+    }));
+    const totalMs = Math.max(...markers.map(marker => marker.startOffset + marker.travelMs)) + 80;
 
     return {
         action,
@@ -345,7 +363,7 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
 
         const missedMarkers = rhythmRun.markers
             .filter(marker => !rhythmRun.results.some(result => result.id === marker.id))
-            .filter(marker => clockMs - rhythmRun.startedAt - marker.startOffset > rhythmRun.travelMs)
+            .filter(marker => clockMs - rhythmRun.startedAt - marker.startOffset > (marker.travelMs || rhythmRun.travelMs))
             .map(marker => ({
                 id: marker.id,
                 score: 100,
@@ -379,7 +397,7 @@ export default function CombatPanel({ character, inventory, combatRequest, isRes
 
     function getMarkerProgress(marker) {
         if (!rhythmRun) return -1;
-        return ((clockMs - rhythmRun.startedAt - marker.startOffset) / rhythmRun.travelMs) * 100;
+        return ((clockMs - rhythmRun.startedAt - marker.startOffset) / (marker.travelMs || rhythmRun.travelMs)) * 100;
     }
 
     function handleRhythmTap() {
