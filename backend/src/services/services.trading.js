@@ -161,14 +161,29 @@ function decorateMarketItem(row) {
 }
 
 async function lockWallet(config) {
-    const result = await config.client.query(`
+    let result = await config.client.query(`
         SELECT *
         FROM wallets
         WHERE player_id = $1
         FOR UPDATE;
     `, [config.playerId]);
 
-    if (result.rows.length === 0) throw new Error('Wallet not found.');
+    if (result.rows.length === 0) {
+        await config.client.query(`
+            INSERT INTO wallets (player_id, money, silver_coin, gold_coin, copper, silver, gold)
+            VALUES ($1, 0, 0, 0, 0, 0, 0)
+            ON CONFLICT (player_id) DO NOTHING;
+        `, [config.playerId]);
+
+        result = await config.client.query(`
+            SELECT *
+            FROM wallets
+            WHERE player_id = $1
+            FOR UPDATE;
+        `, [config.playerId]);
+    }
+
+    if (result.rows.length === 0) throw new Error('Wallet could not be initialized.');
     return result.rows[0];
 }
 
