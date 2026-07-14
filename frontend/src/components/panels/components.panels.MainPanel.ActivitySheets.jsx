@@ -1,6 +1,7 @@
 // frontend/src/components/panels/components.panels.MainPanel.ActivitySheets.jsx
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import CombatPanel from './components.panels.CombatPanel';
 import {
     canSpendEnergy,
     formatDropTable,
@@ -59,11 +60,14 @@ function ActionResultDetails({ result }) {
 
 
 
-export function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, onOpenCombat, executingId }) {
+export function ActivityListSheet({ activityType, activityData, character, inventory, isLoading, error, onClose, onExecute, executingId }) {
+    const [activeEnemy, setActiveEnemy] = useState(null);
+    const [combatResult, setCombatResult] = useState(null);
+    const [cooldownEndsAt, setCooldownEndsAt] = useState(0);
+    const [nowMs, setNowMs] = useState(Date.now());
     const [sheetError, setSheetError] = useState('');
     const [resultMessage, setResultMessage] = useState('');
     const [resultData, setResultData] = useState(null);
-    if (!activityType) return null;
 
     const titleMap = {
         enemy: 'Find enemies',
@@ -78,6 +82,15 @@ export function ActivityListSheet({ activityType, activityData, character, inven
             ? (activityData?.scavengeables || [])
             : (activityType === 'gather' ? (activityData?.gatherables || []) : []));
     const sweep = activityData?.sweep || activityData?.dungeon;
+    const cooldownSeconds = Math.max(0, Math.ceil((cooldownEndsAt - nowMs) / 1000));
+
+    useEffect(() => {
+        if (!cooldownEndsAt) return undefined;
+        const timerId = setInterval(() => setNowMs(Date.now()), 250);
+        return () => clearInterval(timerId);
+    }, [cooldownEndsAt]);
+
+    if (!activityType) return null;
 
     async function startActivity(options) {
         const { item, mode } = options;
@@ -88,10 +101,11 @@ export function ActivityListSheet({ activityType, activityData, character, inven
         }
 
         setSheetError('');
+        setCombatResult(null);
         setResultMessage('');
         setResultData(null);
         if (activityType === 'enemy') {
-            onOpenCombat?.(item);
+            setActiveEnemy(item);
             return;
         }
 
@@ -101,6 +115,25 @@ export function ActivityListSheet({ activityType, activityData, character, inven
             setResultMessage(`${verb} ${item.name}.`);
             setResultData(result.data);
         }
+    }
+
+    async function resolveVictory(enemy) {
+        const result = await onExecute?.(enemy);
+        if (result?.success === false) {
+            setCombatResult({ type: 'error', message: result.error || 'Could not claim combat reward.' });
+            setActiveEnemy(null);
+            return;
+        }
+
+        setCombatResult({ type: 'victory', result: result?.data });
+        setActiveEnemy(null);
+    }
+
+    function resolveDefeat() {
+        setCooldownEndsAt(Date.now() + 5000);
+        setNowMs(Date.now());
+        setCombatResult({ type: 'defeat' });
+        setActiveEnemy(null);
     }
 
     return (
@@ -118,6 +151,27 @@ export function ActivityListSheet({ activityType, activityData, character, inven
 
                 {isLoading && <p className="text-sm text-textMuted py-6 text-center">Loading...</p>}
                 {(error || sheetError) && <p className="text-sm text-danger mb-3">{error || sheetError}</p>}
+                {combatResult?.type === 'victory' && (
+                    <div className="mb-3 rounded-lg border border-success/40 bg-success/10 px-3 py-2">
+                        <p className="text-sm font-semibold text-success">Victory</p>
+                        <p className="text-xs text-textSecondary mt-1">Enemy defeated. Rewards claimed.</p>
+                        <ActionResultDetails result={combatResult.result} />
+                    </div>
+                )}
+                {combatResult?.type === 'defeat' && (
+                    <div className="mb-3 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2">
+                        <p className="text-sm font-semibold text-danger">Defeat</p>
+                        <p className="text-xs text-textSecondary mt-1">
+                            Recovery cooldown: {cooldownSeconds > 0 ? `${cooldownSeconds}s` : 'ready'}.
+                        </p>
+                    </div>
+                )}
+                {combatResult?.type === 'error' && (
+                    <div className="mb-3 rounded-lg border border-danger/40 bg-danger/10 px-3 py-2">
+                        <p className="text-sm font-semibold text-danger">Combat result error</p>
+                        <p className="text-xs text-textSecondary mt-1">{combatResult.message}</p>
+                    </div>
+                )}
                 {resultMessage && (
                     <div className="mb-3 rounded-lg border border-success/40 bg-success/10 px-3 py-2">
                         <p className="text-sm font-semibold text-success">Search result</p>
@@ -125,7 +179,23 @@ export function ActivityListSheet({ activityType, activityData, character, inven
                         <ActionResultDetails result={resultData} />
                     </div>
                 )}
-                {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && (
+                {!isLoading && activityType === 'enemy' && activeEnemy && (
+                    <CombatPanel
+                        character={character}
+                        inventory={inventory}
+                        combatRequest={{
+                            enemy: activeEnemy,
+                            zone: activityData?.zone,
+                            requestId: activeEnemy.id,
+                        }}
+                        isResolving={Boolean(executingId)}
+                        onBack={() => setActiveEnemy(null)}
+                        onVictory={() => resolveVictory(activeEnemy)}
+                        onDefeat={resolveDefeat}
+                    />
+                )}
+
+                {!isLoading && activityType !== 'sweep' && activityType !== 'dungeon' && !activeEnemy && (
                     <div className="space-y-2">
                         {list.map(item => (
                             <div key={item.id} className="card p-3 flex items-center gap-3">
@@ -157,10 +227,14 @@ export function ActivityListSheet({ activityType, activityData, character, inven
                                 <button
                                     type="button"
                                     onClick={() => startActivity({ item })}
-                                    disabled={Boolean(executingId)}
+                                    disabled={Boolean(executingId) || (activityType === 'enemy' && cooldownSeconds > 0)}
                                     className="btn-primary px-3 py-2 text-xs flex-shrink-0"
                                 >
-                                    {executingId === item.id ? 'Working...' : (activityType === 'enemy' ? 'Engage' : (activityType === 'gather' ? 'Gather' : 'Search'))}
+                                    {executingId === item.id
+                                        ? 'Working...'
+                                        : (activityType === 'enemy' && cooldownSeconds > 0
+                                            ? `${cooldownSeconds}s`
+                                            : (activityType === 'enemy' ? 'Engage' : (activityType === 'gather' ? 'Gather' : 'Search')))}
                                 </button>
                             </div>
                         ))}
@@ -254,4 +328,3 @@ export function PoiActionSheet({ poi, onClose, onOpenActivity }) {
         </div>
     );
 }
-

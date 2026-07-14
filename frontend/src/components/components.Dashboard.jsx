@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import BottomNav from './layout/components.layout.BottomNav';
 import MainPanel from './panels/components.panels.MainPanel';
-import CombatPanel from './panels/components.panels.CombatPanel';
 import InventoryPanel from './panels/components.panels.InventoryPanel';
 import ChatPanel from './panels/components.panels.ChatPanel';
 import ProfilePanel from './panels/components.panels.ProfilePanel';
@@ -15,37 +14,23 @@ import {
 import { getMyCharacter } from '../api/api.character';
 import { connectSocket } from '../api/api.socket';
 
-const TAB = { MAIN: 'MAIN', COMBAT: 'COMBAT', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
+const TAB = { MAIN: 'MAIN', INVENTORY: 'INVENTORY', QUEST: 'QUEST', CHAT: 'CHAT', PROFILE: 'PROFILE' };
 const SIDE_TABS = [
     { key: TAB.INVENTORY, label: 'Inventory' },
-    { key: TAB.COMBAT, label: 'Combat' },
     { key: TAB.CHAT, label: 'Chat' },
 ];
 
 // Ham thuan render panel theo tab, tach ra module-level de khong bi tao lai
 // moi lan Dashboard re-render (tranh unmount/remount lam mat state cua panel con)
 function renderPanel(tab, ctx) {
-    const { playerId, character, zones, inventory, jobs, stats, combatRequest, loadAll, onLogout, onOpenCombat } = ctx;
+    const { playerId, character, zones, inventory, jobs, stats, loadAll, onLogout } = ctx;
 
     if (tab === TAB.MAIN) {
-        return (
-            <MainPanel
-                playerId={playerId}
-                character={character}
-                zones={zones}
-                inventory={inventory}
-                onUpdate={loadAll}
-                onOpenCombat={onOpenCombat}
-            />
-        );
+        return <MainPanel playerId={playerId} character={character} zones={zones} inventory={inventory} onUpdate={loadAll} />;
     }
 
     if (tab === TAB.INVENTORY) {
         return <InventoryPanel items={inventory} playerId={playerId} onUpdate={loadAll} />;
-    }
-
-    if (tab === TAB.COMBAT) {
-        return <CombatPanel character={character} inventory={inventory} combatRequest={combatRequest} />;
     }
 
     if (tab === TAB.QUEST) {
@@ -121,15 +106,8 @@ export default function Dashboard({ initialCharacter, onLogout }) {
     const [jobs, setJobs]           = useState([]);
     const [leftTab, setLeftTab]     = useState(TAB.INVENTORY);
     const [centerTab, setCenterTab] = useState(TAB.MAIN);
-    const [combatRequest, setCombatRequest] = useState(null);
 
     const playerId = character?.id;
-
-    function openCombat(request) {
-        setCombatRequest({ ...request, requestId: Date.now() });
-        setLeftTab(TAB.COMBAT);
-        setCenterTab(TAB.COMBAT);
-    }
 
     const loadAll = useCallback(async () => {
         if (!playerId) return;
@@ -165,10 +143,8 @@ export default function Dashboard({ initialCharacter, onLogout }) {
         inventory,
         jobs,
         stats,
-        combatRequest,
         loadAll,
         onLogout,
-        onOpenCombat: openCombat,
     };
 
     return (

@@ -2,7 +2,6 @@
 
 const NAV_ITEMS = [
     { key: 'MAIN',      label: 'Map', mark: 'MAP' },
-    { key: 'COMBAT',    label: 'Combat', mark: 'BAT' },
     { key: 'INVENTORY', label: 'Inventory', mark: 'BAG' },
     { key: 'QUEST',     label: 'Skills', mark: 'SP' },
     { key: 'CHAT',      label: 'Chat', mark: 'CHAT' },

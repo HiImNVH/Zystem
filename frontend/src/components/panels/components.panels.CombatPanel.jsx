@@ -152,12 +152,13 @@ function EnemyPortrait({ enemy }) {
     );
 }
 
-export default function CombatPanel({ character, inventory, combatRequest }) {
+export default function CombatPanel({ character, inventory, combatRequest, isResolving = false, onBack, onVictory, onDefeat }) {
     const [enemy, setEnemy] = useState(() => createEnemy(character, combatRequest));
     const [enemyHp, setEnemyHp] = useState(enemy.maxHp);
     const [playerHp, setPlayerHp] = useState(() => Math.max(1, parseInt(character?.current_hp) || parseInt(character?.max_hp) || 100));
     const [hitMarker, setHitMarker] = useState(50);
     const [markerDirection, setMarkerDirection] = useState(1);
+    const [combatStatus, setCombatStatus] = useState('fighting');
     const [logs, setLogs] = useState(['A hostile target is in front of you.']);
     const weapon = useMemo(() => getEquippedWeapon(inventory), [inventory]);
     const playerAttack = useMemo(() => getPlayerAttack(character, weapon), [character, weapon]);
@@ -191,6 +192,7 @@ export default function CombatPanel({ character, inventory, combatRequest }) {
         const nextEnemy = createEnemy(character, combatRequest);
         setEnemy(nextEnemy);
         setEnemyHp(nextEnemy.maxHp);
+        setCombatStatus('fighting');
         setLogs([`A ${nextEnemy.name} appears.`]);
     }
 
@@ -199,11 +201,12 @@ export default function CombatPanel({ character, inventory, combatRequest }) {
         setEnemy(nextEnemy);
         setEnemyHp(nextEnemy.maxHp);
         setPlayerHp(Math.max(1, parseInt(character?.current_hp) || parseInt(character?.max_hp) || 100));
+        setCombatStatus('fighting');
         setLogs([`A ${nextEnemy.name} appears.`]);
     }, [combatRequest?.requestId]);
 
-    function handleAction(action) {
-        if (enemyHp <= 0 || playerHp <= 0) return;
+    async function handleAction(action) {
+        if (enemyHp <= 0 || playerHp <= 0 || combatStatus !== 'fighting' || isResolving) return;
 
         const hit = getHitResult(Math.round(hitMarker));
         const damage = calculatePlayerDamage({ playerAttack, enemy, action, hit });
@@ -213,6 +216,8 @@ export default function CombatPanel({ character, inventory, combatRequest }) {
 
         if (nextEnemyHp <= 0) {
             pushLog(`You defeated ${enemy.name}.`);
+            setCombatStatus('resolving');
+            await onVictory?.();
             return;
         }
 
@@ -222,8 +227,13 @@ export default function CombatPanel({ character, inventory, combatRequest }) {
             return;
         }
 
-        setPlayerHp(current => Math.max(0, current - enemyDamage.damage));
+        const nextPlayerHp = Math.max(0, playerHp - enemyDamage.damage);
+        setPlayerHp(nextPlayerHp);
         pushLog(`You took ${enemyDamage.damage} damage from ${enemy.name}.`);
+        if (nextPlayerHp <= 0) {
+            setCombatStatus('defeated');
+            onDefeat?.();
+        }
     }
 
     return (
@@ -235,9 +245,15 @@ export default function CombatPanel({ character, inventory, combatRequest }) {
                         <h2 className="text-xl font-bold truncate">{enemy.name}</h2>
                         <p className="text-xs text-textMuted mt-1">Lv.{enemy.level} | {enemy.rank}</p>
                     </div>
-                    <button type="button" onClick={resetEnemy} className="btn-secondary px-3 py-2 text-xs">
-                        New Target
-                    </button>
+                    {onBack ? (
+                        <button type="button" onClick={onBack} className="btn-secondary px-3 py-2 text-xs">
+                            Back
+                        </button>
+                    ) : (
+                        <button type="button" onClick={resetEnemy} className="btn-secondary px-3 py-2 text-xs">
+                            New Target
+                        </button>
+                    )}
                 </div>
                 <div className="mt-3">
                     <div className="flex items-center justify-between text-[10px] font-semibold text-textMuted mb-1">
@@ -302,7 +318,7 @@ export default function CombatPanel({ character, inventory, combatRequest }) {
                             key={action.code}
                             type="button"
                             onClick={() => handleAction(action)}
-                            disabled={enemyHp <= 0 || playerHp <= 0}
+                            disabled={enemyHp <= 0 || playerHp <= 0 || combatStatus !== 'fighting' || isResolving}
                             className="card card-hover p-3 text-left disabled:opacity-50"
                         >
                             <span className="text-[10px] font-bold text-accent block">{action.mark}</span>
